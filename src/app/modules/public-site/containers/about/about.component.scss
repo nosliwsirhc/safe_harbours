@@ -1,0 +1,51 @@
+.about-header-image {
+    background-image: url('../../../../../assets/images/logo_64x64.png');
+    background-size: cover;
+}
+
+.chris-header-image {
+    background-image: url('../../../../../assets/images/chris-wilson-avatar.jpg');
+    background-size: cover;
+}
+
+.hilda-header-image {
+    background-image: url('../../../../../assets/images/hilda-wilson-avatar.jpg');
+    background-size: cover;
+}
+
+.hui-header-image {
+    background-image: url('../../../../../assets/images/hui-chen-avatar.jpg');
+    background-size: cover;
+}
+
+.thomas-header-image {
+    background-image: url('../../../../../assets/images/thomas-jones-avatar.jpg');
+    background-size: cover;
+}
+
+h1, h2, .mat-card-title {
+    font-size: 16px;
+    color: #54617a;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.subtitle {
+    color: #54617a;
+    font-size: 32px;
+    line-height: 48px;
+}
+
+p {
+    font-size: 16px;
+    line-height: 24px;
+    color: #6b7485;
+}
+
+h3 {
+    font-size: 22px;
+}
+
+a {
+    color: #000;
+}

@@ -1,0 +1,27 @@
+#stories {
+    background: white;
+}
+
+#stories .img-fluid {
+    border-radius: 4px;
+    box-shadow: 1px 2px 4px rgba(0,0,0,0.2);
+}
+
+h1, .card-title, .mat-card-title {
+    font-size: 16px;
+    color: #54617a;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.subtitle {
+    color: #54617a;
+    font-size: 32px;
+    line-height: 48px;
+}
+
+p {
+    font-size: 16px;
+    line-height: 24px;
+    color: #6b7485;
+}

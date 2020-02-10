@@ -1,0 +1,51 @@
+a {
+    color: #000;
+    text-decoration: underline;
+}
+
+h1, .question {
+    font-size: 16px;
+    color: #54617a;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.subtitle {
+    color: #54617a;
+    font-size: 32px;
+    line-height: 48px;
+}
+
+p, li {
+    font-size: 16px;
+    line-height: 24px;
+    color: #6b7485;
+}
+
+.mat-expansion-panel-header {
+    padding: 8px 24px !important;
+}
+
+u {
+    text-decoration: underline;
+  }
+
+  tr {
+    color: #6b7485;
+  }
+
+  th, td {
+    padding: 0.3rem;
+}
+
+.amount {
+    text-align: right;
+}
+
+.amount-header {
+    min-width: 100px;
+}
+
+.total {
+    border-top: 2px solid #aaa;
+}

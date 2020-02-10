@@ -1,0 +1,48 @@
+h1 {
+    font-size: 16px;
+    color: #54617a;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.subtitle {
+    color: #54617a;
+    font-size: 32px;
+    line-height: 48px;
+}
+
+.mat-card-title > a {
+    color: #54617a;
+    font-size: 29px;
+    font-weight: 300;
+    line-height: 35px;
+    text-align: center;
+    transition: color 0.5s;
+
+    &:hover {
+        color: #228ae6;
+    }
+}
+
+p, .mat-card-content {
+    font-size: 16px;
+    line-height: 24px;
+    color: #6b7485;
+}
+
+.mat-card-actions {
+    padding: 2rem !important;
+    color: rgb(158,158,158);
+}
+
+fa-icon {
+    margin-right: 0.5rem;
+}
+
+.published {
+    margin-left: 1rem;
+}
+
+img {
+    cursor: pointer;
+}

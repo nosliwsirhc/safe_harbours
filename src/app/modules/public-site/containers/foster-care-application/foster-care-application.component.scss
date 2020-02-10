@@ -1,0 +1,41 @@
+h1 {
+    font-size: 16px;
+    color: #54617a;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.subtitle {
+    color: #54617a;
+    font-size: 32px;
+    line-height: 48px;
+}
+
+p {
+    font-size: 16px;
+    line-height: 24px;
+    color: #6b7485;
+}
+
+a.internal-link, a.internal-link:hover {
+    color: #000;
+    text-decoration: underline;
+}
+
+.mat-radio-button ~ .mat-radio-button {
+    margin-left: 16px;
+}
+
+.child {
+    border: 1px solid teal;
+    border-radius: 4px;
+    padding: 1rem;
+}
+
+.mat-checkbox-layout {
+    white-space: normal !important;
+}
+
+.mat-checkbox-label {
+    margin-left: 0.75rem !important;
+}

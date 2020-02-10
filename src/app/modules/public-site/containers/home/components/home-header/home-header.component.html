@@ -1,0 +1,29 @@
+<header class="v-header" id="home">
+  <div class="fullscreen-video-wrap"></div>
+  <!-- <div class="header-overlay"></div> -->
+  <div class="header-content">
+    <div class="contrast">
+      <div class="title-area">
+        <img class="logo" src="assets/images/logo.png" alt="logo">
+        <div class="titles">
+          <h1>Safe Harbours</h1>
+          <h2 class="header-subtitle">Foster Care in Ontario</h2>
+        </div>
+      </div>
+      <div class="cta-buttons">
+        <a class="apply" [routerLink]="['/', 'apply-to-foster']">Apply To Foster</a>
+        <a class="learn" [routerLink]="['/', 'frequently-asked-questions']">Learn About Fostering</a>
+      </div>
+    </div>
+    <a class="scroll-link nav-scroll" (click)="scrollTo.emit('whatwedo')">
+      <svg class="mouse" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 76 130" preserveAspectRatio="xMidYMid meet">
+        <g fill="none" fill-rule="evenodd">
+          <rect width="70" height="118" x="1.5" y="1.5" stroke="#228ae6" fill="#FFF" stroke-width="3" rx="36" />
+          <circle class="scroll" cx="36.5" cy="31.5" r="4.5" fill="#228ae6" />
+        </g>
+      </svg>
+      <br>
+      <p style="color: #228ae6;">More Below</p>
+    </a>
+  </div>
+</header>

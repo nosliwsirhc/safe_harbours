@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 23.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 800 800" style="enable-background:new 0 0 800 800;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill-rule:evenodd;clip-rule:evenodd;fill:#1C8ADB;}
+	.st1{fill-rule:evenodd;clip-rule:evenodd;fill:#FFFFFF;filter:url(#Adobe_OpacityMaskFilter);}
+	.st2{mask:url(#f_1_);fill:url(#SVGID_1_);}
+	.st3{fill-rule:evenodd;clip-rule:evenodd;fill:#FFFFFF;filter:url(#Adobe_OpacityMaskFilter_1_);}
+	.st4{mask:url(#e_1_);fill:#FFFFFF;}
+</style>
+<circle color-rendering="auto" image-rendering="auto" shape-rendering="auto" class="st0" cx="400" cy="400" r="274.5"/>
+<defs>
+	<filter id="Adobe_OpacityMaskFilter" filterUnits="userSpaceOnUse" x="147.6" y="286.2" width="361.7" height="385.3">
+		<feColorMatrix  type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
+	</filter>
+</defs>
+<mask maskUnits="userSpaceOnUse" x="147.6" y="286.2" width="361.7" height="385.3" id="f_1_">
+	<circle color-rendering="auto" image-rendering="auto" shape-rendering="auto" class="st1" cx="400" cy="400" r="274.5"/>
+</mask>
+<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="414.4478" y1="373.1998" x2="234.9934" y2="193.7454" gradientTransform="matrix(1 0 0 -1 0 800)">
+	<stop  offset="0" style="stop-color:#000000;stop-opacity:0.42"/>
+	<stop  offset="1" style="stop-color:#000000;stop-opacity:0"/>
+</linearGradient>
+<path color-rendering="auto" image-rendering="auto" shape-rendering="auto" class="st2" d="M400,286.2c-18.3,0-34.8,7.6-46.5,19.9
+	L147.6,512c47.7,98.7,119.7,142.9,204,159.5l157.7-157.7c0-0.6,0.1-1.1,0.1-1.7c0-40.1-19.5-77.3-51.4-98.5h0
+	c-14.4,13.2-32.9,21.1-52.3,22.4c0,0,0,0,0,0l38.9-38.9c12.3-11.7,19.9-28.2,19.9-46.5C464.4,315,435.6,286.2,400,286.2L400,286.2z"
+	/>
+<defs>
+	<filter id="Adobe_OpacityMaskFilter_1_" filterUnits="userSpaceOnUse" x="290.7" y="286.2" width="218.5" height="227.7">
+		<feColorMatrix  type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
+	</filter>
+</defs>
+<mask maskUnits="userSpaceOnUse" x="290.7" y="286.2" width="218.5" height="227.7" id="e_1_">
+	<circle color-rendering="auto" image-rendering="auto" shape-rendering="auto" class="st3" cx="400" cy="400" r="274.5"/>
+</mask>
+<path color-rendering="auto" image-rendering="auto" shape-rendering="auto" class="st4" d="M400,286.2c-35.6,0-64.4,28.8-64.4,64.4
+	c0,35.6,28.8,64.4,64.4,64.4c35.6,0,64.4-28.8,64.4-64.4C464.4,315,435.6,286.2,400,286.2L400,286.2z M457.8,413.6
+	c-15.8,14.5-36.4,22.5-57.8,22.6c-21.4,0-42-8.1-57.7-22.5c-32,21.2-51.4,58.4-51.5,98.4c0,0.6,0,1.1,0.1,1.7h218.4
+	c0-0.6,0.1-1.1,0.1-1.7C509.2,472.1,489.8,434.9,457.8,413.6L457.8,413.6z"/>
+</svg>

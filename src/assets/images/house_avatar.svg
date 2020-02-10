@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 23.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 800 800" style="enable-background:new 0 0 800 800;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#1C8ADB;}
+	.st1{fill:#FFFFFF;filter:url(#Adobe_OpacityMaskFilter);}
+	.st2{opacity:0.42;mask:url(#a_1_);fill:url(#SVGID_1_);enable-background:new    ;}
+	.st3{fill:#FFFFFF;filter:url(#Adobe_OpacityMaskFilter_1_);}
+	.st4{mask:url(#b_1_);fill:#FFFFFF;}
+</style>
+<circle color-rendering="auto" shape-rendering="auto" image-rendering="auto" class="st0" cx="400" cy="400" r="302"/>
+<defs>
+	<filter id="Adobe_OpacityMaskFilter" filterUnits="userSpaceOnUse" x="113.6" y="242.7" width="447.7" height="459">
+		<feColorMatrix  type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
+	</filter>
+</defs>
+<mask maskUnits="userSpaceOnUse" x="113.6" y="242.7" width="447.7" height="459" id="a_1_">
+	<circle color-rendering="auto" shape-rendering="auto" image-rendering="auto" class="st1" cx="400" cy="400" r="302"/>
+</mask>
+<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="418.9756" y1="373.2916" x2="159.2934" y2="89.1624" gradientTransform="matrix(1 0 0 -1 0 800)">
+	<stop  offset="0" style="stop-color:#000000"/>
+	<stop  offset="1" style="stop-color:#000000;stop-opacity:0"/>
+</linearGradient>
+<path color-rendering="auto" shape-rendering="auto" image-rendering="auto" class="st2" d="M400,242.7l-93.8,84.9
+	c-70.9,62.5-133.1,123.7-192.7,184.6c42.1,111.4,123.4,183,269.1,189.6l143-143V422.4l35.6-33.8l-67.5-61L400,242.7z"/>
+<defs>
+	<filter id="Adobe_OpacityMaskFilter_1_" filterUnits="userSpaceOnUse" x="238.8" y="242.7" width="322.5" height="316">
+		<feColorMatrix  type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
+	</filter>
+</defs>
+<mask maskUnits="userSpaceOnUse" x="238.8" y="242.7" width="322.5" height="316" id="b_1_">
+	<circle color-rendering="auto" shape-rendering="auto" image-rendering="auto" class="st3" cx="400" cy="400" r="302"/>
+</mask>
+<path color-rendering="auto" shape-rendering="auto" image-rendering="auto" class="st4" d="M400,242.7l-93.8,84.9l-67.5,61h22.7
+	l61.8-55.9l76.7-69.5l76.8,69.5l61.8,55.9h22.7l-67.5-61L400,242.7z M400,274.9l-62.8,56.9l-62.8,56.8v170.1h83.5V426.8h84.3v131.9
+	h83.5V388.6l-62.8-56.8L400,274.9z M374.4,443.6v115.1h51.3V443.6H374.4z"/>
+</svg>

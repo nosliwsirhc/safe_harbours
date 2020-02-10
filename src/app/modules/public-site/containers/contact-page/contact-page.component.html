@@ -1,0 +1,68 @@
+<div class="container page-container" id="contact">
+    <div class="row">
+        <div class="col">
+            <h2>Contact Us About Foster Parenting</h2>
+            <p class="subtitle">All Questions Get Answered</p>
+        </div>
+    </div>
+    <div class="row contact">
+        <div class="col-12 col-md-6 col-lg-8 contact-form">
+            <p>We are always pleased to help people understand our programs talk about our
+                organization. If you are looking at becoming a foster parent in Ontario, looking for a home for
+                a youth, or simply have a question - contact us using any method you prefer below. We look
+                forward to hearing from you.</p>
+            <mat-divider class="mb-2"></mat-divider>
+            <form [formGroup]="contactForm" (ngSubmit)="submit()">
+                <mat-form-field appearance="outline">
+                    <mat-label>Name</mat-label>
+                    <input matInput type="text" placeholder="Your Name" formControlName="name">
+                    <mat-hint>Full name not required.</mat-hint>
+                </mat-form-field>
+                <div class="w-100"></div>
+                <mat-form-field appearance="outline">
+                    <mat-label>Email</mat-label>
+                    <input matInput type="email" placeholder="yourname@email.com" formControlName="email">
+                    <mat-hint>Double check address before sending.</mat-hint>
+                </mat-form-field>
+                <div class="w-100"></div>
+                <mat-form-field appearance="fill" class="mb-2">
+                    <mat-label>Message</mat-label>
+                    <textarea matInput cdkTextareaAutosize="true" formControlName="message"></textarea>
+                    <mat-hint>Please provide some details.</mat-hint>
+                </mat-form-field>
+                <re-captcha (resolved)="resolved($event)" siteKey="6LcZ9HUUAAAAAPADU07U8yCeA-0xn9gWDg3TsXhG"
+                    formControlName="token"></re-captcha>
+                <div class="w-100"></div>
+                <button mat-flat-button color="primary" type="submit" class="mt-4" [disabled]="!contactForm.valid || sendingMessage">{{submitText}}</button>
+            </form>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 contact-info">
+            <div class="mb-4">
+                <p class="subtitle">Phone</p>
+                <p>Tel: <a href="tel:800-610-3454">(800) 610-3454</a><br>
+                    Fax: (905) 635-1470</p>
+            </div>
+            <div>
+                <p class="subtitle">Email</p>
+                <p>
+                    <strong>Departments</strong><br>
+                    <a href="mailto:accounting@safeharbours.ca">Accounting</a><br>
+                    <a href="mailto:newhomes@safeharbours.ca">Home Recruitment</a><br>
+                    <a href="mailto:placement@safeharbours.ca">Placement Referrals</a><br>
+                </p>
+            </div>
+            <div class="mb-4">
+                <p class="subtitle">People</p>
+                <p>
+                    <a href="mailto:chriswilson@safeharbours.ca">Chris Wilson&nbsp;&nbsp;<span class="job-title">|&nbsp;&nbsp;Executive
+                        Director</span></a><br>
+                    <a href="mailto:thomas.jones@safeharbours.ca">Thomas Jones&nbsp;&nbsp;<span class="job-title">|&nbsp;&nbsp;Clinical Director</span></a><br>
+                    <a href="mailto:laura.rudolph@safeharbours.ca">Laura Rudolph&nbsp;&nbsp;<span class="job-title">|&nbsp;&nbsp;Resource Worker</span></a><br>
+                    Hui Chen&nbsp;&nbsp;<span class="job-title">|&nbsp;&nbsp;Administrator</span><br>
+                    Hilda Wilson&nbsp;&nbsp;<span class="job-title">|&nbsp;&nbsp;Home Study Practitioner</span><br>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<read-more [links]="links"></read-more>

@@ -1,0 +1,49 @@
+mat-card {
+    cursor: pointer;
+    transition: color 0.5s, background 0.5s, box-shadow 0.5s;
+    background: #eee;
+
+    &.active-link {
+        box-shadow: 0 6px 12px rgba(100,100,100,0.5);
+        background: #228ae6;
+
+        .mat-card-title {
+            color: white;
+        }
+
+        .mat-card-subtitle {
+            color: white;
+        }
+
+        .mat-card-content {
+            color: white;
+        }
+
+        button {
+            color: white;
+        }
+    }
+}
+
+a.active-link {
+    background: rgba(0,0,0,0.2);
+}
+
+h1, .mat-card-title {
+    font-size: 16px;
+    color: #54617a;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.subtitle {
+    color: #54617a;
+    font-size: 32px;
+    line-height: 48px;
+}
+
+p {
+    font-size: 16px;
+    line-height: 24px;
+    color: #6b7485;
+}

@@ -1,0 +1,95 @@
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import '~bootstrap/scss/bootstrap-reboot';
+@import '~bootstrap/scss/bootstrap-grid';
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+* {
+    &:active,
+    :focus {
+      outline: none !important;
+    }
+}
+
+p {
+    font-size: 16px;
+    line-height: 24px;
+}
+
+a {
+    color: white;
+}
+
+a:hover {
+    color: #ccc;
+    text-decoration: none;
+}
+
+.page-container {
+    background: rgb(246, 250, 253);
+    padding: 2rem;
+    margin-top: 96px;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+
+    &.flush {
+        border-radius: 0;
+        margin-top: 64px;
+    }
+}
+
+.g-recaptcha {
+    margin-top: 1rem;
+}
+
+.menu-backdrop {
+    background-color: rgba(246, 250, 253, 0.9);
+}
+
+.mat-menu-item {
+    color: #000;
+
+    &.active-link {
+        color: white;
+        background: #228ae6;
+
+        &:hover {
+            color: white;
+            background: #228ae6;
+        }
+    }
+}
+
+.mat-card-content {
+    padding: .75rem;
+}
+
+.dropzone { 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column; 
+    min-width: 80vw;
+    font-weight: 200;
+    height: 200px;
+    border: 2px dashed #f16624;
+    border-radius: 5px;
+    background: white;
+    margin: 10px 0;
+  
+    &.hovering {
+        border: 2px solid #f16624;
+        color: #dadada !important;
+    }
+  
+    .file-label {
+        font-size: 1.2em;
+    }
+  }
+  
+  progress::-webkit-progress-value {
+    transition: width 0.1s ease;
+  }

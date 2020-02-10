@@ -1,0 +1,14 @@
+<div class="container page-container">
+  <mat-card *ngIf="(article$ | async) as article" class="container">
+    <img *ngIf="article?.imgUrl" mat-card-image [src]="article.imgUrl" alt="article.imgAlt">
+    <mat-card-content class="row">
+      <div class="col">
+        <article>
+          <h1>{{article.title}}</h1>
+          <p class="byline">Published {{article.publishedDate | date}}</p>
+          <div [innerHTML]="article.content | safeHtml"></div>
+        </article>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

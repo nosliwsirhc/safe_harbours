@@ -1,0 +1,58 @@
+// .contact-wrapper {
+//     background: rgb(246, 250, 253);
+
+    h2 {
+        font-size: 16px;
+        color: #54617a;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .subtitle {
+        color: #54617a;
+        font-size: 32px;
+        line-height: 48px;
+    }
+
+    p {
+        font-size: 16px;
+        line-height: 24px;
+        color: #6b7485;
+    }
+    
+    .contact {
+    
+        border-radius: 0.25rem;
+        background: white;
+        box-shadow: 0 2px 4px #54617a;
+        margin: 0 auto;
+    
+        mat-divider {
+            margin-bottom: 1rem;
+        }
+    
+        .contact-form {
+            padding: 1.5rem 2rem;
+        
+            mat-form-field {
+                width: 100%;
+            }
+        }
+    
+        .contact-info {
+            padding: 1.5rem 2rem;
+            background: #228ae6;
+            color: white;
+            border-radius: 0 0.25rem 0.25rem 0;
+    
+            p {
+                color: white;
+            }
+        }
+
+        .job-title {
+            font-size: 12px;
+        }
+    
+    }
+// }

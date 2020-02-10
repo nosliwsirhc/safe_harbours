@@ -1,0 +1,42 @@
+.container-fluid {
+    background: rgb(246, 250, 253);
+    color: #333;
+    padding: 0.5rem 0 1.5rem 0;
+
+    h2 {
+        font-size: 16px;
+        color: #54617a;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .subtitle {
+        color: #54617a;
+        font-size: 32px;
+        line-height: 48px;
+    }
+
+    p {
+        font-size: 16px;
+        line-height: 24px;
+        color: #6b7485;
+    }
+
+    .responsive {
+        width: 90%;
+        height: auto;
+    }
+
+    .styled {
+        border-radius: 6px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+        position: relative;
+        top: 20px;
+    }
+}
+
+@media only screen and (min-width: 960px) {
+    .styled.left {
+        transform: rotate(-5deg);
+    }
+}

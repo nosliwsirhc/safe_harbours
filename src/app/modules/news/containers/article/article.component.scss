@@ -1,0 +1,61 @@
+article {
+    h1 {
+        color: #54617a;
+        font-size: 2.1rem;
+        line-height: 2.5rem;
+        font-weight: 300;
+        word-wrap: break-word;
+        text-rendering: optimizeLegibility;
+    }
+
+    h2{
+        margin-top: 2rem;
+        color: #54617a;
+        font-size: 1.8rem;
+    }
+
+    h3{
+        margin-top: 2rem;
+        color: #54617a;
+        font-size: 1.6rem;
+    }
+
+    h4{
+        margin-top: 2rem;
+        color: #54617a;
+        font-size: 1.4rem;
+        line-height: 40px;
+    }
+    
+    .byline{
+        font-size: 16px;
+        font-weight: 300;
+        color: #54617a;
+        margin-bottom: 1.5rem;
+    }
+
+    ul{
+        margin: 0.5rem 0;
+    }
+
+    li{
+        color: #54617a;
+        font-size: 16px;
+        margin-bottom: 0.5rem;
+    }
+    
+    p{
+        font-size: 16px;
+        line-height: 24px;
+        color: #6b7485;
+    }
+    
+    a{
+        color: #6b7485;
+        text-decoration: underline;
+    
+        &:hover {
+            color: #737a86;
+        }
+    }
+}

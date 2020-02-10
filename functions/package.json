@@ -1,0 +1,45 @@
+{
+  "name": "functions",
+  "scripts": {
+    "lint": "tslint --project tsconfig.json",
+    "build": "tsc",
+    "serve": "npm run build && firebase serve --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "@angular/animations": "^7.2.0",
+    "@angular/core": "~7.2.0",
+    "@angular/common": "~7.2.0",
+    "@angular/compiler": "~7.2.0",
+    "@angular/http": "~7.2.0",
+    "@angular/platform-browser": "~7.2.0",
+    "@angular/platform-browser-dynamic": "~7.2.0",
+    "@angular/platform-server": "~7.2.0",
+    "@nguniversal/common": "^7.0.2",
+    "@nguniversal/express-engine": "^7.0.2",
+    "@nguniversal/module-map-ngfactory-loader": "^7.0.2",
+    "@sendgrid/mail": "^6.3.1",
+    "@types/grecaptcha": "^2.0.36",
+    "@types/request-promise": "^4.1.42",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "firebase-admin": "~6.0.0",
+    "firebase-functions": "^2.1.0",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.2",
+    "rxjs": "^6.3.3",
+    "zone.js": "~0.8.27"
+  },
+  "devDependencies": {
+    "tslint": "~5.8.0",
+    "typescript": "~2.8.3"
+  },
+  "private": true,
+  "engines": {
+    "node": "8"
+  }
+}

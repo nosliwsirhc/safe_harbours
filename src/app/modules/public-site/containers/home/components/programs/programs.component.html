@@ -1,0 +1,71 @@
+<div class="container py-5">
+  <div class="row">
+    <div class="col mb-2">
+      <h2>FOSTER CARE PROGRAMS</h2>
+      <p class="subtitle">Support Across a Spectrum of Care</p>
+    </div>
+  </div>
+  <div class="w-100"></div>
+  <div class="row">
+    <div class="col-12 col-lg-4 my-2 my-lg-0">
+      <mat-card>
+        <mat-card-title-group>
+          <mat-card-title>Mainstream</mat-card-title>
+          <mat-card-subtitle>Low Needs Program</mat-card-subtitle>
+        </mat-card-title-group>
+        <img mat-card-image src="assets/images/mainstream-card.jpg" alt="Mainstream Program">
+        <mat-card-content>
+          <p>
+            All Ontario foster children come into care with some degree of trauma and unique considerations. Foster care programs must take this trauma into consideration regarding training, placement choices and the family dynamics of the foster home.
+          </p>
+          <p>
+              Children in our Mainstream Program have a low degree of trauma-related behaviours.
+          </p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button color="primary" [routerLink]="['/', 'programs', 'mainstream-foster-care']">More...</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+    <div class="col-12 col-lg-4 my-2 my-lg-0">
+      <mat-card>
+        <mat-card-title-group>
+          <mat-card-title>Trauma-Focused</mat-card-title>
+          <mat-card-subtitle>Moderate Needs Program</mat-card-subtitle>
+        </mat-card-title-group>
+        <img mat-card-image src="assets/images/trauma-card.jpg" alt="Trauma-Focused Program">
+        <mat-card-content>
+          <p>
+            There has been a significant increase in the need for trauma-focused foster homes in recent years. These trauma-focused foster parents have either an educational or work background with children's mental health.
+          </p>
+          <p>
+            Foster parents with training and experience may also foster children with PTSD.
+          </p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button color="primary" [routerLink]="['/', 'programs', 'trauma-focused-foster-care']">More...</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+    <div class="col-12 col-lg-4 my-2 my-lg-0">
+      <mat-card>
+        <mat-card-title-group>
+          <mat-card-title>Behavioural</mat-card-title>
+          <mat-card-subtitle>High Needs Program</mat-card-subtitle>
+        </mat-card-title-group>
+        <img mat-card-image src="assets/images/behavioural-card.jpg" alt="Behavioural Program">
+        <mat-card-content>
+          <p>
+            A large number of children and youth in care suffer from complex trauma(s). At-risk behaviours such as self-harm, substance abuse, interactions with law enforcement, etc. are common among the youth placed in this program.
+          </p>
+          <p>
+            These youth require a support plan which includes intensive help from trained professionals.
+          </p>
+        </mat-card-content>
+        <mat-card-actions>
+            <button mat-button color="primary" [routerLink]="['/', 'programs', 'behavioural-foster-care']">More...</button>
+        </mat-card-actions>
+    </mat-card>
+    </div>
+  </div>
+</div>

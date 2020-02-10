@@ -1,0 +1,69 @@
+<div class="container page-container">
+  <div class="row mb-4">
+    <div class="col">
+      <h1>FOSTER CARE PROGRAMS</h1>
+      <p class="subtitle">Support Across a Spectrum of Care</p>
+    </div>
+  </div>
+  <div class="w-100"></div>
+  <!-- Only Visible on Large Displays -->
+  <div class="row d-none d-lg-flex">
+    <div class="col">
+      <mat-card [routerLink]="['/', 'programs', 'mainstream-foster-care']" routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{exact: true}">
+              <img mat-card-image src="assets/images/mainstream-card.jpg" alt="Mainstream Program">
+        <mat-card-title-group>
+          <mat-card-title>Mainstream</mat-card-title>
+          <mat-card-subtitle>Low Needs Program</mat-card-subtitle>
+        </mat-card-title-group>
+      </mat-card>
+    </div>
+    <div class="col">
+      <mat-card [routerLink]="['/', 'programs', 'trauma-focused-foster-care']" routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{exact: true}">
+              <img mat-card-image src="assets/images/trauma-card.jpg" alt="Trauma-Focused Program">
+        <mat-card-title-group>
+          <mat-card-title>Trauma-Focused</mat-card-title>
+          <mat-card-subtitle>Moderate Needs Program</mat-card-subtitle>
+        </mat-card-title-group>
+      </mat-card>
+    </div>
+    <div class="col">
+      <mat-card [routerLink]="['/', 'programs', 'behavioural-foster-care']" routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{exact: true}">
+        <img mat-card-image src="assets/images/behavioural-card.jpg" alt="Behavioural Program">
+        <mat-card-title-group>
+          <mat-card-title>Behavioural</mat-card-title>
+          <mat-card-subtitle>High Needs Program</mat-card-subtitle>
+        </mat-card-title-group>
+       </mat-card>
+    </div>
+  </div>
+  <!-- Only Visible on Small Displays -->
+  <div class="row d-lg-none">
+    <div class="col">
+      <mat-nav-list>
+        <a mat-list-item [routerLink]="['/', 'programs', 'mainstream-foster-care']" routerLinkActive="active-link"
+          [routerLinkActiveOptions]="{exact: true}">
+          <span>Mainstream Program</span>
+          <span style="flex: 1 1 auto;"></span>
+          <mat-icon>touch_app</mat-icon>
+        </a>
+        <a mat-list-item [routerLink]="['/', 'programs', 'trauma-focused-foster-care']" routerLinkActive="active-link"
+          [routerLinkActiveOptions]="{exact: true}">
+          <span>Trauma-Focused Program</span>
+          <span style="flex: 1 1 auto;"></span>
+          <mat-icon>touch_app</mat-icon>
+        </a>
+        <a mat-list-item [routerLink]="['/', 'programs', 'behavioural-foster-care']" routerLinkActive="active-link"
+          [routerLinkActiveOptions]="{exact: true}">
+          <span>Behavioural Program</span>
+          <span style="flex: 1 1 auto;"></span>
+          <mat-icon>touch_app</mat-icon>
+        </a>
+      </mat-nav-list>
+    </div>
+  </div>
+  <router-outlet></router-outlet>
+</div>
+<read-more [links]="links"></read-more>

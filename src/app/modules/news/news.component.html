@@ -1,0 +1,24 @@
+<div class="container page-container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Foster Care Articles and News</h1>
+      <p class="subtitle">Stay Informed About Ontario Foster Care</p>
+    </div>
+  </div>
+  <mat-divider class="mb-4"></mat-divider>
+  <div class="row">
+    <div class="col-12 col-md-6 col-lg-4 my-3" *ngFor="let article of articles$ | async">
+      <mat-card>
+        <img *ngIf="article?.imgUrl" mat-card-image [src]="article.imgUrl" alt="article.imgAlt" [routerLink]="['/', 'news', article.id]">
+        <mat-card-title><a [routerLink]="['/', 'news', article.id]">{{article.title}}</a></mat-card-title>
+        <mat-card-content>
+          {{article.description}}
+        </mat-card-content>
+        <mat-divider></mat-divider>
+        <mat-card-actions>
+          <span class="author"><fa-icon [icon]="faUser"></fa-icon>&nbsp;{{article.author}}</span><span class="published"><fa-icon [icon]="faClock"></fa-icon>&nbsp;{{article.publishedDate | date}}</span>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,44 @@
+.container-fluid {
+    padding: 0.5rem 0 1.5rem 0;
+    -webkit-box-shadow: inset 0px 4px 4px 0px rgba(34,138,230,0.2);
+    -moz-box-shadow: inset 0px 4px 4px 0px rgba(34,138,230,0.2);
+    box-shadow: inset 0px 4px 4px 0px rgba(34,138,230,0.2);
+
+    h2 {
+        font-size: 16px;
+        color: #54617a;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .subtitle {
+        color: #54617a;
+        font-size: 32px;
+        line-height: 48px;
+    }
+
+    p {
+        font-size: 16px;
+        line-height: 24px;
+        color: #6b7485;
+    }
+
+    .responsive {
+        width: 90%;
+        height: auto;
+    }
+
+    .styled {
+        border-radius: 6px;
+        box-shadow: 0 8px 16px rgba(100,100,100,0.5);
+        position: relative;
+        top: 20px;
+    }
+}
+
+
+@media only screen and (min-width: 960px) {
+    .styled.right {
+        transform: rotate(5deg);
+    }
+}

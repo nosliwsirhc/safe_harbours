@@ -1,0 +1,106 @@
+<div class="container page-container">
+  <div class="row">
+    <div class="col">
+      <h2>Compose Article</h2>
+    </div>
+  </div>
+  <form [formGroup]="articleForm" class="row">
+
+    <mat-form-field appearance="fill" class="col-12 mb-2">
+      <mat-label>Title</mat-label>
+      <input matInput type="text" placeholder="My Article Title" formControlName="title">
+      <mat-hint>{{titleLength$ | async}}/60 Characters</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field class="col-12 mb-2" appearance="fill">
+      <mat-label>Description</mat-label>
+      <input matInput type="text" formControlName="description">
+      <mat-hint>{{descriptionLength$ | async}}/155 Characters</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field class="col-12 mb-2" appearance="fill">
+      <mat-label>Keyword(s)</mat-label>
+      <mat-chip-list #chipList>
+        <mat-chip *ngFor="let keyword of keywords" [selectable]="selectable" [removable]="removable" (removed)="remove(keyword)">
+          {{keyword}}
+          <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+        </mat-chip>
+        <input [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+          [matChipInputAddOnBlur]="addOnBlur" (matChipInputTokenEnd)="add($event)">
+      </mat-chip-list>
+    </mat-form-field>
+
+    <mat-form-field class="col-12 mb-2" appearance="fill">
+      <mat-label>Slug</mat-label>
+      <input matInput type="text" formControlName="slug">
+    </mat-form-field>
+
+    <mat-form-field class="col-12 col-md-6 mb-2" appearance="fill">
+      <mat-label>Image URL</mat-label>
+      <input matInput type="text" formControlName="imgUrl">
+    </mat-form-field>
+
+    <mat-form-field class="col-12 col-md-6 mb-2" appearance="fill">
+      <mat-label>Image Alt Text</mat-label>
+      <input matInput type="text" formControlName="imgAlt">
+    </mat-form-field>
+
+    <mat-form-field class="col-12 col-md-6 mb-2" appearance="fill">
+      <mat-label>Published Date</mat-label>
+      <input matInput [matDatepicker]="publishedTime" formControlName="publishedTime">
+      <mat-datepicker-toggle matSuffix [for]="publishedTime"></mat-datepicker-toggle>
+      <mat-datepicker #publishedTime></mat-datepicker>
+    </mat-form-field>
+
+    <div [froalaEditor] class="col-12 mb-2" formControlName="content"></div>
+
+    <div class="dropzone col-6" dropZone (hovered)="toggleHover($event)" (dropped)="startUpload($event)"
+      [class.hovering]="isHovering">
+      <h3>Header Image</h3>
+      <div class="file">
+        <label class="file-label">
+          <input class="file-input" type="file" (change)="startUpload($event.target.files)">
+          <span class="file-cta">
+            <span class="file-icon">
+              <fa-icon [icon]="faUpload"></fa-icon>
+            </span>
+            <span class="file-label">
+              or choose a file…
+            </span>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <div *ngIf="percentage | async as pct" class="col-12">
+
+      <progress class="progress is-info" [value]="pct" max="100">
+      </progress>
+
+      {{ pct | number }}%
+
+    </div>
+
+
+    <!-- <div *ngIf="snapshot | async as snap" class="col-12">
+      {{ snap.bytesTransferred | fileSize }} of {{ snap.totalBytes | fileSize }}
+
+      <div *ngIf="downloadURL | async as url">
+        <h3>Results!</h3>
+        <img [src]="url"><br>
+        <a [href]="url" target="_blank" rel="noopener">Download Me!</a>
+      </div>
+
+      <button (click)="task.pause()" class="button is-warning" [disabled]="!isActive(snap)">Pause</button>
+      <button (click)="task.cancel()" class="button is-danger" [disabled]="!isActive(snap)">Cancel</button>
+      <button (click)="task.resume()" class="button is-info" [disabled]="!(snap?.state === 'paused')">Resume</button>
+
+    </div> -->
+
+    <div class="col-12">
+      <button mat-flat-button color="primary" (click)="publish()">Publish</button>
+      <button mat-flat-button color="accent" (click)="save()">Save</button>
+    </div>
+
+  </form>
+</div>

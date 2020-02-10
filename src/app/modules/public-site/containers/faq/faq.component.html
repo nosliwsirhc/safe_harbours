@@ -1,0 +1,413 @@
+<div class="container page-container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Foster Care Frequently Asked Questions</h1>
+            <p class="subtitle">Have a Question? <strong>Ask</strong> Us.</p>
+        </div>
+    </div>
+    <mat-divider class="mb-2"></mat-divider>
+    <div class="row">
+        <div class="col-12">
+            <p>Click on a question below to see the answer. Another click will close the
+                answer. If you have any other questions, <a [routerLink]="['/contact']">please contact us</a>.</p>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col">
+            <mat-accordion>
+                <mat-expansion-panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <h3 class="question">Q: What are the requirements to become a foster parent?</h3>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <p>
+                        There are no barriers to become a foster parent based on race, ethnicity, sexuality or gender.
+                        Foster parents are expected to be tolerant and supportive of children in their care regardless
+                        of their background or identity.
+                    </p>
+                    <p>
+                        You, and any other adult in the home, MUST have:
+                    </p>
+                    <ul>
+                        <li>A clear criminal background check</li>
+                        <li>No verified child welfare investigations</li>
+                        <li>No unmanaged health issues</li>
+                        <li>No addiction issues</li>
+                        <li>Stable income and manageable debt</li>
+                        <li>Clear understanding of English</li>
+                        <li>Reading and writing comprehension</li>
+                        <li>Willing to attend all mandatory training</li>
+                    </ul>
+                    <p>
+                        Apart from these requirements, the most important requirement is a capacity to care for all
+                        children in loving and nurturing manner.
+                    </p>
+
+                    <mat-action-row>
+                        <button mat-button color="warn" (click)="prevStep()">Previous</button>
+                        <button mat-button color="primary" (click)="nextStep()">Next</button>
+                    </mat-action-row>
+
+                </mat-expansion-panel>
+
+                <mat-expansion-panel [expanded]="step === 1" (opened)="setStep(1)" hideToggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <h3 class="question">Q: What type and size of home do I need to foster?</h3>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <p>
+                        Typically, you need one free bedroom with a closet and window on the main sleeping level of the
+                        home. However, we prefer homes which have two free bedrooms in the event a second youth
+                        matching the home's care profile is referred to Safe Harbours.
+                    </p>
+                    <p>
+                        Townhomes, semi-detached and detached homes are the only configurations we accept. The area of
+                        the home should be approximately 1800 sq. ft. or higher. The property should be clear of
+                        hazardous items such as exposed nails, fire hazards, unfenced swimming pools, etc.
+                    </p>
+                    <p>
+                        Each home should have a common recreational room where everyone can spend time together.
+                    </p>
+
+                    <mat-action-row>
+                        <button mat-button color="warn" (click)="prevStep()">Previous</button>
+                        <button mat-button color="primary" (click)="nextStep()">Next</button>
+                    </mat-action-row>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel [expanded]="step === 2" (opened)="setStep(2)" hideToggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <h3 class="question">Q: Can a single person become a foster parent?</h3>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <p>Safe Harbours does <u>not</u> consider single parent homes. Other organizations may take on single applicants, however, we do not.
+                        The reason for refusing single applicants is that there needs to be another adult who earns a
+                        stable income. Single applicants tend to depend on the foster care per diem for income which is
+                        not its purpose.</p>
+
+                    <mat-action-row>
+                        <button mat-button color="primary" (click)="nextStep()">Next</button>
+                    </mat-action-row>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel [expanded]="step === 3" (opened)="setStep(3)" hideToggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <h3 class="question">Q: Can I still have a job and foster children?</h3>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <p>
+                        Safe Harbours prefers to have foster homes where at least <u>one</u> caregiver stays at home. The amount of
+                        time needed to attend appointments and meetings, as well as unexpected emergencies such as
+                        illness or school closures / suspensions, can be quite a lot to handle.
+                    </p>
+                    <p>
+                        For these reasons we <u>do not</u>> accept applications from homes where both adult caregivers are
+                        employed. That being said, if you still wish to foster you may apply with your local Children's
+                        Aid Society or Family and Child Services organization.
+                    </p>
+
+                    <mat-action-row>
+                        <button mat-button color="primary" (click)="nextStep()">Next</button>
+                    </mat-action-row>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel [expanded]="step === 4" (opened)="setStep(4)" hideToggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <h3 class="question">Q: How long is the approval process?</h3>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <p>For Safe Harbours, our target is between 2 - 3 months, depending on a few factors. Caring for
+                        higher needs youth will require more training. Speed of background checks varies by region.</p>
+                    <p>
+                        See "What are the steps to become a foster parent?" below.
+                    </p>
+
+                    <mat-action-row>
+                        <button mat-button color="warn" (click)="prevStep()">Previous</button>
+                        <button mat-button color="primary" (click)="nextStep()">Next</button>
+                    </mat-action-row>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel [expanded]="step === 5" (opened)="setStep(5)" hideToggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <h3 class="question">Q: What are the steps to become a foster parent?</h3>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <p>
+                        Below is a list of the paperwork and steps required to open your home to foster with Safe Harbours. Beside
+                        each item is an expected time to completion - times may vary by region or other reasons.
+                    </p>
+
+                    <ol>
+                        <li>Initial Phone Call // 20 Minutes to 1 Hour</li>
+                        <li>Initial Home Visit // 1 Hour</li>
+                        <li>Vulnerable Sector Police Check // 1 Day to 4 Weeks</li>
+                        <li>Child Welfare Investigation Check // 2 to 12 Weeks</li>
+                        <li>Medical Clearance // 1 Week</li>
+                        <li>Five (5) Letters of Reference // 2 - 4 Weeks</li>
+                        <li>Driver's Abstract // 1 Day to 2 Weeks</li>
+                        <li>Proof of Auto Insurance // No Wait</li>
+                        <li>Proof of Home Insurance // No Wait</li>
+                        <li>Well Water Test Result (if applicable) // 1 - 2 Weeks</li>
+                        <li>Pet Vaccination Records (if applicable) // 1 - 2 Weeks</li>
+                        <li>Income Verification via Tax Records // 1 Day</li>
+                        <li>Pre-Service Training // 40 Hours</li>
+                        <li>Home Study (three or more visits) // 1 - 1&#189; Months</li>
+                    </ol>
+
+                    <p>
+                        Steps 3-12 are done concurrently. Training can begin once all previous items have been
+                        collected and approved. When training is near completion, the Home Study can begin.
+                    </p>
+
+                    <mat-action-row>
+                        <button mat-button color="warn" (click)="prevStep()">Previous</button>
+                        <button mat-button color="primary" (click)="nextStep()">Next</button>
+                    </mat-action-row>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel [expanded]="step === 6" (opened)="setStep(6)" hideToggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <h3 class="question">Q: What is a Home Study?</h3>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <p>
+                        The Home Study is an extensive document that is created detailing your family makeup, history
+                        and parenting styles. It is an essential document for fostering and no home may open in Ontario
+                        without one. Some people find the questions of the Home Study to be very personal which can
+                        cause some discomfort. If you are very private, consider that questions about your
+                        relationships and family history will come up before you apply to become a foster parent.
+                    </p>
+                    <p>
+                        Safe Harbours uses the SAFE (Structured Analysis Family Evaluation) model for all Home Studies.
+                        This requires a minimum of three interviews at the potential foster home lasting about one hour
+                        each. NOTE: Foster parents may review the Home Study for errors or omissions, however, it is
+                        the property of Safe Harbours and parents will NOT be given a copy to keep.
+                    </p>
+
+                    <mat-action-row>
+                        <button mat-button color="warn" (click)="prevStep()">Previous</button>
+                        <button mat-button color="primary" (click)="nextStep()">Next</button>
+                    </mat-action-row>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel [expanded]="step === 7" (opened)="setStep(7)" hideToggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <h3 class="question">Q: How much money are foster parents paid?</h3>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <p>
+                        Foster parents don't earn a typical income. They are given a set amount of money per day for
+                        each child they care for, called a "per diem". From the per diem, foster parents must buy food,
+                        clothing, miscellaneous daily care items, reasonably costed recreational/arts programs, etc. The
+                        per diem is not viewed as a form of compensation. Foster parenting is not a job and foster
+                        parents are not employees. It is expected that foster parents pay for all the child's needs from
+                        the per diem. There are high cost items which are reimbursed (see next Q&A item).
+                    </p>
+                    <p>
+                        Foster homes are required to spend their own money to make their home suitable to accept
+                        children. These items may include the purchase of beds, filing cabinets, medication lockbox,
+                        smoke detectors, privacy locks, etc.
+                    </p>
+                    <p>
+                        Across Ontario, the typical per diem ranges from $45 - $70 with some slightly higher or lower.
+                        Safe Harbours' per diem offers a premium to this average to help support stay-at-home parents
+                        (homes must still have two adult caregivers). The base per diem ranges from $75-95 (this is
+                        daily for each child) plus $5 for following the rules/regulations and attending training and
+                        finally $10 to pay for overnight care (respite which is time off basically). The total financial
+                        support adds up to $90-$110 depending on prior experience being foster parents and the <a
+                            [routerLink]="['/', 'programs', 'mainstream-foster-care']">care program</a> that the child
+                        utilizes.
+                    </p>
+                    <p>
+                        For more detail on the per diem please visit the <a
+                            [routerLink]="['/', 'foster-care-per-diem']">Foster Care Per Diem</a> page. There you will
+                        find much more detail about how it is not taxable, expectations of how it's spent and more.
+                    </p>
+
+                    <mat-action-row>
+                        <button mat-button color="warn" (click)="prevStep()">Previous</button>
+                        <button mat-button color="primary" (click)="nextStep()">Next</button>
+                    </mat-action-row>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel [expanded]="step === 8" (opened)="setStep(8)" hideToggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <h3 class="question">Q: Why do foster parents receive a per diem?</h3>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <p>
+                        Raising children comes with a number of costs. To name a few main expenses:
+                    </p>
+                    <ul>
+                        <li>Food</li>
+                        <li>Clothing</li>
+                        <li>Bedding</li>
+                        <li>School Fees</li>
+                        <li>Travel</li>
+                        <li>Recreational/Artistic Activities</li>
+                        <li>March Break and Summer Camps</li>
+                        <li>Gifts (birthdays, holidays, etc.)</li>
+                        <li>Misc. (phones, haircuts, toothpaste, allowances, etc.)</li>
+                    </ul>
+                    <p>
+                        The per diem is given to foster homes to cover the cost of these items. Here is a breakdown of how much
+                        of the per diem should, at minimum, be used to cover these expenses (these are based on the total for an
+                        average 30-day month and actual monthly costs will vary:
+                    </p>
+                    <table>
+                        <tr>
+                            <th>Item</th>
+                            <th class="amount amount-header">Amount ($)</th>
+                        </tr>
+                        <tr>
+                            <td>Food</td>
+                            <td class="amount">540</td>
+                        </tr>
+                        <tr>
+                            <td>Clothing</td>
+                            <td class="amount">120</td>
+                        </tr>
+                        <tr>
+                            <td>School Fees</td>
+                            <td class="amount">25</td>
+                        </tr>
+                        <tr>
+                            <td>Travel</td>
+                            <td class="amount">95</td>
+                        </tr>
+                        <tr>
+                            <td>Recreational/Artistic Activities</td>
+                            <td class="amount">90</td>
+                        </tr>
+                        <tr>
+                            <td>March Break and Summer Camps</td>
+                            <td class="amount">65</td>
+                        </tr>
+                        <tr>
+                            <td>Gifts</td>
+                            <td class="amount">45</td>
+                        </tr>
+                        <tr>
+                            <td>Misc.</td>
+                            <td class="amount">120</td>
+                        </tr>
+                        <tr class="total">
+                            <td><strong>TOTAL</strong></td>
+                            <td class="amount"><strong>1100</strong></td>
+                        </tr>
+                        <tr>
+                            <td>*Food is set higher than average allowing for special dietary needs which may come up and for
+                                homes who use organic ingredients.</td>
+                        </tr>
+                    </table>
+                    <p style="margin-top: 1rem;">
+                        It is important to note that you may spend more in one month on clothes and less in other months. Same
+                        goes for all the other categories. Clothing must be purchased new and of the same quality as your own
+                        children, if applicable, with the exception of infant clothing which is in good condition with no
+                        stains.
+                    </p>
+
+                    <mat-action-row>
+                        <button mat-button color="warn" (click)="prevStep()">Previous</button>
+                        <button mat-button color="primary" (click)="nextStep()">Next</button>
+                    </mat-action-row>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel [expanded]="step === 9" (opened)="setStep(9)" hideToggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <h3 class="question">Q: Which items are reimbursed?</h3>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <ul>
+                        <li>Dental (covered by CAS insurance)</li>
+                        <li>Prescriptions (covered by CAS insurance)</li>
+                        <li>Medical devices</li>
+                        <li>Intake initial clothing (typically $200)</li>
+                        <li>Airfare (in many cases)</li>
+                        <li>Other items not related to typical daily care (case-by-case)</li>
+                    </ul>
+
+                    <mat-action-row>
+                        <button mat-button color="warn" (click)="prevStep()">Previous</button>
+                        <button mat-button color="primary" (click)="nextStep()">Next</button>
+                    </mat-action-row>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel [expanded]="step === 10" (opened)="setStep(10)" hideToggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <h3 class="question"> Q: What kind of support is available?</h3>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <p>
+                        All of our programs come with clinical support hours. If those are no longer needed, they can
+                        be used for extra respite ("time off") or more support hours from a Child and Youth Worker
+                        (CYW) - whichever is more beneficial to the youth and home dynamic. Homes are also assigned a
+                        Resource Worker to help keep filing in order, stay compliant with regulations, assist in case
+                        management, etc.
+                    </p>
+                    <p>
+                        Youth in our Trauma and Behavioural programs also have an in-house <a
+                            [routerLink]="['/', 'about']">Clinical Director</a> attached
+                        to their file to help guide them to local mental health resources and ensure that Safe Harbours
+                        is acquiring the best services possible for each youth.
+                    </p>
+                    <p>
+                        With the exception of the Mainstream program, there are a set number of hours per month which
+                        can be used for one-to-one support from a qualified CYW. CYWs with enough experience can make a
+                        tremendous difference in the life of a young person. They can also give valuable tips to foster
+                        parents in coping and managing behaviours.
+                    </p>
+
+                    <mat-action-row>
+                        <button mat-button color="warn" (click)="prevStep()">Previous</button>
+                        <button mat-button color="primary" (click)="nextStep()">Next</button>
+                    </mat-action-row>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel [expanded]="step === 11" (opened)="setStep(11)" hideToggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <h3 class="question">Q: Are pets allowed?</h3>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <p>
+                        Yes! However, some children have no experience with pets. Extra care should be taken to
+                        acclimatize children placed in your home to your pet(s). In some cases, children can be abusive
+                        to animals which would be considered before placing such a child in your home. Remember, you
+                        are always given as much information as is available to Safe Harbours and the final decision to
+                        accept a child is yours.
+                    </p>
+
+                    <mat-action-row>
+                        <button mat-button color="warn" (click)="prevStep()">Previous</button>
+                    </mat-action-row>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </div>
+    </div>
+</div>
+<read-more [links]="links"></read-more>

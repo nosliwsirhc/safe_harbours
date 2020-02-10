@@ -1,0 +1,6 @@
+<div class="public-site-container mat-typography">
+    <ps-navbar [isAuth$]="isAuth$" (login)="login()" (logout)="logout()">
+    </ps-navbar>
+    <router-outlet></router-outlet>
+    <ps-footer></ps-footer>
+</div>

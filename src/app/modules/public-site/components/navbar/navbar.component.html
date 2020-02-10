@@ -1,0 +1,64 @@
+<nav class="mat-elevation-z4">
+  <mat-toolbar>
+    <button type="button" aria-label="Navigation dropdown" mat-icon-button [matMenuTriggerFor]="dropdownNav" class="d-md-none">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <mat-menu #dropdownNav="matMenu" [class]="'menu-backdrop'">
+      <button class="nav-item" mat-menu-item [routerLink]="['/']" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">Home</button>
+      <button class="nav-item" mat-menu-item [routerLink]="['/foster-care-stories']" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">Stories</button>
+      <button class="nav-item" mat-menu-item [matMenuTriggerFor]="programs" routerLinkActive="active-link">Programs</button>
+      <button class="nav-item" mat-menu-item [routerLink]="['/frequently-asked-questions']" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">FAQ</button>
+      <button class="nav-item" mat-menu-item [routerLink]="['/about']" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">About</button>
+      <button class="nav-item" mat-menu-item [routerLink]="['/news']" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">News</button>
+      <button class="nav-item" mat-menu-item [routerLink]="['/contact']" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">Contact</button>
+      <button class="nav-item" mat-menu-item [routerLink]="['/apply-to-foster']" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">Apply</button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="login.emit()" *ngIf="!(isAuth$ | async)">Login</button>
+      <button mat-menu-item (click)="logout.emit()" *ngIf="isAuth$ | async">Logout</button>
+    </mat-menu>
+    
+    <mat-menu #programs="matMenu" [class]="'menu-backdrop'">
+      <button class="nav-item" mat-menu-item [routerLink]="['/programs/mainstream-foster-care']" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">Mainstream Foster Care</button>
+      <button class="nav-item" mat-menu-item [routerLink]="['/programs/trauma-focused-foster-care']" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">Trauma-Focused Foster Care</button>
+      <button class="nav-item" mat-menu-item [routerLink]="['/programs/behavioural-foster-care']" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">Behavioural Foster Care</button>
+    </mat-menu>
+
+    <span class="brand">Safe Harbours</span>
+    <span style="flex: 1 1 auto;"></span>
+    <div class="nav-buttons" class="d-none d-md-flex">
+      <a class="nav-item" mat-button [routerLink]="['/']" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">Home</a>
+      <a class="nav-item" mat-button [routerLink]="['/foster-care-stories']" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">Stories</a>
+      <button class="nav-item" type="button" aria-label="Programs dropdown" mat-button [matMenuTriggerFor]="programs" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: false}">Programs</button>
+      <a class="nav-item" mat-button [routerLink]="['/frequently-asked-questions']" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">FAQ</a>
+      <a class="nav-item" mat-button [routerLink]="['/about']" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">About</a>
+      <a class="nav-item" mat-button [routerLink]="['/news']" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">News</a>
+      <a class="nav-item" mat-button [routerLink]="['/contact']" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">Contact</a>
+      <a class="nav-item" mat-button [routerLink]="['/apply-to-foster']" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">Apply</a>
+    </div>
+    <span style="flex: 1 1 auto;"></span>
+    <div class="social-nav-buttons">
+      <a class="social-link" href="https://www.facebook.com/SafeHarbours" aria-label="Facebook" target="_blank" rel="noopener">
+        <fa-icon [icon]="faFacebook"></fa-icon>
+      </a>
+      <a class="social-link" href="https://www.twitter.com/SafeHarbours" aria-label="Twitter" target="_blank" rel="noopener">
+        <fa-icon [icon]="faTwitterSquare"></fa-icon>
+      </a>
+      <a class="social-link" href="https://instagram.com/safe_harbours" aria-label="Instagram" target="_blank" rel="noopener">
+        <fa-icon [icon]="faInstagram"></fa-icon>
+      </a>
+    </div>
+    <div *ngIf="isAuth$ | async; else loggedOut" style="margin-left: 1rem;">
+      <button type="button" aria-label="Protected dropdown" mat-icon-button [matMenuTriggerFor]="protectedMenu" class="d-none d-md-flex">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+      <mat-menu #protectedMenu="matMenu" [class]="'menu-backdrop'">
+        <!-- <button class="nav-item" mat-menu-item [routerLink]="['/protected']" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">User Area</button> -->
+        <button class="nav-item" mat-menu-item (click)="logout.emit()">Logout</button>
+      </mat-menu>
+    </div>
+    <ng-template #loggedOut>
+      <a mat-button (click)="login.emit()" style="margin-left: 1rem;">Login</a>
+    </ng-template>
+  </mat-toolbar>
+</nav>

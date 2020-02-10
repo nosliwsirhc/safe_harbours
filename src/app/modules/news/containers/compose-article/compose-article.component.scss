@@ -1,0 +1,43 @@
+.dropzone { 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column; 
+    height: 300px;
+    border: 2px dashed #f16624;
+    border-radius: 5px;
+    background: white;
+    margin: 10px 0;
+
+    &.hovering {
+        border: 2px solid #f16624;
+        color: #dadada !important;
+    }
+}
+
+progress::-webkit-progress-value {
+    transition: width 0.1s ease;
+}
+
+.file-input {
+    display: none;
+}
+
+h2 {
+    font-size: 16px;
+    color: #54617a;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.subtitle {
+    color: #54617a;
+    font-size: 32px;
+    line-height: 48px;
+}
+
+p {
+    font-size: 16px;
+    line-height: 24px;
+    color: #6b7485;
+}

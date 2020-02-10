@@ -1,0 +1,18 @@
+.read-more {
+    max-width: 600px;
+    line-height: 60px;
+    background: rgb(246, 250, 253);
+    color: #333;
+    margin: 0 auto 2rem auto;
+    padding: 1rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
+
+    h2 {
+        padding-left: 1rem;
+    }
+
+    .mat-list-item {
+        color: #333 !important;
+    }
+}
