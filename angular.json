@@ -175,7 +175,9 @@
       }
     }
   },
-  "cli": {},
+  "cli": {
+    "analytics": "a5b5109e-b06c-486f-8bd9-c54d2ed84710"
+  },
   "schematics": {
     "@schematics/angular:class": {
       "spec": false
