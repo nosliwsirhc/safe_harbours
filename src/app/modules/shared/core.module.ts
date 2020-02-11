@@ -2,8 +2,6 @@ import { NgModule } from '@angular/core';
 import { BrowserModule, BrowserTransferStateModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { HttpModule } from '@angular/http';
-import { TransferHttpCacheModule } from '@nguniversal/common';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../../../environments/environment';
 import { AngularFireModule } from '@angular/fire';
@@ -33,15 +31,13 @@ import { LoginModalComponent } from '../../components/login-modal/login-modal.co
         BrowserModule.withServerTransition({ appId: 'safeharbours' }),
         BrowserTransferStateModule,
         BrowserAnimationsModule,
-        TransferHttpCacheModule,
         ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
         MatButtonModule,
         MatDialogModule,
         MatDividerModule,
         MatFormFieldModule,
         MatInputModule,
-        ReactiveFormsModule,
-        HttpModule
+        ReactiveFormsModule
     ],
     exports: [
         AngularFireModule,
@@ -52,7 +48,6 @@ import { LoginModalComponent } from '../../components/login-modal/login-modal.co
         BrowserModule,
         BrowserTransferStateModule,
         BrowserAnimationsModule,
-        TransferHttpCacheModule,
         ServiceWorkerModule,
         MatButtonModule,
         MatDialogModule,
@@ -60,8 +55,7 @@ import { LoginModalComponent } from '../../components/login-modal/login-modal.co
         MatDividerModule,
         MatFormFieldModule,
         MatInputModule,
-        ReactiveFormsModule,
-        HttpModule
+        ReactiveFormsModule
     ],
     providers: [
         AuthenticationService,
