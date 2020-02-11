@@ -16,7 +16,7 @@
         </mat-card-content>
         <mat-divider></mat-divider>
         <mat-card-actions>
-          <span class="author"><fa-icon [icon]="faUser"></fa-icon>&nbsp;{{article.author}}</span><span class="published"><fa-icon [icon]="faClock"></fa-icon>&nbsp;{{article.publishedDate | date}}</span>
+          <span class="author"><fa-icon [icon]="faUser"></fa-icon>&nbsp;{{article.author}}</span><span class="published"><fa-icon [icon]="faClock"></fa-icon>&nbsp;{{article.publishedTime.seconds * 1000 | date}}</span>
         </mat-card-actions>
       </mat-card>
     </div>

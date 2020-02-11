@@ -9,7 +9,7 @@ import { AppComponent } from './app.component';
   declarations: [AppComponent],
   imports: [
     CoreModule,
-    AppRoutingModule,
+    AppRoutingModule
   ],
   bootstrap: [AppComponent]
 })

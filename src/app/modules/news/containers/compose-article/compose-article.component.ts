@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { COMMA, ENTER, TAB } from '@angular/cdk/keycodes';
-import { MatChipInputEvent } from '@angular/material';
+import { MatChipInputEvent } from '@angular/material/chips';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AngularFireStorage, AngularFireUploadTask } from '@angular/fire/storage';
@@ -95,13 +95,13 @@ export class ComposeArticleComponent implements OnInit {
     }
   }
 
-  toggleHover(event: boolean) {
-    this.isHovering = event;
+  toggleHover(event: Event) {
+    this.isHovering = !!event;
   }
 
-  startUpload(event: FileList) {
+  startUpload(event: Event) {
     // The File object
-    const file = event.item(0);
+    const file = event.target['files'].item(0);
 
     // Client-side validation example
     if (file.type.split('/')[0] !== 'image') {

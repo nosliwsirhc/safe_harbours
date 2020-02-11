@@ -28,7 +28,7 @@ export class AuthenticationService {
             return this.afs.doc(`users/${authState.uid}`).snapshotChanges().pipe(
               map(action => {
                 const id = action.payload.id;
-                const data = action.payload.data();
+                const data = action.payload.data() as object;
                 return { ...data, id };
               })
             );

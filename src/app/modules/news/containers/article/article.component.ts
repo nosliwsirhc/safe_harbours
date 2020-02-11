@@ -42,10 +42,10 @@ export class ArticleComponent implements OnInit {
               image: article.imgUrl
             })
           }),
-          map(article => {
-            const publishedDate = new Date(article.publishedTime.seconds * 1000);
-            return { ...article, publishedDate };
-          }),
+          // map(article => {
+          //   const publishedDate = new Date(article.publishedTime.seconds * 1000);
+          //   return { ...article, publishedDate };
+          // }),
           // startWith(exists)
         );
       })

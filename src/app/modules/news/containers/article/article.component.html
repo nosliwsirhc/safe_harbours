@@ -5,7 +5,7 @@
       <div class="col">
         <article>
           <h1>{{article.title}}</h1>
-          <p class="byline">Published {{article.publishedDate | date}}</p>
+          <p class="byline">Published {{article.publishedTime.seconds * 1000 | date}}</p>
           <div [innerHTML]="article.content | safeHtml"></div>
         </article>
       </div>

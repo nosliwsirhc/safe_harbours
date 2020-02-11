@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, PLATFORM_ID, isDevMode } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { LoginModalComponent } from '../../components/login-modal/login-modal.component';
 import { AuthenticationService } from '../../services/authentication.service';
 import { Observable } from 'rxjs';

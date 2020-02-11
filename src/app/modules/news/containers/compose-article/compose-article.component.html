@@ -52,14 +52,14 @@
       <mat-datepicker #publishedTime></mat-datepicker>
     </mat-form-field>
 
-    <div [froalaEditor] class="col-12 mb-2" formControlName="content"></div>
+    <!-- <div [froalaEditor] class="col-12 mb-2" formControlName="content"></div> -->
 
     <div class="dropzone col-6" dropZone (hovered)="toggleHover($event)" (dropped)="startUpload($event)"
       [class.hovering]="isHovering">
       <h3>Header Image</h3>
       <div class="file">
         <label class="file-label">
-          <input class="file-input" type="file" (change)="startUpload($event.target.files)">
+          <input class="file-input" type="file" (change)="startUpload($event)">
           <span class="file-cta">
             <span class="file-icon">
               <fa-icon [icon]="faUpload"></fa-icon>

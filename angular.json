@@ -30,14 +30,9 @@
             ],
             "styles": [
               "src/styles.scss",
-              "./node_modules/froala-editor/css/froala_editor.pkgd.min.css",
-              "./node_modules/froala-editor/css/froala_style.min.css",
               "./node_modules/font-awesome/css/font-awesome.css"
             ],
-            "scripts": [
-              "./node_modules/jquery/dist/jquery.min.js",
-              "./node_modules/froala-editor/js/froala_editor.pkgd.min.js"
-            ]
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -134,7 +129,7 @@
           "builder": "@angular-devkit/build-angular:server",
           "options": {
             "outputPath": "dist/server",
-            "main": "src/main.server.ts",
+            "main": "server.ts",
             "tsConfig": "src/tsconfig.server.json"
           },
           "configurations": {
@@ -148,6 +143,32 @@
               "sourceMap": false,
               "optimization": true
             }
+          }
+        },
+        "serve-ssr": {
+          "builder": "@nguniversal/builders:ssr-dev-server",
+          "options": {
+            "browserTarget": "safeharbours:build",
+            "serverTarget": "safeharbours:server"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "safeharbours:build:production",
+              "serverTarget": "safeharbours:server:production"
+            }
+          }
+        },
+        "prerender": {
+          "builder": "@nguniversal/builders:prerender",
+          "options": {
+            "browserTarget": "safeharbours:build:production",
+            "serverTarget": "safeharbours:server:production",
+            "routes": [
+              "/"
+            ]
+          },
+          "configurations": {
+            "production": {}
           }
         }
       }

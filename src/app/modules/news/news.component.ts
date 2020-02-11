@@ -43,9 +43,9 @@ export class NewsComponent implements OnInit {
       // }),
       map(actions => actions.map(a => {
         const data = a.payload.doc.data() as IArticle;
-        const publishedDate = new Date(data.publishedTime.seconds * 1000);
+        const publishedTime = data.publishedTime;
         const id = a.payload.doc.id;
-        return { ...data, id, publishedDate };
+        return { ...data, id, publishedTime } as IArticle;
       })),
       // startWith(exists)
     );

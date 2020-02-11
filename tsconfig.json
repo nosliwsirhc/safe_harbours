@@ -20,5 +20,10 @@
   "include": [
     "src/polyfills.ts",
     "src/main.ts"
-  ]
+  ],
+  "angularCompilerOptions": {
+    "fullTemplateTypeCheck": true,
+    "strictInjectionParameters": true,
+    "strictTemplates": true
+  }
 }
