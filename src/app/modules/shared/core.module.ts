@@ -1,6 +1,4 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule, BrowserTransferStateModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../../../environments/environment';
@@ -28,9 +26,6 @@ import { LoginModalComponent } from '../../components/login-modal/login-modal.co
         AngularFireAuthModule,
         AngularFireStorageModule,
         AngularFireFunctionsModule,
-        BrowserModule.withServerTransition({ appId: 'safeharbours' }),
-        BrowserTransferStateModule,
-        BrowserAnimationsModule,
         ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
         MatButtonModule,
         MatDialogModule,
@@ -45,9 +40,6 @@ import { LoginModalComponent } from '../../components/login-modal/login-modal.co
         AngularFireAuthModule,
         AngularFireStorageModule,
         AngularFireFunctionsModule,
-        BrowserModule,
-        BrowserTransferStateModule,
-        BrowserAnimationsModule,
         ServiceWorkerModule,
         MatButtonModule,
         MatDialogModule,
