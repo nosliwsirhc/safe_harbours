@@ -124,6 +124,53 @@
               "**/node_modules/**"
             ]
           }
+        },
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            "outputPath": "dist/safeharbours/server",
+            "main": "server.ts",
+            "tsConfig": "src/tsconfig.server.json"
+          },
+          "configurations": {
+            "production": {
+              "outputHashing": "media",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "sourceMap": false,
+              "optimization": true
+            }
+          }
+        },
+        "serve-ssr": {
+          "builder": "@nguniversal/builders:ssr-dev-server",
+          "options": {
+            "browserTarget": "safeharbours:build",
+            "serverTarget": "safeharbours:server"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "safeharbours:build:production",
+              "serverTarget": "safeharbours:server:production"
+            }
+          }
+        },
+        "prerender": {
+          "builder": "@nguniversal/builders:prerender",
+          "options": {
+            "browserTarget": "safeharbours:build:production",
+            "serverTarget": "safeharbours:server:production",
+            "routes": [
+              "/"
+            ]
+          },
+          "configurations": {
+            "production": {}
+          }
         }
       }
     },
