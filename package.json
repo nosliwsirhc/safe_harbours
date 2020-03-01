@@ -41,6 +41,7 @@
     "@fortawesome/free-brands-svg-icons": "^5.12.1",
     "@fortawesome/free-regular-svg-icons": "^5.12.1",
     "@fortawesome/free-solid-svg-icons": "^5.12.1",
+    "@nguniversal/aspnetcore-engine": "^9.0.1",
     "@nguniversal/express-engine": "^9.0.0",
     "@schematics/angular": "^9.0.1",
     "bootstrap": "^4.4.1",
