@@ -223,9 +223,12 @@ async function processHtml(html, outName) {
 
   // --- reserve image space (CLS): set width/height from the downloaded file's
   // intrinsic dimensions when the markup omits them (theme CSS keeps
-  // max-width:100%; height:auto, so the attrs only fix the aspect ratio). ---
+  // max-width:100%; height:auto, so the attrs only fix the aspect ratio).
+  // Skip chrome images (logo/header/footer/nav) — they're tiny, load instantly,
+  // and the theme sizes them responsively; pinning a width breaks the logo. ---
   for (const img of body.querySelectorAll('img')) {
     if (img.getAttribute('width') && img.getAttribute('height')) continue;
+    if (img.closest('header, footer, nav, .site-header, .top-bar, .off-canvas, [class*="logo"]')) continue;
     const src = img.getAttribute('src') || '';
     if (!src.startsWith(`/${ASSET_DIR}/`)) continue;
     const file = path.join(PUB, src.replace(/^\//, ''));
