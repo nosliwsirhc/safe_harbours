@@ -224,6 +224,17 @@ async function processHtml(html, outName) {
     }
   }
 
+  // --- fix dead placeholder CTAs: a bare href="#" with generic text (e.g. the
+  // careers "In College?" "Learn More") was never wired up on WordPress —
+  // point it at Contact Us. Only generic-text links, so real JS toggles are untouched. ---
+  for (const a of body.querySelectorAll('a[href="#"]')) {
+    const t = a.text.replace(/\s+/g, ' ').trim();
+    if (!GENERIC.test(t)) continue;
+    a.setAttribute('href', '/contact-us');
+    a.set_content('Get in Touch');
+    a.removeAttribute('aria-label');
+  }
+
   // --- a11y: normalize heading order (no skipped levels) WITHOUT changing the
   // visual — retag downward jumps and pin the original level's typography
   // inline so it renders identically (the theme styles headings by tag). ---
