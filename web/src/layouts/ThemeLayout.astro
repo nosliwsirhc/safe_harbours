@@ -37,7 +37,7 @@ const turnstileKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
 // a tuned a11y/forms file keeps serving the previous version for up to a day —
 // which makes already-fixed changes look like live regressions.
 const assetRaw = import.meta.glob(
-  ['../../public/assets/a11y-overrides.css', '../../public/assets/forms-bridge.js'],
+  ['../../public/assets/a11y-overrides.css', '../../public/assets/forms.js'],
   { query: '?raw', import: 'default', eager: true }
 ) as Record<string, string>;
 const hashStr = (s: string) => {
@@ -116,6 +116,6 @@ const orgSchema = {
     <ConsentBanner />
     <script is:inline define:vars={{ turnstileKey }}>window.__TS_KEY = turnstileKey;</script>
     <script src={meta.script} defer is:inline></script>
-    <script src={ver('/assets/forms-bridge.js')} defer is:inline></script>
+    <script src={ver('/assets/forms.js')} defer is:inline></script>
   </body>
 </html>
