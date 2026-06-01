@@ -37,6 +37,31 @@ const pageTitle = title ?? meta.title ?? site.name;
 const pageDesc = description || meta.description || SITE_DESC;
 const cleanPath = Astro.url.pathname.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
 const canonical = new URL(cleanPath || '/', site.url).href;
+
+// Structured data (mirroring stripped the WP JSON-LD). Helps search + AI agents
+// understand the organization.
+const orgSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: site.name,
+  legalName: site.legalName,
+  url: site.url,
+  logo: `${site.url}/images/og-default.jpg`,
+  image: `${site.url}/images/og-default.jpg`,
+  description: SITE_DESC,
+  telephone: site.phoneHref.replace('tel:', ''),
+  email: site.email,
+  areaServed: { '@type': 'State', name: 'Ontario, Canada' },
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: `${site.address.street}, 1st Floor`,
+    addressLocality: site.address.city,
+    addressRegion: 'ON',
+    postalCode: site.address.postal,
+    addressCountry: 'CA',
+  },
+  sameAs: [site.social.facebook, site.social.instagram, site.social.linkedin],
+};
 ---
 <!doctype html>
 <html lang="en-CA">
@@ -56,6 +81,7 @@ const canonical = new URL(cleanPath || '/', site.url).href;
     <meta property="og:description" content={pageDesc} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={new URL('/images/og-default.jpg', site.url).href} />
+    <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
     {meta.styles.map((href: string) => <link rel="stylesheet" href={href} />)}
     <Fragment set:html={headStyles} />
   </head>

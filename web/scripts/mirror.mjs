@@ -202,6 +202,40 @@ async function processHtml(html, outName) {
     else if (href.startsWith('//www.safeharbours.ca')) a.setAttribute('href', href.replace('//www.safeharbours.ca', '') || '/');
   }
 
+  // --- a11y: give generic-text links a descriptive aria-label (derived from
+  // the destination) so screen readers + crawlers know where they go ---
+  const GENERIC = /^(learn more|read more|click here|more|here|get started|view more|see more|details)$/i;
+  const humanize = (s) => s.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  for (const a of body.querySelectorAll('a[href]')) {
+    if (a.getAttribute('aria-label')) continue;
+    const txt = a.text.replace(/\s+/g, ' ').trim();
+    if (!GENERIC.test(txt)) continue;
+    const href = a.getAttribute('href') || '';
+    const seg = href.split(/[?#]/)[0].replace(/\/$/, '').split('/').filter(Boolean).pop();
+    const dest = href === '/' || href === '' ? 'Home' : seg && /^[a-z0-9-]+$/i.test(seg) ? humanize(seg) : '';
+    if (dest) a.setAttribute('aria-label', `${txt}: ${dest}`);
+  }
+
+  // --- a11y: normalize heading order (no skipped levels) WITHOUT changing the
+  // visual — retag downward jumps and pin the original level's typography
+  // inline so it renders identically (the theme styles headings by tag). ---
+  const HSIZE = {
+    1: ['48px', '67.2px'], 2: ['66px', '92.4px'], 3: ['42px', '58.8px'],
+    4: ['32px', '44.8px'], 5: ['20px', '28px'], 6: ['16px', '22.4px'],
+  };
+  let prevLevel = null;
+  for (const h of body.querySelectorAll('h1, h2, h3, h4, h5, h6')) {
+    const lvl = Number(h.rawTagName.slice(1));
+    const target = prevLevel === null ? lvl : lvl > prevLevel + 1 ? prevLevel + 1 : lvl;
+    if (target !== lvl) {
+      const [fs, lh] = HSIZE[lvl]; // pin to the ORIGINAL level's look
+      const prev = (h.getAttribute('style') || '').trim().replace(/;?$/, '');
+      h.setAttribute('style', `${prev ? prev + ';' : ''}font-size:${fs};line-height:${lh}`);
+      h.rawTagName = `h${target}`;
+    }
+    prevLevel = target;
+  }
+
   await writeFile(path.join(MIRROR, `${outName}.head.html`), headStyles);
   await writeFile(path.join(MIRROR, `${outName}.body.html`), body.innerHTML);
   await writeFile(path.join(MIRROR, `${outName}.meta.json`), JSON.stringify({ bodyClass, title, description: desc, styles, script: `/${ASSET_DIR}/theme/build/app.js` }, null, 2));
