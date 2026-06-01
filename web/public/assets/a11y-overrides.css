@@ -161,6 +161,10 @@ a.button-secondary {
   font-weight: 600;
   font-size: 0.95rem;
   margin-bottom: 6px;
+  /* Set explicitly: the theme sets a dark label colour that would otherwise win
+     over inheritance (made footer labels black-on-slate). Light page sections
+     keep slate; the footer override below switches to white. */
+  color: #394254;
 }
 .sh-form .sh-req { color: #e74c3c; }
 .sh-form input[type='text'],
@@ -236,6 +240,7 @@ a.button-secondary {
 
 /* On the dark slate footer the newsletter form needs lighter error text + a
    readable disclaimer; labels already inherit the footer's white text. */
+.site-footer .sh-form .sh-field > label { color: #fff; }
 .site-footer .sh-form .sh-err,
 .site-footer .sh-form .sh-form-error { color: #ffb4ab; }
 .site-footer .sh-form .sh-form-disclaimer { color: rgba(255, 255, 255, 0.8); }
