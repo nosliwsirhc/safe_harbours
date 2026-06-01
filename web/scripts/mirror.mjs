@@ -313,18 +313,44 @@ async function processHtml(html, outName) {
   // it around the content region (between </header> and <footer>) so the page
   // keeps its main landmark and matches the source structure exactly.
   let bodyHtml = body.innerHTML;
-  const srcMain = html.match(/<main\b[^>]*>/i);
-  if (srcMain && !/<main\b/i.test(bodyHtml)) {
+
+  // node-html-parser intermittently mangles certain well-formed pages (the blog
+  // index is one: querySelector('body') returns null and even the regex-fallback
+  // re-parse silently drops boilerplate wrappers). When a wrapper present in the
+  // source is missing from our output, restore it at its known position so the
+  // page matches every other mirrored page. Each repair is verified and reverted
+  // if it can't be placed safely.
+  const restore = (label, present, apply) => {
+    if (present.test(bodyHtml)) return;
     const before = bodyHtml;
-    bodyHtml = bodyHtml
-      .replace(/(<div id="content"\b)/i, `${srcMain[0]}$1`)
-      .replace(/(<footer\b)/i, `</main>\n$1`);
-    if (bodyHtml !== before && /<main\b/i.test(bodyHtml) && /<\/main>/i.test(bodyHtml)) {
-      console.log(`  ~ ${outName}: restored dropped <main> landmark`);
+    const out = apply(before);
+    if (out !== before && present.test(out)) {
+      bodyHtml = out;
+      console.log(`  ~ ${outName}: restored dropped ${label}`);
     } else {
-      bodyHtml = before; // couldn't place it safely — leave output untouched
-      console.warn(`  ! ${outName}: <main> was dropped and could not be restored`);
+      console.warn(`  ! ${outName}: ${label} was dropped and could not be restored`);
     }
+  };
+
+  // Foundation off-canvas slide wrapper — holds header+main+footer, opens right
+  // before the header and closes at the very end (inside .off-canvas-wrapper).
+  const srcOC = html.match(/<div class="off-canvas-content"[^>]*>/i);
+  if (srcOC) {
+    restore('off-canvas-content wrapper', /off-canvas-content/i, (s) => {
+      if (!/<header\b/i.test(s)) return s;
+      const withOpen = s.replace(/(<header\b)/i, `${srcOC[0]}\n$1`);
+      // close it just inside .off-canvas-wrapper (before the final </div>)
+      const i = withOpen.lastIndexOf('</div>');
+      return i === -1 ? withOpen : `${withOpen.slice(0, i)}</div>\n${withOpen.slice(i)}`;
+    });
+  }
+
+  // Main landmark — wraps the content region, between </header> and <footer>.
+  const srcMain = html.match(/<main\b[^>]*>/i);
+  if (srcMain) {
+    restore('<main> landmark', /<main\b/i, (s) =>
+      s.replace(/(<div id="content"\b)/i, `${srcMain[0]}$1`).replace(/(<footer\b)/i, `</main>\n$1`)
+    );
   }
 
   await writeFile(path.join(MIRROR, `${outName}.head.html`), headStyles);
