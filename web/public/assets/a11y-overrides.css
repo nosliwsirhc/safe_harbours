@@ -58,6 +58,16 @@ a.button-secondary {
   text-align: left !important;
   padding: 14px 28px !important;
 }
+/* Submenu chevron (e.g. Program Description) is a 16px ::after pinned to the
+   screen edge — make it bigger and inset it to line up with the item padding. */
+.off-canvas-wrapper .site-navigation > li.menu-item-has-children::after {
+  width: 24px !important;
+  height: 24px !important;
+  right: 24px !important;
+  background-size: 24px 24px !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+}
 /* The panel moves focus to the logo on open, painting an ugly box around it.
    The logo is an obvious, large target; drop its focus ring (menu items keep theirs). */
 .off-canvas-wrapper .site-header__logo:focus { outline: none; }
