@@ -2,10 +2,11 @@ import type { APIRoute } from 'astro';
 import { env as workerEnv } from 'cloudflare:workers';
 import { isValidEmail } from '../../lib/form';
 
-// On-demand newsletter signup. Adds the subscriber to a Resend Audience (a real
-// mailing list) when RESEND_AUDIENCE_ID is set; otherwise (or if that call
-// fails) it falls back to emailing the team so no signup is ever lost. Protected
-// by the form's Cloudflare Turnstile widget plus a honeypot (`company`).
+// On-demand newsletter signup. Adds the subscriber to the account's Resend
+// Contacts (POST /contacts — the modern replacement for the now-deprecated
+// per-Audience contacts API, so no audience id is needed). If that call fails it
+// falls back to emailing the team so no signup is ever lost. Protected by the
+// form's Cloudflare Turnstile widget plus a honeypot (`company`).
 export const prerender = false;
 
 const TURNSTILE_VERIFY = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
@@ -54,28 +55,30 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     return json({ ok: false, error: 'Subscriptions are not configured yet. Please email us.' }, 500);
   }
 
-  // Preferred path: add the subscriber straight to a Resend Audience (real list).
-  const audienceId = env.RESEND_AUDIENCE_ID;
-  if (audienceId) {
-    const sp = name.indexOf(' ');
-    const firstName = sp === -1 ? name : name.slice(0, sp);
-    const lastName = sp === -1 ? '' : name.slice(sp + 1);
-    try {
-      const res = await fetch(`https://api.resend.com/audiences/${audienceId}/contacts`, {
-        method: 'POST',
-        headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
-        body: JSON.stringify({ email, first_name: firstName, last_name: lastName, unsubscribed: false }),
-      });
-      // 2xx = added (or already present — Resend upserts by email). On any other
-      // status, fall through to the email backstop so the signup isn't lost.
-      if (res.ok) return json({ ok: true });
-    } catch {
-      /* fall through to email backstop */
-    }
+  // Add the subscriber to the account's Resend Contacts. No audience id needed
+  // (the per-Audience API is deprecated in favour of Segments/Topics). Resend
+  // upserts by email, so re-submits are harmless.
+  const sp = name.indexOf(' ');
+  try {
+    const res = await fetch('https://api.resend.com/contacts', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        first_name: sp === -1 ? name : name.slice(0, sp),
+        last_name: sp === -1 ? '' : name.slice(sp + 1),
+        unsubscribed: false,
+      }),
+    });
+    // 2xx = added (or already present). On any other status fall through to the
+    // email backstop so the signup isn't lost.
+    if (res.ok) return json({ ok: true });
+  } catch {
+    /* fall through to email backstop */
   }
 
-  // Fallback: no audience configured, or the audience call failed — notify the
-  // team by email so the signup is captured.
+  // Fallback: the contacts call failed (e.g. the API key lacks contacts
+  // permission) — notify the team by email so the signup is still captured.
   const to = env.CONTACT_TO ?? 'info@safeharbours.ca';
   const from = env.CONTACT_FROM ?? 'Safe Harbours <noreply@safeharbours.ca>';
   try {
