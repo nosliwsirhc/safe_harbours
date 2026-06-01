@@ -77,10 +77,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
   const text =
     `New website inquiry\n\n` +
+    `Category: ${role}\n` +
     `Name: ${first} ${last}`.trim() + `\n` +
     `Email: ${email || '(not provided)'}\n` +
-    `Phone: ${phone || '(not provided)'}\n` +
-    `I am a: ${role}\n\n` +
+    `Phone: ${phone || '(not provided)'}\n\n` +
     `${message}\n`;
 
   try {
@@ -91,7 +91,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         from,
         to: [to],
         reply_to: email || undefined,
-        subject: `New inquiry from ${first} ${last}`.trim(),
+        // Prefix the subject with the category so the team can filter/route
+        // (e.g. "[Recruitment: Foster Parents] …").
+        subject: `[${role}] New inquiry from ${first} ${last}`.trim(),
         text,
       }),
     });
