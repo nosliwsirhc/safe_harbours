@@ -76,6 +76,14 @@ const FORMS = {
 };
 
 let totalReplaced = 0;
+// Mark every field so password managers (1Password/LastPass/…) ignore these
+// non-login forms — their inline UI was masking input and offering to save logins.
+const pmIgnore = (s) =>
+  s.replace(
+    /<(input|textarea)\b(?![^>]*data-1p-ignore)/g,
+    '<$1 data-1p-ignore="true" data-lpignore="true" data-bwignore="true" data-form-type="other"'
+  );
+
 const summary = {};
 for (const file of readdirSync(MIRROR).filter((f) => f.endsWith('.body.html'))) {
   const p = path.join(MIRROR, file);
@@ -85,13 +93,19 @@ for (const file of readdirSync(MIRROR).filter((f) => f.endsWith('.body.html'))) 
     // match the original Gravity Forms block: <form ... id='gform_X' ...> ... </form>
     const re = new RegExp(`<form\\b[^>]*\\bid='${id}'[^>]*>[\\s\\S]*?<\\/form>`, 'i');
     if (re.test(html)) {
-      html = html.replace(re, clean);
+      html = html.replace(re, pmIgnore(clean));
       summary[id] = (summary[id] || 0) + 1;
       changed = true;
       totalReplaced++;
     }
   }
-  if (changed) writeFileSync(p, html);
+  // Gravity Forms ships some wrappers hidden (display:none) and reveals them with
+  // its JS, which mirroring strips — leaving the form invisible. Un-hide them.
+  if (changed) {
+    const unhidden = html.replace(/(<div\b[^>]*\bgform_wrapper\b[^>]*?)\s*style='display:none'/g, '$1');
+    if (unhidden !== html) html = unhidden;
+    writeFileSync(p, html);
+  }
 }
 console.log('replaced form blocks:', JSON.stringify(summary, null, 2));
 console.log('total:', totalReplaced);
