@@ -1,0 +1,56 @@
+---
+// Renders a faithfully-mirrored WordPress-theme page. Reads the captured
+// markup/styles produced by scripts/mirror.mjs (in _mirror/) and emits the
+// page verbatim, self-hosting the theme CSS/JS + assets under /wp/.
+import { site } from '../data/site';
+import ConsentBanner from '../components/ConsentBanner.astro';
+
+// Inline the mirrored markup at BUILD time (Vite ?raw) — the Cloudflare
+// prerender runtime has no node:fs, so we can't read files at render time.
+const heads = import.meta.glob('../../_mirror/*.head.html', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+const bodies = import.meta.glob('../../_mirror/*.body.html', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+const metas = import.meta.glob('../../_mirror/*.meta.json', { import: 'default', eager: true }) as Record<string, any>;
+
+interface Props {
+  name: string;            // mirror basename, e.g. "home"
+  title?: string;
+  description?: string;
+}
+const { name, title, description } = Astro.props;
+
+const headStyles = heads[`../../_mirror/${name}.head.html`];
+const bodyHtml = bodies[`../../_mirror/${name}.body.html`];
+const meta = metas[`../../_mirror/${name}.meta.json`];
+
+const pageTitle = title ?? meta.title ?? site.name;
+const pageDesc = description ?? meta.description ?? '';
+const cleanPath = Astro.url.pathname.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
+const canonical = new URL(cleanPath || '/', site.url).href;
+---
+<!doctype html>
+<html lang="en-CA">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{pageTitle}</title>
+    {pageDesc && <meta name="description" content={pageDesc} />}
+    <link rel="canonical" href={canonical} />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <meta name="theme-color" content="#484e5e" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDesc} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL('/images/og-default.jpg', site.url).href} />
+    {meta.styles.map((href: string) => <link rel="stylesheet" href={href} />)}
+    <Fragment set:html={headStyles} />
+  </head>
+  <body class={meta.bodyClass}>
+    <Fragment set:html={bodyHtml} />
+    <ConsentBanner />
+    <script src={meta.script} defer is:inline></script>
+  </body>
+</html>

@@ -74,13 +74,14 @@ const gaId = 'G-BMMJVTQGHX';
     position: fixed;
     left: clamp(12px, 3vw, 24px);
     bottom: clamp(12px, 3vw, 24px);
-    z-index: 200;
+    z-index: 2000;
     max-width: 26rem;
-    background: var(--slate);
-    color: var(--on-dark);
-    border: 1px solid color-mix(in oklch, var(--slate), white 16%);
+    background: var(--slate, #484e5e);
+    color: var(--on-dark, #e3e7ee);
+    border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 14px;
     padding: 18px 20px 16px;
+    font-family: "Source Sans 3", system-ui, -apple-system, sans-serif;
     box-shadow: 0 14px 40px -12px rgba(13, 24, 33, 0.55);
     opacity: 0;
     transform: translateY(12px);
@@ -94,8 +95,17 @@ const gaId = 'G-BMMJVTQGHX';
     margin: 0 0 14px;
     font-size: 0.92rem;
     line-height: 1.55;
-    color: var(--on-dark);
+    color: var(--on-dark, #e3e7ee);
   }
+  /* Self-contained button styling so the banner renders identically whether
+     or not the global stylesheet is present (it isn't on mirrored pages). */
+  .consent .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 800; border: 1.5px solid transparent; border-radius: 8px;
+    cursor: pointer; font-family: inherit; line-height: 1.2; transition: filter 0.2s, background 0.2s, color 0.2s;
+  }
+  .consent .btn-coral { background: var(--coral-d, #c8453f); color: #fff; }
+  .consent .btn-coral:hover { filter: brightness(1.06); }
   .consent-text a {
     color: #fff;
     text-decoration: underline;
@@ -112,8 +122,8 @@ const gaId = 'G-BMMJVTQGHX';
   }
   /* Keep the decline (ghost) button legible on the dark card. */
   .consent .btn-out {
-    color: var(--on-dark);
-    border-color: color-mix(in oklch, var(--on-dark), transparent 55%);
+    color: var(--on-dark, #e3e7ee);
+    border-color: rgba(227,231,238,0.45);
     background: transparent;
   }
   .consent .btn-out:hover {

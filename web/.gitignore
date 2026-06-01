@@ -1,5 +1,6 @@
-# build output
-dist/
+# build output (anchored to web root so it doesn't catch mirrored
+# theme assets under public/wp/.../dist/ or .../build/)
+/dist/
 # generated types
 .astro/
 
