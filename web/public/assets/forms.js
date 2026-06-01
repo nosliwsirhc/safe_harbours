@@ -77,7 +77,13 @@
     var hpEl = form.querySelector('[name="company"], [name="hp"]');
     var hp = hpEl ? String(hpEl.value || '').trim() : '';
     if (/subscribe/.test(form.getAttribute('data-endpoint') || '')) {
-      return { name: get('name') || (get('first') + ' ' + get('last')).trim(), email: get('email'), company: hp, token: token };
+      return {
+        name: get('name') || (get('first') + ' ' + get('last')).trim(),
+        email: get('email'),
+        source: form.getAttribute('data-source') || '',
+        company: hp,
+        token: token,
+      };
     }
     var msg = get('msg');
     var city = get('city');

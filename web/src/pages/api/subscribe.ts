@@ -57,8 +57,11 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
   // Add the subscriber to the account's Resend Contacts. No audience id needed
   // (the per-Audience API is deprecated in favour of Segments/Topics). Resend
-  // upserts by email, so re-submits are harmless.
+  // upserts by email, so re-submits are harmless. The `source` property records
+  // which form they came from (footer newsletter vs Resources sign-up) so the
+  // team can build a Segment on it.
   const sp = name.indexOf(' ');
+  const source = (data.source ?? '').trim() || 'Website form';
   try {
     const res = await fetch('https://api.resend.com/contacts', {
       method: 'POST',
@@ -68,6 +71,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         first_name: sp === -1 ? name : name.slice(0, sp),
         last_name: sp === -1 ? '' : name.slice(sp + 1),
         unsubscribed: false,
+        properties: { source: source },
       }),
     });
     // 2xx = added (or already present). On any other status fall through to the

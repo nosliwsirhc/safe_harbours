@@ -12,7 +12,7 @@ import path from 'node:path';
 const MIRROR = path.join(process.cwd(), '_mirror');
 
 const FORMS = {
-  gform_1: `<form class="sh-form" data-endpoint="/api/subscribe" data-success="Thanks — you're subscribed!" novalidate>
+  gform_1: `<form class="sh-form" data-endpoint="/api/subscribe" data-source="Newsletter (footer)" data-success="Thanks — you're subscribed!" novalidate>
   <div class="sh-field">
     <label for="nl-name">Your Name</label>
     <input id="nl-name" name="name" type="text" autocomplete="name">
@@ -45,7 +45,7 @@ const FORMS = {
   <p class="sh-form-error" role="alert"></p>
 </form>`,
 
-  gform_3: `<form class="sh-form" data-endpoint="/api/subscribe" data-success="Thanks — you're subscribed!" novalidate>
+  gform_3: `<form class="sh-form" data-endpoint="/api/subscribe" data-source="Resources sign-up" data-success="Thanks — you're subscribed!" novalidate>
   <div class="sh-form-row">
     <div class="sh-field"><label for="rs-first">First Name</label><input id="rs-first" name="first" type="text" autocomplete="given-name"></div>
     <div class="sh-field"><label for="rs-last">Last Name</label><input id="rs-last" name="last" type="text" autocomplete="family-name"></div>
