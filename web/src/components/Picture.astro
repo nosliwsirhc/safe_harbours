@@ -1,0 +1,45 @@
+---
+// Reusable responsive <picture>. Emits avif/webp sources only when those
+// variants exist (pass via `formats`); always provides a jpg/png fallback.
+// With `widths`, builds a width-based srcset (`{base}-{w}.{ext}`); otherwise
+// a single-size source (`{base}.{ext}`).
+interface Props {
+  base: string;            // path without extension, e.g. "/images/carousel1"
+  alt: string;
+  width: number;
+  height: number;
+  formats?: ('avif' | 'webp')[];
+  fallback?: 'jpg' | 'png';
+  widths?: number[];
+  sizes?: string;
+  loading?: 'lazy' | 'eager';
+  fetchpriority?: 'high' | 'auto';
+  class?: string;
+}
+const {
+  base, alt, width, height,
+  formats = [], fallback = 'jpg', widths, sizes,
+  loading = 'lazy', fetchpriority = 'auto', class: className,
+} = Astro.props;
+
+const srcset = (ext: string) =>
+  widths && widths.length
+    ? widths.map((w) => `${base}-${w}.${ext} ${w}w`).join(', ')
+    : `${base}.${ext}`;
+---
+<picture>
+  {formats.map((fmt) => (
+    <source type={`image/${fmt}`} srcset={srcset(fmt)} {...(sizes ? { sizes } : {})} />
+  ))}
+  <img
+    src={`${base}.${fallback}`}
+    {...(widths && widths.length ? { srcset: srcset(fallback), ...(sizes ? { sizes } : {}) } : {})}
+    alt={alt}
+    width={width}
+    height={height}
+    loading={loading}
+    fetchpriority={fetchpriority}
+    decoding="async"
+    class={className}
+  />
+</picture>

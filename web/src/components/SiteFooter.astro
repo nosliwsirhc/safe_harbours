@@ -1,0 +1,53 @@
+---
+import { site, footerNav } from '../data/site';
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <b>{site.name}</b>
+        <p>A trusted provider of treatment foster care in Ontario, helping children find stability and flourish in caring homes.</p>
+        <div class="foot-social">
+          <a href={site.social.facebook} aria-label="Facebook" target="_blank" rel="noopener">Facebook</a>
+          <a href={site.social.instagram} aria-label="Instagram" target="_blank" rel="noopener">Instagram</a>
+          <a href={site.social.linkedin} aria-label="LinkedIn" target="_blank" rel="noopener">LinkedIn</a>
+        </div>
+      </div>
+      <div>
+        <h2>Explore</h2>
+        <ul>
+          {footerNav.explore.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+        </ul>
+      </div>
+      <div>
+        <h2>More</h2>
+        <ul>
+          {footerNav.more.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+        </ul>
+      </div>
+      <div>
+        <h2>Get in Touch</h2>
+        <ul>
+          <li><a href={site.emailHref}>{site.email}</a></li>
+          <li><a href={site.phoneHref}>{site.phone}</a></li>
+          <li>{site.address.street}<br />{site.address.city}, {site.address.region} {site.address.postal}</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>&copy; {year} {site.legalName}. All rights reserved.</span>
+      <span class="foot-legal">
+        {footerNav.legal.map((l, i) => (
+          <>{i > 0 && <span aria-hidden="true"> · </span>}<a href={l.href}>{l.label}</a></>
+        ))}
+      </span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .foot-social { display: flex; gap: 18px; margin-top: 16px; font-weight: 700; font-size: 0.86rem; }
+  .foot-legal { display: flex; gap: 6px; align-items: center; }
+  .foot-legal a:hover { color: #fff; }
+</style>

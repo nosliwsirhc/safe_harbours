@@ -1,0 +1,104 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import Picture from '../../components/Picture.astro';
+import ReadMore from '../../components/ReadMore.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import ShareButtons from '../../components/ShareButtons.astro';
+import { site } from '../../data/site';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+
+// Rough reading time from the raw Markdown body (~200 wpm).
+const words = post.body?.trim().split(/\s+/).length ?? 0;
+const readingTime = Math.max(1, Math.round(words / 200));
+
+const hasHero = Boolean(post.data.image);
+
+const readMore = [
+  { href: '/resources', label: 'All Resources' },
+  { href: '/about-fostering', label: 'About Fostering' },
+  { href: '/become-a-foster-parent', label: 'Become a Foster Parent' },
+  { href: '/contact-us', label: 'Contact Us' },
+];
+---
+<BaseLayout
+  title={`${post.data.title} | Safe Harbours`}
+  description={post.data.description}
+  ogImage={post.data.image ? `${post.data.image}.jpg` : undefined}
+>
+  {hasHero ? (
+    <header class="article-hero">
+      <div class="article-hero-media">
+        <Picture
+          base={post.data.image!}
+          alt={post.data.imageAlt ?? post.data.title}
+          width={1440}
+          height={760}
+          formats={['avif', 'webp']}
+          fallback="jpg"
+          widths={[640, 1024, 1440, 1920]}
+          sizes="100vw"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+      <div class="article-hero-scrim"></div>
+      <div class="article-hero-inner wrap">
+        <span class="eyebrow kicker">{post.data.kicker}</span>
+        <h1>{post.data.title}</h1>
+        <p class="article-byline">
+          <span>{fmt(post.data.date)}</span>
+          <span class="sep" aria-hidden="true">&bull;</span>
+          <span>{post.data.author}</span>
+          <span class="sep" aria-hidden="true">&bull;</span>
+          <span>{readingTime} min read</span>
+        </p>
+      </div>
+    </header>
+  ) : (
+    <PageHeader title={post.data.title} intro={post.data.description} />
+  )}
+
+  <section class="pad article-section">
+    <div class="wrap">
+      <article class="prose article-body">
+        {!hasHero && (
+          <p class="article-byline standalone">
+            <span>{fmt(post.data.date)}</span>
+            <span class="sep" aria-hidden="true">&bull;</span>
+            <span>{post.data.author}</span>
+            <span class="sep" aria-hidden="true">&bull;</span>
+            <span>{readingTime} min read</span>
+          </p>
+        )}
+        {post.data.youtube && (
+          <div class="video-embed">
+            <iframe
+              src={`https://www.youtube-nocookie.com/embed/${post.data.youtube}`}
+              title={post.data.title}
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          </div>
+        )}
+        <Content />
+      </article>
+      <ShareButtons url={new URL(`/resources/${post.id}`, site.url).href} title={post.data.title} />
+    </div>
+  </section>
+
+  <CtaBand />
+  <ReadMore links={readMore} />
+</BaseLayout>

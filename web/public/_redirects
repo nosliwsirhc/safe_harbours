@@ -1,0 +1,16 @@
+# Cloudflare redirects. Syntax: /from  /to  status
+#
+# The Astro slugs match the old WordPress paths 1:1, and Cloudflare's static-
+# asset handler auto-drops trailing slashes (so /about-fostering/ -> /about-fostering
+# and /resources/<slug>/ -> /resources/<slug> resolve without rules here).
+# These cover common aliases / shortcuts that may be linked externally.
+
+/home/        /                                  301
+/contact      /contact-us                        301
+/contact/     /contact-us                        301
+/complaints   /program-description/complaints     301
+/complaints/  /program-description/complaints     301
+/blog         /resources                         301
+/blog/        /resources                         301
+/thank-you    /thank-you-fostering               301
+/thank-you/   /thank-you-fostering               301

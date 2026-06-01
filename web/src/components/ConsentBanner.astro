@@ -1,0 +1,137 @@
+---
+// Opt-in cookie consent. No analytics cookies load until the visitor clicks
+// Accept; the choice is remembered in localStorage. Declining (or doing
+// nothing, or having JS off) loads nothing. Returning visitors who accepted
+// get GA loaded immediately without seeing the banner again.
+// Safe Harbours' GA4 Measurement ID (from the live WordPress site).
+const gaId = 'G-BMMJVTQGHX';
+---
+<div class="consent" id="consent" role="region" aria-label="Cookie consent" hidden>
+  <p class="consent-text">
+    We use Google Analytics to understand how visitors find and use our site. May we turn on
+    analytics cookies? You can read more in our <a href="/privacy-policy">Privacy Policy</a>.
+  </p>
+  <div class="consent-actions">
+    <button type="button" class="btn btn-out btn-sm" id="consent-decline">Decline</button>
+    <button type="button" class="btn btn-coral btn-sm" id="consent-accept">Accept</button>
+  </div>
+</div>
+
+<script is:inline define:vars={{ gaId }}>
+  (function () {
+    var KEY = 'sh-consent';
+    var loaded = false;
+
+    function loadGA() {
+      if (loaded || !gaId || gaId === 'G-XXXXXXXXXX') return;
+      loaded = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + gaId;
+      document.head.appendChild(s);
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { window.dataLayer.push(arguments); }
+      window.gtag = gtag;
+      gtag('js', new Date());
+      gtag('config', gaId, { anonymize_ip: true });
+    }
+
+    var stored = null;
+    try { stored = localStorage.getItem(KEY); } catch (e) {}
+
+    if (stored === 'granted') {
+      loadGA();
+      return;
+    }
+    if (stored === 'denied') {
+      return;
+    }
+
+    // No choice yet: show the banner.
+    var banner = document.getElementById('consent');
+    if (!banner) return;
+    banner.hidden = false;
+    // Next frame so the entrance transition runs.
+    requestAnimationFrame(function () { banner.classList.add('show'); });
+
+    function decide(value) {
+      try { localStorage.setItem(KEY, value); } catch (e) {}
+      banner.classList.remove('show');
+      var hide = function () { banner.hidden = true; banner.removeEventListener('transitionend', hide); };
+      banner.addEventListener('transitionend', hide);
+      // Fallback in case transitionend doesn't fire (reduced motion, etc.).
+      setTimeout(hide, 400);
+      if (value === 'granted') loadGA();
+    }
+
+    document.getElementById('consent-accept')?.addEventListener('click', function () { decide('granted'); });
+    document.getElementById('consent-decline')?.addEventListener('click', function () { decide('denied'); });
+  })();
+</script>
+
+<style>
+  .consent {
+    position: fixed;
+    left: clamp(12px, 3vw, 24px);
+    bottom: clamp(12px, 3vw, 24px);
+    z-index: 200;
+    max-width: 26rem;
+    background: var(--slate);
+    color: var(--on-dark);
+    border: 1px solid color-mix(in oklch, var(--slate), white 16%);
+    border-radius: 14px;
+    padding: 18px 20px 16px;
+    box-shadow: 0 14px 40px -12px rgba(13, 24, 33, 0.55);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .consent.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .consent-text {
+    margin: 0 0 14px;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--on-dark);
+  }
+  .consent-text a {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .consent-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  .consent .btn-sm {
+    padding: 8px 18px;
+    font-size: 0.9rem;
+  }
+  /* Keep the decline (ghost) button legible on the dark card. */
+  .consent .btn-out {
+    color: var(--on-dark);
+    border-color: color-mix(in oklch, var(--on-dark), transparent 55%);
+    background: transparent;
+  }
+  .consent .btn-out:hover {
+    background: color-mix(in oklch, white, transparent 88%);
+    color: #fff;
+  }
+  @media (max-width: 520px) {
+    .consent {
+      left: 10px;
+      right: 10px;
+      max-width: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .consent {
+      transition: opacity 0.2s linear;
+      transform: none;
+    }
+    .consent.show { transform: none; }
+  }
+</style>

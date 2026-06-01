@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+.astro/
+.wrangler/
+
+# Environment / secrets (never commit)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.example
+.dev.vars
+.cf.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Caches
+.npm
+.npm-cache
+.eslintcache
+*.tsbuildinfo
+
+# OS / editor
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Local-only tooling / config (machine-specific)
+.mcp.json
+.claude/
+.devcontainer/
+
+# Drafts inbox (local only)
+web/_drafts/

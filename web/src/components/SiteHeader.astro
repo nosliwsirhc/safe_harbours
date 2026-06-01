@@ -1,0 +1,97 @@
+---
+import { site, nav } from '../data/site';
+---
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="/">
+      <img src="/images/logo-mark.png" alt="" width="44" height="44" />
+      <span>
+        <b>{site.name}</b>
+        <span class="sub">{site.tagline}</span>
+      </span>
+    </a>
+
+    <nav aria-label="Primary">
+      <ul class="nav-links">
+        {nav.filter((i) => i.label !== 'Home').map((item) => (
+          item.children ? (
+            <li class="has-menu">
+              {item.href ? (
+                <a class="lnk" href={item.href}>{item.label} <span class="caret" aria-hidden="true"></span></a>
+              ) : (
+                <button class="lnk" aria-haspopup="true" aria-expanded="false">{item.label} <span class="caret" aria-hidden="true"></span></button>
+              )}
+              <ul class="submenu">
+                {item.children.map((c) => (
+                  <li><a href={c.href}>{c.label}</a></li>
+                ))}
+              </ul>
+            </li>
+          ) : item.label === 'Contact Us' ? (
+            <li><a class="btn btn-pri" href={item.href}>Contact Us</a></li>
+          ) : (
+            <li><a class="lnk" href={item.href}>{item.label}</a></li>
+          )
+        ))}
+      </ul>
+    </nav>
+
+    <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-controls="drawer" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- Mobile drawer - kept OUTSIDE <header> because the header's backdrop-filter
+     would otherwise make this fixed panel size relative to the header, not the viewport. -->
+<div class="drawer" id="drawer">
+    <div class="drawer-backdrop" data-close></div>
+    <div class="drawer-panel" role="dialog" aria-modal="true" aria-label="Menu">
+      <button class="drawer-close" data-close aria-label="Close menu">&times;</button>
+      <div class="drawer-cta">
+        <a class="btn btn-coral" href="/contact-us" data-close>Contact Us</a>
+        <a class="btn btn-out" href={site.phoneHref} data-close>Call {site.phone}</a>
+      </div>
+      <nav aria-label="Mobile">
+        <ul>
+          {nav.map((item) => (
+            item.children ? (
+              <li>
+                <span class="grp-label">{item.label}</span>
+                <ul class="sub">
+                  {item.children.map((c) => <li><a href={c.href} data-close>{c.label}</a></li>)}
+                </ul>
+              </li>
+            ) : (
+              <li><a href={item.href} data-close>{item.label}</a></li>
+            )
+          ))}
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+<script>
+  const btn = document.getElementById('menuBtn');
+  const drawer = document.getElementById('drawer');
+  if (btn && drawer) {
+    const open = () => { drawer.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); document.body.style.overflow = 'hidden'; };
+    const close = () => { drawer.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); document.body.style.overflow = ''; };
+    btn.addEventListener('click', open);
+    drawer.querySelectorAll('[data-close]').forEach((el) => el.addEventListener('click', close));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+  }
+
+  // Keep desktop dropdown aria-expanded in sync (menus open on hover/focus via CSS).
+  document.querySelectorAll('.has-menu').forEach((li) => {
+    const trigger = li.querySelector(':scope > .lnk');
+    if (!trigger) return;
+    trigger.setAttribute('aria-haspopup', 'true');
+    trigger.setAttribute('aria-expanded', 'false');
+    const set = (v) => trigger.setAttribute('aria-expanded', String(v));
+    li.addEventListener('mouseenter', () => set(true));
+    li.addEventListener('mouseleave', () => set(false));
+    li.addEventListener('focusin', () => set(true));
+    li.addEventListener('focusout', () => set(false));
+  });
+</script>

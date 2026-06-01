@@ -1,0 +1,17 @@
+# Copy to `.dev.vars` for local testing, and set these as secrets in the
+# Cloudflare dashboard for production. `.dev.vars` is gitignored.
+#
+# Cloudflare Turnstile (https://dash.cloudflare.com -> Turnstile):
+#   PUBLIC_TURNSTILE_SITE_KEY is exposed to the browser (the widget).
+#   TURNSTILE_SECRET_KEY is server-only.
+# Leave unset locally to use Cloudflare's always-pass TEST keys.
+PUBLIC_TURNSTILE_SITE_KEY=
+TURNSTILE_SECRET_KEY=
+
+# Resend (https://resend.com) — server-only. Without it, the form returns a
+# dev-only success locally and errors in production.
+RESEND_TOKEN=
+
+# Where inquiries are sent / sent from (the "from" domain must be verified in Resend).
+CONTACT_TO=info@safeharbours.ca
+CONTACT_FROM=Safe Harbours <noreply@safeharbours.ca>

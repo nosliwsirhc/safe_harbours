@@ -1,0 +1,149 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Icon from '../components/Icon.astro';
+import Picture from '../components/Picture.astro';
+import { site } from '../data/site';
+
+const title = 'Our Story — Safe Harbours Foster Care';
+const description =
+  'Safe Harbours is a foster care organization committed to providing safe, nurturing homes for children facing significant challenges. Meet our founder, our team, and the values that guide our work.';
+
+const values = [
+  { icon: 'shield', h: 'Safety First', p: 'Homes are thoroughly screened and prepared.' },
+  { icon: 'star', h: 'Lasting Impact', p: 'Long-term positive change in children’s lives.' },
+  { icon: 'heart', h: 'Compassionate Care', p: 'Love, patience, and understanding for vulnerable children.' },
+  { icon: 'headset', h: 'Continuous Support', p: '24/7 guidance to foster parents.' },
+  { icon: 'handshake', h: 'Integrity and Trust', p: 'Honesty and transparency standards.' },
+] as const;
+
+const team = [
+  { base: '/images/our-story-matt-pearson', name: 'Matt Pearson', role: 'Case Manager, Classroom Supervisor' },
+  { base: '/images/our-story-michelle-powell', name: 'Michelle Powell', role: 'Case Manager' },
+  { base: '/images/our-story-jamie-moreau', name: 'Jamie Moreau', role: 'Director of Service' },
+] as const;
+---
+<BaseLayout title={title} description={description}>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="badge"><Icon name="compass" /> Our Story</span>
+        <h1>Building Safe and Supportive <em>Homes</em> for Children in Need</h1>
+        <p class="lede">Safe Harbours is a foster care organization committed to providing safe, nurturing homes for children facing significant challenges, including trauma and mental health issues.</p>
+        <div class="hero-cta">
+          <a class="btn btn-coral" href="/become-a-foster-parent">Get Started</a>
+          <a class="btn btn-out" href="/careers">View Our Career Opportunities</a>
+        </div>
+      </div>
+      <div class="hero-media">
+        <Picture
+          base="/images/our-story-hero"
+          alt="A safe, supportive home for children in need"
+          width={600}
+          height={400}
+          formats={['avif', 'webp']}
+          widths={[640, 1024, 1440]}
+          sizes="(min-width: 920px) 540px, 100vw"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- PURPOSE -->
+  <section class="pad">
+    <div class="wrap story">
+      <div class="story-text reveal">
+        <span class="eyebrow">Why we exist</span>
+        <h2>Our Purpose</h2>
+        <p>At Safe Harbours, our purpose is to ensure that every child in need is placed in a home where they are safe, supported, and given the opportunity to grow. We carefully recruit and train foster parents who are committed to making a lasting difference in a child’s life.</p>
+        <p>By prioritizing trauma-informed care and providing ongoing support, we help both children and foster families navigate the challenges of fostering with confidence and compassion.</p>
+      </div>
+      <div class="story-media reveal">
+        <Picture
+          base="/images/our-story-purpose"
+          alt="A foster family spending time together"
+          width={800}
+          height={600}
+          formats={['avif', 'webp']}
+          widths={[640, 1024]}
+          sizes="(min-width: 920px) 45vw, 100vw"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUES -->
+  <section class="pad how">
+    <div class="wrap">
+      <div class="sec-head center">
+        <span class="eyebrow">What guides us</span>
+        <h2>Our Values</h2>
+      </div>
+      <div class="points">
+        {values.map((v) => (
+          <div class="point reveal">
+            <div class="ic"><Icon name={v.icon} /></div>
+            <h3>{v.h}</h3>
+            <p>{v.p}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FOUNDER -->
+  <section class="pad bg-warm">
+    <div class="wrap story">
+      <div class="story-media reveal">
+        <Picture
+          base="/images/our-story-founder"
+          alt="Chris Wilson, founder of Safe Harbours"
+          width={800}
+          height={600}
+          formats={['avif', 'webp']}
+          widths={[640, 1024]}
+          sizes="(min-width: 920px) 45vw, 100vw"
+        />
+      </div>
+      <div class="story-text reveal">
+        <span class="eyebrow">A Founder With A Passion</span>
+        <h2>Chris Wilson</h2>
+        <p>Chris Wilson founded Safe Harbours in 2015, continuing a family legacy that began in the 1970s. He grew up with foster siblings, and that experience shaped a lifelong commitment to caring for children in need.</p>
+        <p>Before founding Safe Harbours, Chris worked with our sister agency, <a href={site.sisterAgency.url}>{site.sisterAgency.name}</a>, beginning in 2008 — including a period as Interim Executive Director from 2011 to 2013.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <section class="pad">
+    <div class="wrap">
+      <div class="sec-head center">
+        <span class="eyebrow">The people behind the work</span>
+        <h2>Our Team</h2>
+      </div>
+      <div class="team-grid">
+        {team.map((m) => (
+          <figure class="person reveal">
+            <Picture
+              base={m.base}
+              alt={`${m.name}, ${m.role}`}
+              width={400}
+              height={400}
+              formats={['avif', 'webp']}
+              fallback="png"
+              widths={[400, 600]}
+              sizes="(min-width: 920px) 300px, 50vw"
+            />
+            <div class="nm">{m.name}</div>
+            <div class="role">{m.role}</div>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CtaBand title="Ready To Get Started?" />
+</BaseLayout>

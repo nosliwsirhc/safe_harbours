@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Icon from '../components/Icon.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { site } from '../data/site';
+
+const title = 'Contact Us — Safe Harbours Ontario Foster Care';
+const description =
+  'Get in touch with Safe Harbours. Reach out today and our team will get in touch soon — by phone, email, or the form below.';
+
+const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+  `${site.address.street}, ${site.address.city}, ${site.address.region} ${site.address.postal}`
+)}`;
+---
+<BaseLayout title={title} description={description}>
+  <PageHeader
+    title="Contact Us"
+    intro="Reach out today and our team will get in touch soon. Whether you have a quick question or you’re ready to start fostering, we’d love to hear from you."
+  />
+
+  <section class="pad cta" id="contact">
+    <div class="wrap cta-grid">
+      <div class="reveal">
+        <h2>Let’s talk.</h2>
+        <p>Share a few details and a real member of our team will get back to you within one business day. No pressure — just a conversation.</p>
+        <div class="ways">
+          <div class="way"><span class="wic"><Icon name="phone" /></span><a href={site.phoneHref}>{site.phone}</a></div>
+          <div class="way"><span class="wic"><Icon name="mail" /></span><a href={site.emailHref}>{site.email}</a></div>
+          <div class="way"><span class="wic"><Icon name="pin" /></span><a href={mapsHref} target="_blank" rel="noopener">{site.address.street}, {site.address.city}, {site.address.region} {site.address.postal}</a></div>
+        </div>
+      </div>
+      <ContactForm />
+    </div>
+  </section>
+</BaseLayout>

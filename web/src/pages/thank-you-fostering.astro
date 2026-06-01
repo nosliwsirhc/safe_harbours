@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Icon from '../components/Icon.astro';
+
+const title = 'Thank You — Safe Harbours Ontario Foster Care';
+const description =
+  'Thank you for taking the first step in this life-changing journey. We’ll review your submission and be in touch soon.';
+---
+<BaseLayout title={title} description={description}>
+  <PageHeader title="Thank You" />
+
+  <section class="pad">
+    <div class="wrap prose reveal" style="text-align:center;max-width:680px">
+      <p style="font-size:1.2rem;color:var(--slate-d)">
+        Thank you so much for taking the first step in this life-changing journey.
+        We will review your submission and be in touch soon if you meet the basic criteria.
+      </p>
+      <p>
+        In the meantime, feel free to keep exploring — our resources can help you picture
+        what fostering looks like day to day, and what to expect next.
+      </p>
+      <p class="hero-cta" style="justify-content:center;margin-top:28px">
+        <a class="btn btn-coral" href="/">Back to Home</a>
+        <a class="btn btn-out" href="/resources">Browse Resources <Icon name="compass" size={16} /></a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>

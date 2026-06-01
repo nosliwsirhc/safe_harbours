@@ -1,0 +1,21 @@
+---
+interface Props {
+  links: { href: string; label: string }[];
+  heading?: string;
+}
+const { links, heading = 'Read more' } = Astro.props;
+---
+{links?.length ? (
+  <section class="read-more">
+    <div class="wrap">
+      <h2>{heading}</h2>
+      <ul>
+        {links.map((l) => (
+          <li>
+            <a href={l.href}>{l.label}<span class="arr" aria-hidden="true">→</span></a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+) : null}

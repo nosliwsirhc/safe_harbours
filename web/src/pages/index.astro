@@ -1,0 +1,226 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import Picture from '../components/Picture.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { site } from '../data/site';
+
+const title = 'Safe Harbours — Become a Foster Parent in Ontario';
+const description =
+  'Safe Harbours is an Ontario treatment foster care agency. You can give a child the stability they’ve been waiting for — with the training, on-call support, and dedicated case management you need to foster with confidence.';
+
+const why = [
+  {
+    icon: 'headset',
+    h: 'Continuous support',
+    p: 'You are never on your own. On-call support and a dedicated case management team walk alongside you — before, during, and well after a placement.',
+  },
+  {
+    icon: 'compass',
+    h: 'Intentional matching',
+    p: 'We approach placements thoughtfully, weighing your strengths and capacity against a child’s needs — because stability matters, and the right fit is never taken lightly.',
+  },
+  {
+    icon: 'users',
+    h: 'A team-based approach',
+    p: 'For children with more complex needs, you are backed by a wider team — including Child and Youth Workers and a psychologist — so no caregiver carries it alone.',
+  },
+] as const;
+
+const guidePoints = [
+  'What fostering looks like day-to-day',
+  'The different types of fostering',
+  'How Safe Harbours supports you every step of the way',
+  'What makes someone a great foster parent',
+  'The process from first conversation to placement',
+  'Answers to common worries and misconceptions',
+];
+
+const testimonials = [
+  'Safe Harbours provided me with the support and training I needed to become a successful foster parent. I highly recommend their services.',
+  'I can’t thank Safe Harbours enough for the care and support they provided for my foster child. They truly made a difference in his life.',
+  'Safe Harbours is an amazing organization. They provide quality care and services for foster children and families alike.',
+];
+
+const partners = [1, 2, 3, 4, 5, 6, 7];
+---
+<BaseLayout title={title} description={description}>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="badge"><Icon name="heart" /> Become a Foster Parent in Ontario</span>
+        <h1>You can give a child the <em>stability</em> they’ve been waiting for.</h1>
+        <p class="lede">Get the training and ongoing support you need to foster with confidence — including on-call support and a dedicated case management team.</p>
+        <div class="hero-cta">
+          <a class="btn btn-coral" href="/become-a-foster-parent">Become a Foster Parent</a>
+          <a class="btn btn-out" href="#how">How It Works</a>
+        </div>
+      </div>
+      <div class="hero-media">
+        <Picture
+          base="/images/hero"
+          alt="A foster parent and child together at home"
+          width={600}
+          height={400}
+          formats={['avif', 'webp']}
+          widths={[640, 1024, 1440]}
+          sizes="(min-width: 920px) 540px, 100vw"
+          loading="eager"
+          fetchpriority="high"
+        />
+        <div class="verify"><span class="chk"><Icon name="shield" /></span><div><b>Fully supported</b><br /><span>On-call support &amp; case management</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CREDIBILITY STRIP -->
+  <div class="strip">
+    <div class="wrap">
+      <span class="lbl">What you can count on</span>
+      <div class="stat"><b>On-call</b><span>support when you need it</span></div>
+      <div class="divider"></div>
+      <div class="stat"><b>Licensed</b><span>in the Province of Ontario</span></div>
+      <div class="divider"></div>
+      <div class="stat"><b>Team-based</b><span>care for complex needs</span></div>
+      <div class="divider"></div>
+      <div class="stat"><b>Costs covered</b><span>so fostering is sustainable</span></div>
+    </div>
+  </div>
+
+  <!-- INTRO: what it looks like in practice -->
+  <section class="pad">
+    <div class="wrap story">
+      <div class="story-media reveal">
+        <Picture base="/images/family-home" alt="A warm family home" width={800} height={600} formats={['avif', 'webp']} widths={[640, 1024]} sizes="(min-width: 920px) 45vw, 100vw" />
+      </div>
+      <div class="story-text reveal">
+        <span class="eyebrow">Fostering in Ontario</span>
+        <h2>What it looks like in practice</h2>
+        <p>When you open your home to a child in need, you’re not just giving them safety — you’re discovering a deeper sense of purpose, connection, and impact in your own life. Fostering is an opportunity to show up for someone when it matters most.</p>
+        <p><a class="btn btn-coral" href="/about-fostering">About Fostering</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY SAFE HARBOURS -->
+  <section class="pad how" id="why">
+    <div class="wrap">
+      <div class="sec-head center">
+        <span class="eyebrow">Why Safe Harbours</span>
+        <h2>Why foster with Safe Harbours?</h2>
+        <p>We pair every family with the people, training, and back-up that make fostering sustainable.</p>
+      </div>
+      <div class="why-grid">
+        {why.map((w) => (
+          <div class="panel reveal">
+            <div class="ic"><Icon name={w.icon} /></div>
+            <h3>{w.h}</h3>
+            <p>{w.p}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="pad" id="how">
+    <div class="wrap">
+      <div class="sec-head center">
+        <span class="eyebrow">How it works</span>
+        <h2>How do you become a foster parent?</h2>
+        <p>Becoming a foster parent is a life-changing decision that can bring immense joy and fulfillment. We offer a comprehensive training program and personalized guidance, so you’re prepared to make a meaningful difference in a child’s life.</p>
+      </div>
+      <div class="timeline">
+        <div class="tnode reveal"><div class="tdot">1</div><h3>Get in touch</h3><p>Ask us anything. A real member of our team answers — no commitment required.</p></div>
+        <div class="tnode reveal"><div class="tdot">2</div><h3>Assessment</h3><p>Background checks and a home study, completed together step by step.</p></div>
+        <div class="tnode reveal"><div class="tdot">3</div><h3>Training</h3><p>Comprehensive, trauma-informed preparation so you feel genuinely ready.</p></div>
+        <div class="tnode reveal"><div class="tdot">4</div><h3>Placement &amp; support</h3><p>A thoughtful match, then ongoing support for as long as you foster.</p></div>
+      </div>
+      <p class="center" style="margin-top:36px"><a class="btn btn-coral" href="/become-a-foster-parent">Get Started</a></p>
+    </div>
+  </section>
+
+  <!-- LEAD-GEN GUIDE -->
+  <section class="pad bg-warm">
+    <div class="wrap story">
+      <div class="story-text reveal">
+        <span class="eyebrow">Get started</span>
+        <h2>Here’s your first step.</h2>
+        <p>Becoming a foster parent starts with understanding what the journey looks like. We’ve put together a simple, helpful guide to walk you through everything you need to know before opening your home.</p>
+        <p style="font-weight:700;color:var(--slate-d);margin-top:1em">What’s inside the guide:</p>
+        <ul class="spectrum">
+          {guidePoints.map((g) => <li>{g}</li>)}
+        </ul>
+        <p style="margin-top:24px"><a class="btn btn-coral" href="/become-a-foster-parent">Download Your Guide</a></p>
+      </div>
+      <div class="story-media reveal">
+        <Picture base="/images/get-started" alt="The Complete Guide to Becoming a Foster Parent" width={800} height={600} formats={['avif', 'webp']} widths={[640, 1024]} sizes="(min-width: 920px) 45vw, 100vw" />
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="pad">
+    <div class="wrap">
+      <div class="sec-head center">
+        <span class="eyebrow">From our families</span>
+        <h2>Foster parents on fostering with us</h2>
+      </div>
+      <div class="tcards">
+        {testimonials.map((t) => (
+          <figure class="tcard reveal">
+            <div class="stars" aria-hidden="true"><Icon name="star" size={18} /><Icon name="star" size={18} /><Icon name="star" size={18} /><Icon name="star" size={18} /><Icon name="star" size={18} /></div>
+            <blockquote>{t}</blockquote>
+            <figcaption>A Safe Harbours foster parent</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- REFERRAL PARTNERS -->
+  <section class="pad how">
+    <div class="wrap">
+      <div class="sec-head center"><span class="eyebrow">Referral Partners</span><h2>Trusted by agencies across Ontario</h2></div>
+      <div class="partners">
+        {partners.map((n) => (
+          <img src={`/images/partners/partner-${n}.png`} alt="Referral partner logo" loading="lazy" decoding="async" />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="pad cta" id="contact">
+    <div class="wrap cta-grid">
+      <div class="reveal">
+        <h2>Have a question? Let’s talk.</h2>
+        <p>Share a few details and a member of our team will get back to you within one business day. No pressure — just a conversation.</p>
+        <div class="ways">
+          <div class="way"><span class="wic"><Icon name="phone" /></span><a href={site.phoneHref}>{site.phone}</a></div>
+          <div class="way"><span class="wic"><Icon name="mail" /></span><a href={site.emailHref}>{site.email}</a></div>
+          <div class="way"><span class="wic"><Icon name="pin" /></span>{site.address.street}, {site.address.city}, {site.address.region}</div>
+        </div>
+      </div>
+      <ContactForm />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  @media (max-width: 920px) { .why-grid { grid-template-columns: 1fr; } }
+
+  .tcards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  @media (max-width: 920px) { .tcards { grid-template-columns: 1fr; } }
+  .tcard { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; padding: 30px; box-shadow: var(--shadow); }
+  .tcard .stars { display: flex; gap: 2px; color: var(--gold); margin-bottom: 14px; }
+  .tcard .stars :global(svg) { fill: var(--gold); }
+  .tcard blockquote { font-size: 1.06rem; line-height: 1.6; color: var(--ink); }
+  .tcard figcaption { margin-top: 16px; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--coral-d); }
+
+  .partners { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 38px 48px; }
+  .partners img { height: 46px; width: auto; opacity: 0.85; filter: grayscale(1); transition: filter 0.2s, opacity 0.2s; }
+  .partners img:hover { filter: none; opacity: 1; }
+</style>
