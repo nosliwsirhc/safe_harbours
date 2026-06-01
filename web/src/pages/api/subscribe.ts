@@ -2,8 +2,10 @@ import type { APIRoute } from 'astro';
 import { env as workerEnv } from 'cloudflare:workers';
 import { isValidEmail } from '../../lib/form';
 
-// On-demand newsletter signup. Notifies the team via Resend. Protected by the
-// newsletter form's Cloudflare Turnstile widget plus a honeypot (`company`).
+// On-demand newsletter signup. Adds the subscriber to a Resend Audience (a real
+// mailing list) when RESEND_AUDIENCE_ID is set; otherwise (or if that call
+// fails) it falls back to emailing the team so no signup is ever lost. Protected
+// by the form's Cloudflare Turnstile widget plus a honeypot (`company`).
 export const prerender = false;
 
 const TURNSTILE_VERIFY = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
@@ -47,13 +49,35 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   }
 
   const apiKey = env.RESEND_TOKEN ?? env.RESEND_API_KEY;
-  const to = env.CONTACT_TO ?? 'info@safeharbours.ca';
-  const from = env.CONTACT_FROM ?? 'Safe Harbours <noreply@safeharbours.ca>';
   if (!apiKey) {
     if (import.meta.env.DEV) return json({ ok: true, dev: true });
     return json({ ok: false, error: 'Subscriptions are not configured yet. Please email us.' }, 500);
   }
 
+  // Preferred path: add the subscriber straight to a Resend Audience (real list).
+  const audienceId = env.RESEND_AUDIENCE_ID;
+  if (audienceId) {
+    const sp = name.indexOf(' ');
+    const firstName = sp === -1 ? name : name.slice(0, sp);
+    const lastName = sp === -1 ? '' : name.slice(sp + 1);
+    try {
+      const res = await fetch(`https://api.resend.com/audiences/${audienceId}/contacts`, {
+        method: 'POST',
+        headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ email, first_name: firstName, last_name: lastName, unsubscribed: false }),
+      });
+      // 2xx = added (or already present — Resend upserts by email). On any other
+      // status, fall through to the email backstop so the signup isn't lost.
+      if (res.ok) return json({ ok: true });
+    } catch {
+      /* fall through to email backstop */
+    }
+  }
+
+  // Fallback: no audience configured, or the audience call failed — notify the
+  // team by email so the signup is captured.
+  const to = env.CONTACT_TO ?? 'info@safeharbours.ca';
+  const from = env.CONTACT_FROM ?? 'Safe Harbours <noreply@safeharbours.ca>';
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
