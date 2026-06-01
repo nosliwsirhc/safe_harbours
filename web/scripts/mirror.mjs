@@ -202,18 +202,26 @@ async function processHtml(html, outName) {
     else if (href.startsWith('//www.safeharbours.ca')) a.setAttribute('href', href.replace('//www.safeharbours.ca', '') || '/');
   }
 
-  // --- a11y: give generic-text links a descriptive aria-label (derived from
-  // the destination) so screen readers + crawlers know where they go ---
-  const GENERIC = /^(learn more|read more|click here|more|here|get started|view more|see more|details)$/i;
+  // --- a11y/SEO: make generic link text descriptive. "Learn More" links get
+  // their VISIBLE text rewritten to name the destination (approved deviation
+  // from the source copy); other generic CTAs keep their copy but gain a
+  // descriptive aria-label derived from where they go. ---
+  const GENERIC = /^(learn more|read more|click here|more|here|view more|see more|details|get started)$/i;
   const humanize = (s) => s.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   for (const a of body.querySelectorAll('a[href]')) {
-    if (a.getAttribute('aria-label')) continue;
     const txt = a.text.replace(/\s+/g, ' ').trim();
     if (!GENERIC.test(txt)) continue;
     const href = a.getAttribute('href') || '';
     const seg = href.split(/[?#]/)[0].replace(/\/$/, '').split('/').filter(Boolean).pop();
     const dest = href === '/' || href === '' ? 'Home' : seg && /^[a-z0-9-]+$/i.test(seg) ? humanize(seg) : '';
-    if (dest) a.setAttribute('aria-label', `${txt}: ${dest}`);
+    if (/^(learn more|read more|more|view more|see more|details)$/i.test(txt) && dest) {
+      // Rewrite the visible text to be descriptive, e.g. "Learn More" -> "Learn About Fostering".
+      const noun = dest.replace(/^About\s+/i, '') || 'More';
+      a.set_content(`Learn About ${noun}`);
+      a.removeAttribute('aria-label');
+    } else if (dest && !a.getAttribute('aria-label')) {
+      a.setAttribute('aria-label', `${txt}: ${dest}`);
+    }
   }
 
   // --- a11y: normalize heading order (no skipped levels) WITHOUT changing the
