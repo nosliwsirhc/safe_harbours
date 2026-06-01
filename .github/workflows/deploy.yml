@@ -48,11 +48,11 @@ jobs:
         working-directory: web
         env:
           # Public Turnstile site key — baked into the client HTML at build time.
-          # Not a secret. Set it as a GitHub Actions *variable* named
-          # PUBLIC_TURNSTILE_SITE_KEY (Settings → Secrets and variables →
-          # Actions → Variables). Without it, the form uses Cloudflare's
-          # always-pass TEST key.
-          PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
+          # It's a public value (visible in page source), but it's stored as a
+          # GitHub Actions secret named PUBLIC_TURNSTILE_SITE_KEY, so read it
+          # from secrets. Without it, the form uses Cloudflare's always-pass
+          # TEST key.
+          PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.PUBLIC_TURNSTILE_SITE_KEY }}
         run: npm run build
 
       # Deploy with the project's own wrangler (a dependency of
