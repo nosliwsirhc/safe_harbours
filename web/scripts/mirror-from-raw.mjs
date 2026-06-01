@@ -34,10 +34,12 @@ async function genPage(name, route) {
   const meta = JSON.parse(await readFile(path.join(MIRROR, `${name}.meta.json`), 'utf8'));
   const depth = route.split('/').length - 1;
   const up = '../'.repeat(depth + 1);
-  const title = (meta.title || 'Safe Harbours').replace(/\s*[-|]\s*Safe Harbours\s*$/i, '').trim() || 'Safe Harbours';
+  const base = (meta.title || '').replace(/\s*[-|]\s*Safe Harbours\s*$/i, '').trim();
+  // Only append the suffix when the base isn't already "Safe Harbours".
+  const title = base && base.toLowerCase() !== 'safe harbours' ? `${base} | Safe Harbours` : 'Safe Harbours';
   const file = path.join(PAGES_DIR, `${route}.astro`);
   await mkdir(path.dirname(file), { recursive: true });
-  await writeFile(file, `---\nimport ThemeLayout from '${up}layouts/ThemeLayout.astro';\n---\n<ThemeLayout name="${esc(name)}" title="${esc(title)} | Safe Harbours" />\n`);
+  await writeFile(file, `---\nimport ThemeLayout from '${up}layouts/ThemeLayout.astro';\n---\n<ThemeLayout name="${esc(name)}" title="${esc(title)}" />\n`);
 }
 
 const data = JSON.parse(await readFile(path.join(MIRROR, 'raw.json'), 'utf8'));

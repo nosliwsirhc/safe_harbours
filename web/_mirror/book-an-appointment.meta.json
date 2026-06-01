@@ -3,10 +3,10 @@
   "title": "Book an Appointment - Safe Harbours",
   "description": "",
   "styles": [
-    "/wp/theme/build/app.css",
-    "/wp/plugins/gravityforms/assets/css/dist/basic.min.css",
-    "/wp/plugins/gravityforms/assets/css/dist/theme-components.min.css",
-    "/wp/plugins/gravityforms/assets/css/dist/theme.min.css"
+    "/assets/theme/build/app.css",
+    "/assets/plugins/gravityforms/assets/css/dist/basic.min.css",
+    "/assets/plugins/gravityforms/assets/css/dist/theme-components.min.css",
+    "/assets/plugins/gravityforms/assets/css/dist/theme.min.css"
   ],
-  "script": "/wp/theme/build/app.js"
+  "script": "//theme/build/app.js"
 }

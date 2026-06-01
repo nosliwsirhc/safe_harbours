@@ -2,8 +2,6 @@
 import { defineConfig, passthroughImageService, sessionDrivers } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import cloudflare from '@astrojs/cloudflare';
-import remarkDirective from 'remark-directive';
-import remarkArticle from './src/lib/remark-article.mjs';
 
 // Mostly-static content site with one on-demand endpoint (the contact form).
 // Pages are prerendered by default; the contact API route opts into SSR and
@@ -31,8 +29,4 @@ export default defineConfig({
   // that would need a provisioned namespace at deploy time. A memory driver
   // keeps the build binding-free; nothing in the site ever reads a session.
   session: { driver: sessionDrivers.memory() },
-  // Article authoring directives (:::pullquote, :::stats, ::figure, ...) that
-  // map onto the editorial classes in global.css. remarkDirective must run
-  // first to parse the syntax; remarkArticle then rewrites the nodes.
-  markdown: { remarkPlugins: [remarkDirective, remarkArticle] },
 });

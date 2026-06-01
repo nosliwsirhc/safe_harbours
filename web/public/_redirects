@@ -14,3 +14,12 @@
 /blog/        /resources                         301
 /thank-you    /thank-you-fostering               301
 /thank-you/   /thank-you-fostering               301
+
+# Old WordPress asset URLs -> self-hosted /assets/ (preserve indexed/hotlinked
+# images + any path the theme JS/CSS resolves at runtime).
+/wp-content/uploads/*                  /assets/uploads/:splat     301
+/wp-content/themes/safe-harbours/*     /assets/theme/:splat       301
+/wp-content/plugins/*                  /assets/plugins/:splat     301
+/wp-includes/*                         /assets/includes/:splat    301
+# Earlier interim prefix used on the *.workers.dev preview.
+/wp/*                                  /assets/:splat             301

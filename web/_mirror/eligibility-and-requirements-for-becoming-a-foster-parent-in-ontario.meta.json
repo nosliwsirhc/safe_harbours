@@ -3,10 +3,10 @@
   "title": "Eligibility and Requirements for Becoming a Foster Parent in Ontario - Safe Harbours",
   "description": "The process to become a foster parent in Ontario is thorough because it is designed to protect children and support foster families.",
   "styles": [
-    "/wp/theme/build/app.css",
-    "/wp/plugins/gravityforms/assets/css/dist/basic.min.css",
-    "/wp/plugins/gravityforms/assets/css/dist/theme-components.min.css",
-    "/wp/plugins/gravityforms/assets/css/dist/theme.min.css"
+    "/assets/theme/build/app.css",
+    "/assets/plugins/gravityforms/assets/css/dist/basic.min.css",
+    "/assets/plugins/gravityforms/assets/css/dist/theme-components.min.css",
+    "/assets/plugins/gravityforms/assets/css/dist/theme.min.css"
   ],
-  "script": "/wp/theme/build/app.js"
+  "script": "//theme/build/app.js"
 }

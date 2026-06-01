@@ -2,14 +2,17 @@ import type { APIRoute } from 'astro';
 import { env as workerEnv } from 'cloudflare:workers';
 import { isValidEmail } from '../../lib/form';
 
-// On-demand newsletter signup. Notifies the team via Resend. A honeypot field
-// (`company`) filters bots; no Turnstile widget is needed for this low-risk form.
+// On-demand newsletter signup. Notifies the team via Resend. Protected by the
+// newsletter form's Cloudflare Turnstile widget plus a honeypot (`company`).
 export const prerender = false;
+
+const TURNSTILE_VERIFY = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+const TEST_SECRET = '1x0000000000000000000000000000000AA';
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, clientAddress }) => {
   const env = workerEnv as unknown as Record<string, string | undefined>;
 
   let data: Record<string, string> = {};
@@ -21,6 +24,21 @@ export const POST: APIRoute = async ({ request }) => {
 
   // Honeypot: real users leave this empty.
   if ((data.company ?? '').trim()) return json({ ok: true });
+
+  // Require a verified Cloudflare Turnstile token (the newsletter form renders a widget).
+  const secret = env.TURNSTILE_SECRET_KEY ?? TEST_SECRET;
+  let verified = false;
+  try {
+    const body = new URLSearchParams({ secret, response: data.token ?? '' });
+    if (clientAddress) body.set('remoteip', clientAddress);
+    const r = await fetch(TURNSTILE_VERIFY, { method: 'POST', body });
+    verified = ((await r.json()) as { success?: boolean }).success === true;
+  } catch {
+    verified = false;
+  }
+  if (!verified) {
+    return json({ ok: false, error: 'Verification failed. Please complete the check and try again.' }, 400);
+  }
 
   const name = (data.name ?? '').trim();
   const email = (data.email ?? '').trim();

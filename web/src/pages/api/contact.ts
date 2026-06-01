@@ -34,34 +34,29 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   const token = data.token ?? '';
   const honeypot = (data.hp ?? '').trim();
 
-  // Honeypot (used by the mirrored Gravity Forms markup): bots fill it; humans don't.
+  // Honeypot (Akismet field in the mirrored markup): bots fill it; humans don't.
   if (honeypot) return json({ ok: true });
 
-  // Bot protection: prefer Turnstile when a token is present (our own widget);
-  // otherwise fall back to the honeypot above (the theme's contact form has no
-  // Turnstile widget, matching the live site).
-  if (token) {
-    const secret = env.TURNSTILE_SECRET_KEY ?? TEST_SECRET;
-    let verified = false;
-    try {
-      const body = new URLSearchParams({ secret, response: token });
-      if (clientAddress) body.set('remoteip', clientAddress);
-      const r = await fetch(TURNSTILE_VERIFY, { method: 'POST', body });
-      verified = ((await r.json()) as { success?: boolean }).success === true;
-    } catch {
-      verified = false;
-    }
-    if (!verified) {
-      return json({ ok: false, error: 'Verification failed. Please try the check again.' }, 400);
-    }
+  // 1) Require a verified Cloudflare Turnstile token (the form renders a widget;
+  //    matches the live site and our sister project's contact endpoint).
+  const secret = env.TURNSTILE_SECRET_KEY ?? TEST_SECRET;
+  let verified = false;
+  try {
+    const body = new URLSearchParams({ secret, response: token });
+    if (clientAddress) body.set('remoteip', clientAddress);
+    const r = await fetch(TURNSTILE_VERIFY, { method: 'POST', body });
+    verified = ((await r.json()) as { success?: boolean }).success === true;
+  } catch {
+    verified = false;
+  }
+  if (!verified) {
+    return json({ ok: false, error: 'Verification failed. Please complete the check and try again.' }, 400);
   }
 
-  // 2) Server-side validation (mirrors the client).
+  // 2) Server-side validation — mirror the form's required (*) fields: email + phone.
   const missing: string[] = [];
-  if (!first) missing.push('your first name');
-  if (email && !isValidEmail(email)) missing.push('a valid email address');
-  if (phone && !isValidPhone(phone)) missing.push('a 10-digit phone number');
-  if (!email && !phone) missing.push('an email or phone number');
+  if (!isValidEmail(email)) missing.push('a valid email address');
+  if (!isValidPhone(phone)) missing.push('a 10-digit phone number');
   if (missing.length) {
     return json({ ok: false, error: `Please include ${missing.join(', ')}.` }, 422);
   }

@@ -18,9 +18,18 @@ interface Props {
 }
 const { name, title, description } = Astro.props;
 
-const headStyles = heads[`../../_mirror/${name}.head.html`];
-const bodyHtml = bodies[`../../_mirror/${name}.body.html`];
+const headStyles = heads[`../../_mirror/${name}.head.html`] ?? '';
+const bodyHtml = bodies[`../../_mirror/${name}.body.html`] ?? '';
 const meta = metas[`../../_mirror/${name}.meta.json`];
+if (!meta) {
+  throw new Error(
+    `ThemeLayout: no mirror found for "${name}". Run \`node scripts/mirror-from-raw.mjs\` (or scripts/mirror.mjs) to generate _mirror/${name}.{head,body}.html + .meta.json.`
+  );
+}
+
+// Site key for the mirrored Cloudflare Turnstile widgets (forms-bridge applies
+// it to the .cf-turnstile containers so it matches the Worker's secret).
+const turnstileKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
 
 const pageTitle = title ?? meta.title ?? site.name;
 const pageDesc = description ?? meta.description ?? '';
@@ -51,7 +60,8 @@ const canonical = new URL(cleanPath || '/', site.url).href;
   <body class={meta.bodyClass}>
     <Fragment set:html={bodyHtml} />
     <ConsentBanner />
+    <script is:inline define:vars={{ turnstileKey }}>window.__TS_KEY = turnstileKey;</script>
     <script src={meta.script} defer is:inline></script>
-    <script src="/wp/forms-bridge.js" defer is:inline></script>
+    <script src="/assets/forms-bridge.js" defer is:inline></script>
   </body>
 </html>

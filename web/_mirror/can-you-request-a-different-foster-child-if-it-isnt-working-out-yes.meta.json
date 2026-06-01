@@ -3,10 +3,10 @@
   "title": "Can You Request a Different Foster Child If It Isn’t Working Out? Yes - Safe Harbours",
   "description": "Sometimes a foster placement is not the right fit, even when you prepare carefully and show up with commitment",
   "styles": [
-    "/wp/theme/build/app.css",
-    "/wp/plugins/gravityforms/assets/css/dist/basic.min.css",
-    "/wp/plugins/gravityforms/assets/css/dist/theme-components.min.css",
-    "/wp/plugins/gravityforms/assets/css/dist/theme.min.css"
+    "/assets/theme/build/app.css",
+    "/assets/plugins/gravityforms/assets/css/dist/basic.min.css",
+    "/assets/plugins/gravityforms/assets/css/dist/theme-components.min.css",
+    "/assets/plugins/gravityforms/assets/css/dist/theme.min.css"
   ],
-  "script": "/wp/theme/build/app.js"
+  "script": "//theme/build/app.js"
 }
