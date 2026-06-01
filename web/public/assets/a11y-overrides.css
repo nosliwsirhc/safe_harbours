@@ -74,6 +74,14 @@ a.button-secondary {
 .off-canvas-wrapper a:focus:not(:focus-visible),
 .off-canvas-wrapper button:focus:not(:focus-visible) { outline: none; }
 
+/* Contrast: the coral eyebrow labels (.banner-subtitle, e.g. "WHY SAFE
+   HARBOURS") were salmon #f78f8b on white = 2.27:1 (fails WCAG AA). Darken to
+   an accessible deep coral (~5.4:1). These labels sit only on light sections. */
+.banner-subtitle,
+.banner-subtitle strong {
+  color: #c0392b !important;
+}
+
 /* Inline form error (replaces native alert()) — see forms-bridge.js. */
 .mirror-form-error {
   display: block;
