@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { env as workerEnv } from 'cloudflare:workers';
 import { isValidEmail } from '../../lib/form';
+import { renderEmail } from '../../lib/email';
 
 // On-demand newsletter signup. Adds the subscriber to the account's Resend
 // Contacts (POST /contacts — the modern replacement for the now-deprecated
@@ -94,7 +95,15 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         to: [to],
         reply_to: email,
         subject: 'New newsletter subscriber',
-        text: `New newsletter signup\n\nName: ${name || '(not provided)'}\nEmail: ${email}\n`,
+        html: renderEmail({
+          heading: 'New newsletter subscriber',
+          rows: [
+            { label: 'Name', value: name || '(not provided)' },
+            { label: 'Email', value: email },
+            { label: 'Source', value: source },
+          ],
+        }),
+        text: `New newsletter signup\n\nName: ${name || '(not provided)'}\nEmail: ${email}\nSource: ${source}\n`,
       }),
     });
     if (!res.ok) return json({ ok: false, error: 'Could not subscribe right now. Please try again.' }, 502);

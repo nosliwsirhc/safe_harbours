@@ -4,6 +4,7 @@ import type { APIRoute } from 'astro';
 // the `env` export from the `cloudflare:workers` virtual module.
 import { env as workerEnv } from 'cloudflare:workers';
 import { isValidEmail, isValidPhone } from '../../lib/form';
+import { renderEmail } from '../../lib/email';
 
 // On-demand: runs as a Cloudflare Worker route, not prerendered.
 export const prerender = false;
@@ -83,6 +84,17 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     `Phone: ${phone || '(not provided)'}\n\n` +
     `${message}\n`;
 
+  const html = renderEmail({
+    heading: 'New website inquiry',
+    rows: [
+      { label: 'Category', value: role },
+      { label: 'Name', value: `${first} ${last}`.trim() || '(not provided)' },
+      { label: 'Email', value: email || '(not provided)' },
+      { label: 'Phone', value: phone || '(not provided)' },
+    ],
+    message: message || undefined,
+  });
+
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -94,6 +106,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         // Prefix the subject with the category so the team can filter/route
         // (e.g. "[Recruitment: Foster Parents] …").
         subject: `[${role}] New inquiry from ${first} ${last}`.trim(),
+        html,
         text,
       }),
     });
