@@ -31,6 +31,25 @@ if (!meta) {
 // it to the .cf-turnstile containers so it matches the Worker's secret).
 const turnstileKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
 
+// Content-hash the theme assets we iterate on so an edit busts the 1-day cache
+// immediately. The _headers cache rules match by path (the ?v query is ignored),
+// so each versioned URL still gets the long, immutable-style cache. Without this,
+// a tuned a11y/forms file keeps serving the previous version for up to a day —
+// which makes already-fixed changes look like live regressions.
+const assetRaw = import.meta.glob(
+  ['../../public/assets/a11y-overrides.css', '../../public/assets/forms-bridge.js'],
+  { query: '?raw', import: 'default', eager: true }
+) as Record<string, string>;
+const hashStr = (s: string) => {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
+  return h.toString(36);
+};
+const ver = (publicPath: string) => {
+  const raw = assetRaw[`../../public${publicPath}`];
+  return raw ? `${publicPath}?v=${hashStr(raw)}` : publicPath;
+};
+
 const SITE_DESC =
   'Safe Harbours is an Ontario treatment foster care agency — training, on-call support, and a dedicated case management team help foster families give children stability.';
 const pageTitle = title ?? meta.title ?? site.name;
@@ -89,7 +108,7 @@ const orgSchema = {
       href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
     />
     {meta.styles.map((href: string) => <link rel="stylesheet" href={href} />)}
-    <link rel="stylesheet" href="/assets/a11y-overrides.css" />
+    <link rel="stylesheet" href={ver('/assets/a11y-overrides.css')} />
     <Fragment set:html={headStyles} />
   </head>
   <body class={meta.bodyClass}>
@@ -97,6 +116,6 @@ const orgSchema = {
     <ConsentBanner />
     <script is:inline define:vars={{ turnstileKey }}>window.__TS_KEY = turnstileKey;</script>
     <script src={meta.script} defer is:inline></script>
-    <script src="/assets/forms-bridge.js" defer is:inline></script>
+    <script src={ver('/assets/forms-bridge.js')} defer is:inline></script>
   </body>
 </html>
