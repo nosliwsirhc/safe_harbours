@@ -84,14 +84,16 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     `Phone: ${phone || '(not provided)'}\n\n` +
     `${message}\n`;
 
+  const fullName = `${first} ${last}`.trim();
+  const isFoster = /foster/i.test(role);
   const html = renderEmail({
-    heading: 'New website inquiry',
-    rows: [
-      { label: 'Category', value: role },
-      { label: 'Name', value: `${first} ${last}`.trim() || '(not provided)' },
-      { label: 'Email', value: email || '(not provided)' },
-      { label: 'Phone', value: phone || '(not provided)' },
-    ],
+    tag: role,
+    tagAccent: 'gold',
+    title: fullName || 'New inquiry',
+    subtitle: isFoster ? 'Interested in becoming a foster parent' : 'Sent a message through the website',
+    preheader: `${fullName || 'New inquiry'} — ${email || phone || 'no contact info'}`,
+    email: email || undefined,
+    phone: phone || undefined,
     message: message || undefined,
   });
 
