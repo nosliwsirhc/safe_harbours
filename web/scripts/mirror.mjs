@@ -306,10 +306,31 @@ async function processHtml(html, outName) {
     prevLevel = target;
   }
 
+  // node-html-parser intermittently drops the <main class="site-content">
+  // wrapper while serializing certain well-formed pages (the blog index is one
+  // — the parser fails to resolve <body> too, and the fallback re-parse still
+  // loses <main>). When the source had a <main> but our output doesn't, restore
+  // it around the content region (between </header> and <footer>) so the page
+  // keeps its main landmark and matches the source structure exactly.
+  let bodyHtml = body.innerHTML;
+  const srcMain = html.match(/<main\b[^>]*>/i);
+  if (srcMain && !/<main\b/i.test(bodyHtml)) {
+    const before = bodyHtml;
+    bodyHtml = bodyHtml
+      .replace(/(<div id="content"\b)/i, `${srcMain[0]}$1`)
+      .replace(/(<footer\b)/i, `</main>\n$1`);
+    if (bodyHtml !== before && /<main\b/i.test(bodyHtml) && /<\/main>/i.test(bodyHtml)) {
+      console.log(`  ~ ${outName}: restored dropped <main> landmark`);
+    } else {
+      bodyHtml = before; // couldn't place it safely — leave output untouched
+      console.warn(`  ! ${outName}: <main> was dropped and could not be restored`);
+    }
+  }
+
   await writeFile(path.join(MIRROR, `${outName}.head.html`), headStyles);
-  await writeFile(path.join(MIRROR, `${outName}.body.html`), body.innerHTML);
+  await writeFile(path.join(MIRROR, `${outName}.body.html`), bodyHtml);
   await writeFile(path.join(MIRROR, `${outName}.meta.json`), JSON.stringify({ bodyClass, title, description: desc, styles, script: `/${ASSET_DIR}/theme/build/app.js` }, null, 2));
-  console.log(`  wrote _mirror/${outName}.{head,body}.html  (body ${Math.round(body.innerHTML.length / 1024)}KB, ${seen.size} assets)`);
+  console.log(`  wrote _mirror/${outName}.{head,body}.html  (body ${Math.round(bodyHtml.length / 1024)}KB, ${seen.size} assets)`);
 }
 
 export { mirror, processHtml, ensureTheme };
