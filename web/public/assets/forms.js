@@ -112,6 +112,15 @@
     var phoneInput = form.querySelector('input[name="phone"], input[type="tel"]');
     var submitBtn = form.querySelector('[type="submit"]');
 
+    // These are newsletter/contact forms, not logins. Tell password managers
+    // (1Password/LastPass/Bitwarden/Dashlane) to leave the fields alone — their
+    // inline menu was intercepting typing and offering to "save a login".
+    // Native browser autofill (the autocomplete=* attrs) still works.
+    var pmAttrs = { 'data-1p-ignore': 'true', 'data-lpignore': 'true', 'data-bwignore': 'true', 'data-form-type': 'other' };
+    form.querySelectorAll('input, textarea, select').forEach(function (el) {
+      for (var k in pmAttrs) el.setAttribute(k, pmAttrs[k]);
+    });
+
     form.addEventListener('input', function (e) {
       var el = e.target;
       if (el === phoneInput) {
