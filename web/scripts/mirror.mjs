@@ -84,15 +84,24 @@ async function localizeAppCss() {
   console.log(`  app.css localized (${refs.length} asset ref(s))`);
 }
 
-async function mirror(pagePath, outName) {
+async function ensureTheme() {
   await mkdir(MIRROR, { recursive: true });
-  // theme CSS/JS (download once, at their natural paths)
   await download(`${ORIGIN}/wp-content/themes/safe-harbours/build/app.css`, path.join(PUB, 'wp', 'theme', 'build', 'app.css'));
   await download(`${ORIGIN}/wp-content/themes/safe-harbours/build/app.js`, path.join(PUB, 'wp', 'theme', 'build', 'app.js'));
   await localizeAppCss();
+}
 
+async function mirror(pagePath, outName) {
+  await ensureTheme();
   const res = await fetch(ORIGIN + pagePath, { headers: { 'user-agent': UA } });
-  const html = await res.text();
+  await processHtml(await res.text(), outName);
+}
+
+async function processHtml(html, outName) {
+  if (/just a moment|challenge-platform|cf-browser-verification/i.test(html.slice(0, 4000))) {
+    console.warn(`  ! ${outName}: looks like a Cloudflare challenge page — skipped`);
+    return;
+  }
   const root = parse(html, { comment: false, blockTextElements: { script: false, style: true } });
 
   // --- head: external stylesheets (in order) + inline <style> blocks ---
@@ -110,7 +119,14 @@ async function mirror(pagePath, outName) {
   const title = root.querySelector('title')?.text?.trim() || 'Safe Harbours';
   const desc = root.querySelector('meta[name="description"]')?.getAttribute('content') || '';
 
-  const body = root.querySelector('body');
+  // node-html-parser occasionally fails to resolve <body> on some pages;
+  // fall back to slicing the body out by regex and re-parsing the fragment.
+  let body = root.querySelector('body');
+  if (!body) {
+    const m = html.match(/<body([^>]*)>([\s\S]*?)<\/body>/i);
+    if (!m) { console.warn(`  ! ${outName}: no <body> found — skipped`); return; }
+    body = parse(`<div${m[1]}>${m[2]}</div>`, { comment: false, blockTextElements: { script: false, style: true } }).querySelector('div');
+  }
   const bodyClass = body.getAttribute('class') || '';
 
   // --- strip scripts, noscript, GTM, emoji, admin bar, svg-defs we don't need ---
@@ -161,5 +177,9 @@ async function mirror(pagePath, outName) {
   console.log(`  wrote _mirror/${outName}.{head,body}.html  (body ${Math.round(body.innerHTML.length / 1024)}KB, ${seen.size} assets)`);
 }
 
-const [pagePath = '/', outName = 'home'] = process.argv.slice(2);
-mirror(pagePath, outName);
+export { mirror, processHtml, ensureTheme };
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const [pagePath = '/', outName = 'home'] = process.argv.slice(2);
+  mirror(pagePath, outName);
+}

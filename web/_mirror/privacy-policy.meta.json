@@ -1,0 +1,13 @@
+{
+  "bodyClass": "privacy-policy wp-singular page-template page-template-page-text-block page-template-page-text-block-php page page-id-3 wp-theme-safe-harbours",
+  "title": "Privacy Policy - Safe Harbours",
+  "description": "",
+  "styles": [
+    "/wp/theme/build/app.css",
+    "https://www.safeharbours.ca/wp-includes/blocks/heading/style.min.css",
+    "/wp/plugins/gravityforms/assets/css/dist/basic.min.css",
+    "/wp/plugins/gravityforms/assets/css/dist/theme-components.min.css",
+    "/wp/plugins/gravityforms/assets/css/dist/theme.min.css"
+  ],
+  "script": "/wp/theme/build/app.js"
+}

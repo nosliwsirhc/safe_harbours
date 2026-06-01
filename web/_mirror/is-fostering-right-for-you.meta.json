@@ -1,0 +1,12 @@
+{
+  "bodyClass": "wp-singular post-template-default single single-post postid-511 single-format-standard wp-theme-safe-harbours",
+  "title": "Is Fostering Right for You? - Safe Harbours",
+  "description": "In Ontario, a wide range of people can become foster parents. This guide will help you decide if becoming a foster parent is right for you",
+  "styles": [
+    "/wp/theme/build/app.css",
+    "/wp/plugins/gravityforms/assets/css/dist/basic.min.css",
+    "/wp/plugins/gravityforms/assets/css/dist/theme-components.min.css",
+    "/wp/plugins/gravityforms/assets/css/dist/theme.min.css"
+  ],
+  "script": "/wp/theme/build/app.js"
+}

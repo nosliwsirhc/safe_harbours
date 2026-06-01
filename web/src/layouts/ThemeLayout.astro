@@ -52,5 +52,6 @@ const canonical = new URL(cleanPath || '/', site.url).href;
     <Fragment set:html={bodyHtml} />
     <ConsentBanner />
     <script src={meta.script} defer is:inline></script>
+    <script src="/wp/forms-bridge.js" defer is:inline></script>
   </body>
 </html>

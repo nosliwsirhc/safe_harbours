@@ -1,0 +1,12 @@
+{
+  "bodyClass": "wp-singular page-template-default page page-id-473 wp-theme-safe-harbours",
+  "title": "Thank You - Safe Harbours",
+  "description": "",
+  "styles": [
+    "/wp/theme/build/app.css",
+    "/wp/plugins/gravityforms/assets/css/dist/basic.min.css",
+    "/wp/plugins/gravityforms/assets/css/dist/theme-components.min.css",
+    "/wp/plugins/gravityforms/assets/css/dist/theme.min.css"
+  ],
+  "script": "/wp/theme/build/app.js"
+}

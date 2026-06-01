@@ -50,3 +50,5 @@ web/_drafts/
 web/_mirror/*.html
 !web/_mirror/*.head.html
 !web/_mirror/*.body.html
+
+web/_mirror/raw.json
