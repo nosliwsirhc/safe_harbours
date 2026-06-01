@@ -6,8 +6,8 @@ export const site = {
   legalName: 'Safe Harbours Family Treatment Homes',
   tagline: 'Ontario Foster Care',
   url: 'https://www.safeharbours.ca',
-  phone: '647-493-9207',
-  phoneHref: 'tel:+16474939207',
+  phone: '905-294-2137',
+  phoneHref: 'tel:+19052942137',
   email: 'info@safeharbours.ca',
   emailHref: 'mailto:info@safeharbours.ca',
   address: {
