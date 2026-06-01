@@ -1,0 +1,51 @@
+/* Accessibility overrides layered after the theme CSS. Kept minimal and
+   visually neutral (loaded by ThemeLayout). */
+
+/* Touch targets: extend the clickable area of buttons to >=44px tall WITHOUT
+   changing their visible size, via a transparent overlay. */
+.button,
+.button-secondary,
+a.button,
+a.button-secondary {
+  position: relative;
+}
+.button::after,
+.button-secondary::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 44px;
+}
+
+/* Footer link rows are ~22px tall; nudge to a comfortable >=24px (WCAG 2.5.8)
+   tap height with a small block padding (footer has the room). */
+.site-footer .footer-menu a,
+.site-footer .menu-item a,
+.site-footer .footer-social a {
+  display: inline-block;
+  padding-block: 3px;
+}
+
+/* Heading-order normalization: when the mirror retags a level-skipping heading,
+   it adds m-h{originalLevel} so the visual size is preserved (theme styles
+   headings by tag). These match the theme's per-tag typography. */
+.m-h1 { font-size: 48px; line-height: 67.2px; }
+.m-h2 { font-size: 66px; line-height: 92.4px; }
+.m-h3 { font-size: 42px; line-height: 58.8px; }
+.m-h4 { font-size: 32px; line-height: 44.8px; }
+.m-h5 { font-size: 20px; line-height: 28px; }
+.m-h6 { font-size: 16px; line-height: 22.4px; }
+
+/* Inline form error (replaces native alert()) — see forms-bridge.js. */
+.mirror-form-error {
+  display: block;
+  margin: 12px 0 0;
+  color: #b3261e;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+.mirror-form-error:empty { display: none; }

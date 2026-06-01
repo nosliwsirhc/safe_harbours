@@ -82,7 +82,14 @@ const orgSchema = {
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={new URL('/images/og-default.jpg', site.url).href} />
     <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    />
     {meta.styles.map((href: string) => <link rel="stylesheet" href={href} />)}
+    <link rel="stylesheet" href="/assets/a11y-overrides.css" />
     <Fragment set:html={headStyles} />
   </head>
   <body class={meta.bodyClass}>

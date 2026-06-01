@@ -93,8 +93,15 @@ async function localizeAppCss() {
   // Replace only inside url(...) tokens (not a global substring replace, which
   // would corrupt URLs that share a prefix).
   css = css.replace(re, (full, q, ref) => (map[ref] ? `url(${q}${map[ref]}${q})` : full));
+  // Pull the render-blocking Google Fonts @import out of the CSS — ThemeLayout
+  // loads it via a parallel <link rel=stylesheet> + preconnect instead.
+  const fontImport = css.match(/@import\s+url\((['"]?)(https:\/\/fonts\.googleapis\.com[^)'"]+)\1\)\s*;?/);
+  if (fontImport) {
+    css = css.replace(fontImport[0], '');
+    await writeFile(path.join(MIRROR, 'fonts.url'), fontImport[2]); // record for ThemeLayout reference
+  }
   await writeFile(file, css);
-  console.log(`  app.css localized (${Object.keys(map).length} asset ref(s))`);
+  console.log(`  app.css localized (${Object.keys(map).length} asset ref(s)${fontImport ? ', font @import hoisted' : ''})`);
 }
 
 async function ensureTheme() {
@@ -160,18 +167,37 @@ async function processHtml(html, outName) {
   // --- strip scripts, noscript, GTM, emoji, admin bar, svg-defs we don't need ---
   body.querySelectorAll('script, noscript, link[rel="dns-prefetch"], #wpadminbar').forEach((n) => n.remove());
 
-  // --- de-lazy images (wp-smush): data-src -> src, data-srcset -> srcset ---
+  // --- de-lazy images (wp-smush stored the real URL in data-src) and set a
+  // sensible loading strategy: the brand logo + the first main image stay
+  // eager (above the fold); everything else lazy-loads. The hero gets
+  // fetchpriority=high for LCP. ---
+  const eager = new Set();
+  const logo = body.querySelector('header img, .site-header img, .logo img, .top-bar img');
+  if (logo) eager.add(logo);
+  const heroImg = body.querySelector('main img, .banner img, [class*="hero"] img');
+  if (heroImg) { eager.add(heroImg); heroImg.setAttribute('fetchpriority', 'high'); }
   body.querySelectorAll('img').forEach((img) => {
     const ds = img.getAttribute('data-src');
     if (ds) { img.setAttribute('src', ds); img.removeAttribute('data-src'); }
     const dss = img.getAttribute('data-srcset');
     if (dss) { img.setAttribute('srcset', dss); img.removeAttribute('data-srcset'); }
     img.setAttribute('class', (img.getAttribute('class') || '').replace(/\blazyload\b/g, '').trim());
-    img.removeAttribute('loading');
+    img.setAttribute('decoding', 'async');
+    img.setAttribute('loading', eager.has(img) ? 'eager' : 'lazy');
   });
   body.querySelectorAll('source').forEach((s) => {
     const dss = s.getAttribute('data-srcset');
     if (dss) { s.setAttribute('srcset', dss); s.removeAttribute('data-srcset'); }
+  });
+
+  // --- defer autoplay videos: load + play only when scrolled into view
+  // (forms-bridge.js handles the IntersectionObserver). ---
+  body.querySelectorAll('video[autoplay]').forEach((v) => {
+    v.removeAttribute('autoplay');
+    v.setAttribute('data-autoplay', '');
+    v.setAttribute('preload', 'none');
+    v.setAttribute('muted', '');
+    v.setAttribute('playsinline', '');
   });
 
   // --- localize asset URLs in src / srcset / style(background) ---
@@ -236,20 +262,15 @@ async function processHtml(html, outName) {
   }
 
   // --- a11y: normalize heading order (no skipped levels) WITHOUT changing the
-  // visual — retag downward jumps and pin the original level's typography
-  // inline so it renders identically (the theme styles headings by tag). ---
-  const HSIZE = {
-    1: ['48px', '67.2px'], 2: ['66px', '92.4px'], 3: ['42px', '58.8px'],
-    4: ['32px', '44.8px'], 5: ['20px', '28px'], 6: ['16px', '22.4px'],
-  };
+  // visual — retag downward jumps and add an m-h{originalLevel} class so the
+  // theme's per-tag typography is preserved (sizes defined in a11y-overrides.css). ---
   let prevLevel = null;
   for (const h of body.querySelectorAll('h1, h2, h3, h4, h5, h6')) {
     const lvl = Number(h.rawTagName.slice(1));
     const target = prevLevel === null ? lvl : lvl > prevLevel + 1 ? prevLevel + 1 : lvl;
     if (target !== lvl) {
-      const [fs, lh] = HSIZE[lvl]; // pin to the ORIGINAL level's look
-      const prev = (h.getAttribute('style') || '').trim().replace(/;?$/, '');
-      h.setAttribute('style', `${prev ? prev + ';' : ''}font-size:${fs};line-height:${lh}`);
+      const cls = (h.getAttribute('class') || '').trim();
+      h.setAttribute('class', `${cls ? cls + ' ' : ''}m-h${lvl}`);
       h.rawTagName = `h${target}`;
     }
     prevLevel = target;

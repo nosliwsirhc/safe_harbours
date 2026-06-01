@@ -32,6 +32,22 @@
     if (form.parentNode) form.parentNode.replaceChild(div, form);
   }
 
+  // Inline, accessible error (replaces native alert()).
+  function showError(form, msg) {
+    var el = form.querySelector('.mirror-form-error');
+    if (!el) {
+      el = document.createElement('p');
+      el.className = 'mirror-form-error';
+      el.setAttribute('role', 'alert');
+      form.appendChild(el);
+    }
+    el.textContent = msg;
+  }
+  function clearError(form) {
+    var el = form.querySelector('.mirror-form-error');
+    if (el) el.textContent = '';
+  }
+
   function bind(form) {
     form.addEventListener(
       'submit',
@@ -49,9 +65,10 @@
         var btn = form.querySelector('[type="submit"]');
         var newsletter = form.id === 'gform_1';
 
+        clearError(form);
         // Require the Turnstile token (bot protection) when a widget is present.
         if (form.querySelector('.cf-turnstile') && !token) {
-          alert('Please complete the verification, then submit again.');
+          showError(form, 'Please complete the verification, then submit again.');
           return;
         }
 
@@ -81,12 +98,12 @@
             showConfirmation(form, okMsg);
             if (window.gtag) window.gtag('event', 'generate_lead', { form_location: location.pathname });
           } else {
-            alert((data && data.error) || 'Something went wrong. Please try again, or call us.');
+            showError(form, (data && data.error) || 'Something went wrong. Please try again, or call us.');
             if (window.turnstile) try { window.turnstile.reset(); } catch (x) {}
             if (btn) btn.disabled = false;
           }
         } catch (err) {
-          alert('We could not reach the server. Please try again, or call us.');
+          showError(form, 'We could not reach the server. Please try again, or call us.');
           if (window.turnstile) try { window.turnstile.reset(); } catch (x) {}
           if (btn) btn.disabled = false;
         }
@@ -95,8 +112,28 @@
     );
   }
 
+  // Autoplay videos (marked data-autoplay by the mirror, preload=none) only
+  // load + play once scrolled into view — saves bandwidth/CPU on first paint.
+  function initVideos() {
+    var vids = document.querySelectorAll('video[data-autoplay]');
+    if (!vids.length) return;
+    var play = function (v) {
+      v.preload = 'auto';
+      var p = v.play();
+      if (p && p.catch) p.catch(function () {});
+    };
+    if (!('IntersectionObserver' in window)) { vids.forEach(play); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { play(en.target); io.unobserve(en.target); }
+      });
+    }, { rootMargin: '200px' });
+    vids.forEach(function (v) { io.observe(v); });
+  }
+
   function init() {
     initTurnstile();
+    initVideos();
     var forms = document.querySelectorAll('form[id^="gform_"]');
     for (var i = 0; i < forms.length; i++) bind(forms[i]);
   }
