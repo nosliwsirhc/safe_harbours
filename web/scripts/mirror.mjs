@@ -261,6 +261,14 @@ async function processHtml(html, outName) {
     a.removeAttribute('aria-label');
   }
 
+  // --- a11y: icon-only buttons (e.g. the mobile menu toggle off-canvas__toggle)
+  // ship no text — give them an accessible name (WCAG 4.1.2). ---
+  for (const btn of body.querySelectorAll('button')) {
+    if (btn.text.replace(/\s+/g, ' ').trim() || btn.getAttribute('aria-label') || btn.getAttribute('aria-labelledby')) continue;
+    const c = (btn.getAttribute('class') || '').toLowerCase();
+    btn.setAttribute('aria-label', /close/.test(c) ? 'Close menu' : /search/.test(c) ? 'Search' : 'Menu');
+  }
+
   // --- a11y: normalize heading order (no skipped levels) WITHOUT changing the
   // visual — retag downward jumps and add an m-h{originalLevel} class so the
   // theme's per-tag typography is preserved (sizes defined in a11y-overrides.css). ---

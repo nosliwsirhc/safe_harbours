@@ -39,6 +39,31 @@ a.button-secondary {
 .m-h5 { font-size: 20px; line-height: 28px; }
 .m-h6 { font-size: 16px; line-height: 22.4px; }
 
+/* Mobile off-canvas menu polish. The theme spreads items over a full-height
+   flex column (justify-content:flex-end, height:100vh, 32px li margins,
+   right-aligned) which reads as huge awkward gaps. Tighten to a clean,
+   top-aligned, left-aligned list with comfortable rows. */
+.off-canvas-wrapper .site-navigation {
+  justify-content: flex-start !important;
+  height: auto !important;
+  align-items: stretch !important;
+  /* top padding clears the absolutely-positioned logo + close button header */
+  padding: 104px 0 32px !important;
+}
+.off-canvas-wrapper .site-navigation > li {
+  margin-bottom: 2px !important;
+  height: auto !important;
+}
+.off-canvas-wrapper .site-navigation a {
+  text-align: left !important;
+  padding: 14px 28px !important;
+}
+/* The panel moves focus to the logo on open, painting an ugly box around it.
+   The logo is an obvious, large target; drop its focus ring (menu items keep theirs). */
+.off-canvas-wrapper .site-header__logo:focus { outline: none; }
+.off-canvas-wrapper a:focus:not(:focus-visible),
+.off-canvas-wrapper button:focus:not(:focus-visible) { outline: none; }
+
 /* Inline form error (replaces native alert()) — see forms-bridge.js. */
 .mirror-form-error {
   display: block;
