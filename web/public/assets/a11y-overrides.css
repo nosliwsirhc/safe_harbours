@@ -109,3 +109,39 @@ a.button-secondary {
   line-height: 1.4;
 }
 .mirror-form-error:empty { display: none; }
+
+/* "Files" footer link — our internal file tool, deliberately NOT in the main
+   nav, so give it a catchy on-brand treatment (gold + folder glyph + subtle
+   pill) to draw the eye against the white footer links. Gold #ffc700 on the
+   slate footer (#394254) is ~10:1 contrast — comfortably AAA. */
+.site-footer #menu-item-files > a {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  color: #ffc700 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em;
+  padding: 4px 12px !important;
+  border: 1px solid rgba(255, 199, 0, 0.45);
+  border-radius: 999px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.site-footer #menu-item-files > a::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  flex: none;
+  background: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='%23ffc700'%3E%3Cpath%20d='M10%204H4c-1.1%200-2%20.9-2%202v12c0%201.1.9%202%202%202h16c1.1%200%202-.9%202-2V8c0-1.1-.9-2-2-2h-8l-2-2z'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: background-image 0.15s ease;
+}
+.site-footer #menu-item-files > a:hover,
+.site-footer #menu-item-files > a:focus-visible {
+  background-color: #ffc700;
+  color: #394254 !important;
+  text-decoration: none;
+}
+/* swap the folder glyph to slate on hover so it stays visible on the gold fill */
+.site-footer #menu-item-files > a:hover::before,
+.site-footer #menu-item-files > a:focus-visible::before {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='%23394254'%3E%3Cpath%20d='M10%204H4c-1.1%200-2%20.9-2%202v12c0%201.1.9%202%202%202h16c1.1%200%202-.9%202-2V8c0-1.1-.9-2-2-2h-8l-2-2z'/%3E%3C/svg%3E");
+}
