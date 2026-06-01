@@ -1,10 +1,21 @@
 # Cache headers for self-hosted assets. (Cloudflare's default for these was
 # max-age=0, must-revalidate — a conditional request on every page load.)
+# Cloudflare combines ALL matching rules, so paths here are non-overlapping to
+# avoid a doubled Cache-Control header.
+#
 # Uploaded media never changes (stable filenames) → cache hard for a year.
 # Theme CSS/JS can change on a re-mirror → cache a day.
 
 /assets/uploads/*
   Cache-Control: public, max-age=31536000, immutable
 
-/assets/*
+/assets/theme/*
+  Cache-Control: public, max-age=86400
+/assets/plugins/*
+  Cache-Control: public, max-age=86400
+/assets/includes/*
+  Cache-Control: public, max-age=86400
+/assets/forms-bridge.js
+  Cache-Control: public, max-age=86400
+/assets/a11y-overrides.css
   Cache-Control: public, max-age=86400
