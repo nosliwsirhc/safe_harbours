@@ -28,7 +28,7 @@ import { site, nav } from '../data/site';
               </ul>
             </li>
           ) : item.label === 'Contact Us' ? (
-            <li><a class="btn btn-pri" href={item.href}>Contact Us</a></li>
+            <li><a class="btn btn-gold" href={item.href}>Contact Us</a></li>
           ) : (
             <li><a class="lnk" href={item.href}>{item.label}</a></li>
           )
@@ -49,7 +49,7 @@ import { site, nav } from '../data/site';
     <div class="drawer-panel" role="dialog" aria-modal="true" aria-label="Menu">
       <button class="drawer-close" data-close aria-label="Close menu">&times;</button>
       <div class="drawer-cta">
-        <a class="btn btn-coral" href="/contact-us" data-close>Contact Us</a>
+        <a class="btn btn-gold" href="/contact-us" data-close>Contact Us</a>
         <a class="btn btn-out" href={site.phoneHref} data-close>Call {site.phone}</a>
       </div>
       <nav aria-label="Mobile">

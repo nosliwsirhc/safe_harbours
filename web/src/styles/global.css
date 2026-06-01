@@ -21,7 +21,8 @@
   --coral: #f88e8a;      /* primary brand accent (salmon-coral) */
   --coral-soft: #fbdad8; /* soft coral wash */
   --coral-d: #c8453f;    /* accessible deep coral - 4.8:1 on white; links, filled buttons, icons */
-  --gold: #dab527;       /* secondary accent (brand gold) */
+  --gold: #ffc700;       /* primary CTA / brand gold (bg + slate text) */
+  --gold-2: #ecd455;     /* softer gold (decorative circles) */
   --gold-soft: #f4e7ad;
   --gold-d: #876c11;     /* accessible gold text on white */
   --on-dark: #e3e7ee;       /* primary text on dark surfaces */
@@ -92,6 +93,12 @@ img { display: block; max-width: 100%; }
 .btn-pri:hover { background: var(--slate-d); }
 .btn-coral { background: var(--coral-d); color: #fff; } /* coral-d gives 4.6:1 with white (AA) */
 .btn-coral:hover { filter: brightness(1.08); }
+/* primary brand CTA — bright gold with slate text (matches safeharbours.ca) */
+.btn-gold { background: var(--gold); color: var(--slate); }
+.btn-gold:hover { filter: brightness(1.04); box-shadow: 0 3px 9px -5px rgba(27, 42, 56, 0.35); }
+/* coral pill — soft coral fill with dark text (secondary CTA on photos) */
+.btn-coral-soft { background: var(--coral); color: var(--slate-dd); }
+.btn-coral-soft:hover { filter: brightness(1.04); }
 .btn-out { background: #fff; color: var(--slate-d); border: 1.5px solid var(--line); }
 .btn-out:hover { border-color: var(--slate); color: var(--slate); }
 
@@ -868,3 +875,91 @@ form.contact .sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 22px
 @media (max-width: 620px) {
   .keypoints ul { grid-template-columns: 1fr; }
 }
+
+/* ============================================================
+   safeharbours.ca signature elements
+   Full-bleed photo hero, floating coral/gold circles, dark
+   rounded sections, numbered "why" list, quote testimonials.
+   ============================================================ */
+
+/* floating decorative circles (the brand motif) */
+.has-deco { position: relative; overflow: hidden; }
+.has-deco > .wrap { position: relative; z-index: 2; }
+.deco { position: absolute; border-radius: 50%; z-index: 1; pointer-events: none; }
+.deco--coral { background: var(--coral); }
+.deco--gold { background: var(--gold-2); }
+.deco--ring-coral { background: transparent; border: 12px solid var(--coral); }
+.deco--ring-gold { background: transparent; border: 12px solid var(--gold-2); }
+@media (prefers-reduced-motion: no-preference) {
+  .deco { transition: transform 0.6s ease; }
+}
+@media (max-width: 700px) { .deco { transform: scale(0.6); opacity: 0.8; } }
+
+/* full-bleed photographic hero with centered white text */
+.hero-photo { position: relative; overflow: hidden; min-height: clamp(540px, 76vh, 740px); display: flex; align-items: center; }
+.hero-photo .hero-bg { position: absolute; inset: 0; z-index: 0; }
+.hero-photo .hero-bg img, .hero-photo .hero-bg picture { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero-photo .hero-scrim { position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(180deg, rgba(42,48,60,0.45) 0%, rgba(42,48,60,0.62) 55%, rgba(42,48,60,0.78) 100%); }
+.hero-photo .hero-inner { position: relative; z-index: 3; text-align: center; max-width: 860px; margin: 0 auto; color: #fff; padding: 64px 0; }
+.hero-photo .kicker { display: inline-block; color: var(--gold-2); font-size: 0.82rem; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; }
+.hero-photo h1 { color: #fff; font-size: clamp(2.3rem, 5vw, 4rem); margin: 16px 0 0; text-wrap: balance; text-shadow: 0 2px 30px rgba(17,32,45,0.45); }
+.hero-photo .lede { color: rgba(255,255,255,0.92); font-size: 1.12rem; max-width: 56ch; margin: 18px auto 0; }
+.hero-photo .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 30px; }
+.js .hero-photo .hero-inner > * { animation: riseIn 0.7s both cubic-bezier(0.2,0.7,0.2,1); }
+.js .hero-photo h1 { animation-delay: 0.1s; }
+.js .hero-photo .lede { animation-delay: 0.2s; }
+.js .hero-photo .hero-cta { animation-delay: 0.3s; }
+
+/* dark section + rounded top cutout */
+.section-dark { background: var(--slate); color: #fff; position: relative; overflow: hidden; }
+.section-dark h2, .section-dark h3 { color: #fff; }
+.section-dark .eyebrow { color: var(--coral); }
+.section-dark p { color: var(--on-dark-muted); }
+.section-round-top { border-top-left-radius: clamp(28px, 5vw, 64px); border-top-right-radius: clamp(28px, 5vw, 64px); margin-top: -1px; }
+
+/* WHY: heading left, numbered list right */
+.why-split { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 52px; align-items: start; }
+.why-list { display: grid; gap: 26px; }
+.why-item h3 { font-size: 1.22rem; margin-bottom: 6px; }
+.why-item p { color: var(--on-dark-muted); font-size: 0.99rem; }
+@media (max-width: 920px) { .why-split { grid-template-columns: 1fr; gap: 30px; } }
+
+/* HOW: photo + text, warm framed image */
+.howrow { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+.howrow .howmedia { border-radius: 22px; overflow: hidden; box-shadow: var(--shadow); position: relative; }
+.howrow .howmedia img { width: 100%; aspect-ratio: 5 / 4; object-fit: cover; display: block; }
+@media (max-width: 920px) { .howrow { grid-template-columns: 1fr; gap: 28px; } }
+
+/* TESTIMONIALS: white cards on dark, big quote glyph */
+.tcards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+@media (max-width: 920px) { .tcards { grid-template-columns: 1fr; } }
+.tcard { background: #fff; border-radius: 18px; padding: 30px 30px 26px; position: relative; overflow: hidden; }
+.tcard blockquote { color: var(--ink); font-size: 1.02rem; line-height: 1.6; position: relative; z-index: 1; }
+.tcard .who { margin-top: 18px; font-weight: 800; color: var(--slate-d); position: relative; z-index: 1; }
+.tcard .who span { display: block; font-weight: 600; color: var(--muted); font-size: 0.86rem; }
+.tcard::after { content: "\201D"; position: absolute; right: 18px; bottom: -22px; font-family: var(--font-head); font-weight: 900; font-size: 7rem; line-height: 1; color: var(--coral); opacity: 0.9; }
+.tcard:nth-child(2)::after { color: var(--gold-2); }
+
+/* FIRST STEP: guide checklist with coral check bullets */
+.guide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 52px; align-items: center; }
+@media (max-width: 920px) { .guide-grid { grid-template-columns: 1fr; gap: 30px; } }
+.guide-points { list-style: none; display: grid; gap: 12px; margin-top: 14px; }
+.guide-points li { position: relative; padding-left: 38px; color: #fff; font-weight: 600; }
+.guide-points li .ck { position: absolute; left: 0; top: -1px; width: 24px; height: 24px; border-radius: 50%; background: var(--coral); display: inline-flex; align-items: center; justify-content: center; }
+.guide-points li .ck svg { width: 14px; height: 14px; color: #fff; }
+.guide-kicker { font-weight: 800; color: #fff; margin-top: 8px; }
+
+/* partner logos row */
+.partner-logos { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 36px 50px; }
+.partner-logos img { height: 46px; width: auto; opacity: 0.9; filter: grayscale(1); transition: filter 0.2s, opacity 0.2s; }
+.partner-logos img:hover { filter: none; opacity: 1; }
+
+/* footer newsletter */
+.foot-newsletter { display: grid; gap: 10px; max-width: 320px; }
+.foot-newsletter input { width: 100%; padding: 11px 13px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: #fff; font-family: inherit; font-size: 0.95rem; }
+.foot-newsletter input::placeholder { color: var(--on-dark-faint); }
+.foot-newsletter input:focus { outline: 0; border-color: var(--gold); background: rgba(255,255,255,0.1); }
+.foot-newsletter .btn { justify-content: center; }
+.foot-newsletter .fine { font-size: 0.74rem; color: var(--on-dark-faint); line-height: 1.45; }
+.foot-newsletter .form-ok-msg { color: var(--gold-2); font-weight: 700; font-size: 0.9rem; }

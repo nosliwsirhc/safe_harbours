@@ -47,23 +47,24 @@ async function processEntry(entry) {
   const img = sharp(buf, { failOn: 'none' });
   const meta = await img.metadata();
   const srcW = meta.width || Math.max(...widths);
-  const useWidths = widths.filter((w) => w <= srcW);
-  if (useWidths.length === 0) useWidths.push(srcW);
-  const largest = Math.max(...useWidths);
 
-  for (const w of useWidths) {
-    const resized = (b) => sharp(b, { failOn: 'none' }).resize({ width: w, fit, withoutEnlargement: true });
+  // Emit a file for EVERY requested width (so <Picture> srcset never 404s),
+  // but never upscale: the actual pixels are capped at the source width while
+  // the filename keeps the requested descriptor.
+  for (const w of widths) {
+    const target = Math.min(w, srcW);
+    const resized = (b) => sharp(b, { failOn: 'none' }).resize({ width: target, fit, withoutEnlargement: true });
     await resized(buf).avif({ quality: 55 }).toFile(path.join(outDir, `${base}-${w}.avif`));
     await resized(buf).webp({ quality: 72 }).toFile(path.join(outDir, `${base}-${w}.webp`));
     await resized(buf).jpeg({ quality: 80, mozjpeg: true }).toFile(path.join(outDir, `${base}-${w}.jpg`));
   }
-  // Fallback at the largest size.
+  // Plain fallback (largest, capped at source).
   await sharp(buf, { failOn: 'none' })
-    .resize({ width: largest, fit, withoutEnlargement: true })
+    .resize({ width: Math.min(Math.max(...widths), srcW), fit, withoutEnlargement: true })
     .jpeg({ quality: 82, mozjpeg: true })
     .toFile(path.join(outDir, `${base}.jpg`));
 
-  console.log(`  ${base}: ${useWidths.join('/')} (avif+webp+jpg)`);
+  console.log(`  ${base}: ${widths.join('/')} (src ${srcW}px; avif+webp+jpg)`);
 }
 
 async function main() {

@@ -2,6 +2,7 @@
   { "src": "https://www.safeharbours.ca/wp-content/uploads/2024/10/safe-harbours-logo.svg", "base": "logo" },
   { "src": "https://www.safeharbours.ca/wp-content/uploads/2024/10/home-logo-alt.svg", "base": "logo-alt" },
   { "src": "https://www.safeharbours.ca/wp-content/uploads/2024/10/shutterstock_1575539629-1.jpg", "base": "hero", "widths": [640, 1024, 1440] },
+  { "src": "https://www.safeharbours.ca/wp-content/uploads/2024/10/Hero-Mobile-1-scaled-e1728576191410.jpg", "base": "hero-bg", "widths": [1024, 1440, 1920] },
   { "src": "https://www.safeharbours.ca/wp-content/uploads/2025/10/cropped-sfh-prof.jpg", "base": "founder", "widths": [640, 1024] },
   { "src": "https://www.safeharbours.ca/wp-content/uploads/2024/10/Family-Home-e1728610237634.png", "base": "family-home", "widths": [640, 1024] },
   { "src": "https://www.safeharbours.ca/wp-content/uploads/2024/10/GetStarted-Global.png", "base": "get-started", "widths": [640, 1024] },
