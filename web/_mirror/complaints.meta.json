@@ -1,12 +1,12 @@
 {
   "bodyClass": "wp-singular page-template-default page page-id-572 page-child parent-pageid-574 wp-theme-safe-harbours",
   "title": "Complaints - Safe Harbours",
-  "description": "",
+  "description": "This policy has been reviewed and updated to ensure compliance with the Child, Youth and Family Services Act, 2017 and Ontario Regulation 155/18. Updates…",
   "styles": [
     "/assets/theme/build/app.css",
     "/assets/plugins/gravityforms/assets/css/dist/basic.min.css",
     "/assets/plugins/gravityforms/assets/css/dist/theme-components.min.css",
     "/assets/plugins/gravityforms/assets/css/dist/theme.min.css"
   ],
-  "script": "//theme/build/app.js"
+  "script": "/assets/theme/build/app.js"
 }

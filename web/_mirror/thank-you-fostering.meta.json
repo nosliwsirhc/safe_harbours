@@ -1,12 +1,12 @@
 {
   "bodyClass": "wp-singular page-template-default page page-id-473 wp-theme-safe-harbours",
   "title": "Thank You - Safe Harbours",
-  "description": "",
+  "description": "Thank you so much for taking the first step in this life changing journey. We will review your submission and be in touch soon if you meet the basic…",
   "styles": [
     "/assets/theme/build/app.css",
     "/assets/plugins/gravityforms/assets/css/dist/basic.min.css",
     "/assets/plugins/gravityforms/assets/css/dist/theme-components.min.css",
     "/assets/plugins/gravityforms/assets/css/dist/theme.min.css"
   ],
-  "script": "//theme/build/app.js"
+  "script": "/assets/theme/build/app.js"
 }

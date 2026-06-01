@@ -31,8 +31,10 @@ if (!meta) {
 // it to the .cf-turnstile containers so it matches the Worker's secret).
 const turnstileKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
 
+const SITE_DESC =
+  'Safe Harbours is an Ontario treatment foster care agency — training, on-call support, and a dedicated case management team help foster families give children stability.';
 const pageTitle = title ?? meta.title ?? site.name;
-const pageDesc = description ?? meta.description ?? '';
+const pageDesc = description || meta.description || SITE_DESC;
 const cleanPath = Astro.url.pathname.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
 const canonical = new URL(cleanPath || '/', site.url).href;
 ---

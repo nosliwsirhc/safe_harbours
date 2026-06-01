@@ -1,12 +1,12 @@
 {
   "bodyClass": "wp-singular page-template page-template-page-text-block page-template-page-text-block-php page page-id-75 wp-theme-safe-harbours",
   "title": "Terms & Conditions - Safe Harbours",
-  "description": "",
+  "description": "OVERVIEW This website is operated by Safe Harbours Family Treatment Homes Ltd. Throughout the site, the terms “we”, “us” and “our” refer to Safe Harbours…",
   "styles": [
     "/assets/theme/build/app.css",
     "/assets/plugins/gravityforms/assets/css/dist/basic.min.css",
     "/assets/plugins/gravityforms/assets/css/dist/theme-components.min.css",
     "/assets/plugins/gravityforms/assets/css/dist/theme.min.css"
   ],
-  "script": "//theme/build/app.js"
+  "script": "/assets/theme/build/app.js"
 }

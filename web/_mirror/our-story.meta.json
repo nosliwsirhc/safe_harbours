@@ -1,12 +1,12 @@
 {
   "bodyClass": "wp-singular page-template-default page page-id-69 wp-theme-safe-harbours",
   "title": "Our Story - Safe Harbours",
-  "description": "",
+  "description": "Safe Harbours is a foster care organization committed to providing safe, nurturing homes for children facing significant challenges, including trauma and…",
   "styles": [
     "/assets/theme/build/app.css",
     "/assets/plugins/gravityforms/assets/css/dist/basic.min.css",
     "/assets/plugins/gravityforms/assets/css/dist/theme-components.min.css",
     "/assets/plugins/gravityforms/assets/css/dist/theme.min.css"
   ],
-  "script": "//theme/build/app.js"
+  "script": "/assets/theme/build/app.js"
 }

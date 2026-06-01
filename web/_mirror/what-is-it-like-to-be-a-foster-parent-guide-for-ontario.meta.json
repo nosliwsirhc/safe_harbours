@@ -1,12 +1,12 @@
 {
   "bodyClass": "wp-singular post-template-default single single-post postid-542 single-format-standard wp-theme-safe-harbours",
   "title": "What is it Like to be a Foster Parent? - A Guide for Ontario - Safe Harbours",
-  "description": "",
+  "description": "If you are considering fostering, it helps to understand what the role actually looks like once a child arrives in your home. Foster parenting is…",
   "styles": [
     "/assets/theme/build/app.css",
     "/assets/plugins/gravityforms/assets/css/dist/basic.min.css",
     "/assets/plugins/gravityforms/assets/css/dist/theme-components.min.css",
     "/assets/plugins/gravityforms/assets/css/dist/theme.min.css"
   ],
-  "script": "//theme/build/app.js"
+  "script": "/assets/theme/build/app.js"
 }

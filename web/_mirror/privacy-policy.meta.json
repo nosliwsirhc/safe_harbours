@@ -1,7 +1,7 @@
 {
   "bodyClass": "privacy-policy wp-singular page-template page-template-page-text-block page-template-page-text-block-php page page-id-3 wp-theme-safe-harbours",
   "title": "Privacy Policy - Safe Harbours",
-  "description": "",
+  "description": "This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You…",
   "styles": [
     "/assets/theme/build/app.css",
     "/assets/includes/blocks/heading/style.min.css",
@@ -9,5 +9,5 @@
     "/assets/plugins/gravityforms/assets/css/dist/theme-components.min.css",
     "/assets/plugins/gravityforms/assets/css/dist/theme.min.css"
   ],
-  "script": "//theme/build/app.js"
+  "script": "/assets/theme/build/app.js"
 }

@@ -130,7 +130,7 @@ async function processHtml(html, outName) {
   }
   const headStyles = root.querySelectorAll('head style').map((s) => s.toString()).join('\n');
   const title = root.querySelector('title')?.text?.trim() || 'Safe Harbours';
-  const desc = root.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+  let desc = root.querySelector('meta[name="description"]')?.getAttribute('content') || '';
 
   // node-html-parser occasionally fails to resolve <body> on some pages;
   // fall back to slicing the body out by regex and re-parsing the fragment.
@@ -141,6 +141,21 @@ async function processHtml(html, outName) {
     body = parse(`<div${m[1]}>${m[2]}</div>`, { comment: false, blockTextElements: { script: false, style: true } }).querySelector('div');
   }
   const bodyClass = body.getAttribute('class') || '';
+
+  // The WP pages rarely set a meta description; derive one from the first
+  // substantial MAIN-content paragraph (skipping header/footer boilerplate)
+  // so every page ships a unique, content-based one (SEO).
+  if (!desc) {
+    const scope = body.querySelector('main') || body;
+    for (const p of scope.querySelectorAll('p')) {
+      if (p.closest && p.closest('header, footer')) continue;
+      const t = p.text.replace(/\s+/g, ' ').trim();
+      if (t.length >= 60) {
+        desc = t.length > 157 ? t.slice(0, 157).replace(/\s+\S*$/, '') + '…' : t;
+        break;
+      }
+    }
+  }
 
   // --- strip scripts, noscript, GTM, emoji, admin bar, svg-defs we don't need ---
   body.querySelectorAll('script, noscript, link[rel="dns-prefetch"], #wpadminbar').forEach((n) => n.remove());
@@ -189,7 +204,7 @@ async function processHtml(html, outName) {
 
   await writeFile(path.join(MIRROR, `${outName}.head.html`), headStyles);
   await writeFile(path.join(MIRROR, `${outName}.body.html`), body.innerHTML);
-  await writeFile(path.join(MIRROR, `${outName}.meta.json`), JSON.stringify({ bodyClass, title, description: desc, styles, script: `//theme/build/app.js` }, null, 2));
+  await writeFile(path.join(MIRROR, `${outName}.meta.json`), JSON.stringify({ bodyClass, title, description: desc, styles, script: `/${ASSET_DIR}/theme/build/app.js` }, null, 2));
   console.log(`  wrote _mirror/${outName}.{head,body}.html  (body ${Math.round(body.innerHTML.length / 1024)}KB, ${seen.size} assets)`);
 }
 

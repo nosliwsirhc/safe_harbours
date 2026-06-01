@@ -1,12 +1,12 @@
 {
   "bodyClass": "blog wp-theme-safe-harbours",
   "title": "Resources - Safe Harbours",
-  "description": "",
+  "description": "From essential training materials to expert advice on trauma-informed care, our resources are designed to help you provide the best possible care for the…",
   "styles": [
     "/assets/theme/build/app.css",
     "/assets/plugins/gravityforms/assets/css/dist/basic.min.css",
     "/assets/plugins/gravityforms/assets/css/dist/theme-components.min.css",
     "/assets/plugins/gravityforms/assets/css/dist/theme.min.css"
   ],
-  "script": "//theme/build/app.js"
+  "script": "/assets/theme/build/app.js"
 }

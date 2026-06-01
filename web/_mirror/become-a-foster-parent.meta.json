@@ -1,12 +1,12 @@
 {
   "bodyClass": "wp-singular page-template-default page page-id-67 wp-theme-safe-harbours",
   "title": "Become a Foster Parent - Safe Harbours",
-  "description": "",
+  "description": "Becoming a foster parent is a rewarding journey that gives you the opportunity to provide a safe, stable, and loving home for children in need. If you’ve…",
   "styles": [
     "/assets/theme/build/app.css",
     "/assets/plugins/gravityforms/assets/css/dist/basic.min.css",
     "/assets/plugins/gravityforms/assets/css/dist/theme-components.min.css",
     "/assets/plugins/gravityforms/assets/css/dist/theme.min.css"
   ],
-  "script": "//theme/build/app.js"
+  "script": "/assets/theme/build/app.js"
 }

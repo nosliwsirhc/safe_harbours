@@ -1,12 +1,12 @@
 {
   "bodyClass": "wp-singular page-template-default page page-id-486 wp-theme-safe-harbours",
   "title": "Book an Appointment - Safe Harbours",
-  "description": "",
+  "description": "Right now, there are children in Ontario who have nowhere safe to go. They’ve faced trauma, addiction, even exploitation, and they urgently need homes where…",
   "styles": [
     "/assets/theme/build/app.css",
     "/assets/plugins/gravityforms/assets/css/dist/basic.min.css",
     "/assets/plugins/gravityforms/assets/css/dist/theme-components.min.css",
     "/assets/plugins/gravityforms/assets/css/dist/theme.min.css"
   ],
-  "script": "//theme/build/app.js"
+  "script": "/assets/theme/build/app.js"
 }

@@ -1,12 +1,12 @@
 {
   "bodyClass": "wp-singular page-template-default page page-id-574 page-parent wp-theme-safe-harbours",
   "title": "Program Description - Safe Harbours",
-  "description": "",
+  "description": "Treatment-level foster care with specialized supports for complex needs.",
   "styles": [
     "/assets/theme/build/app.css",
     "/assets/plugins/gravityforms/assets/css/dist/basic.min.css",
     "/assets/plugins/gravityforms/assets/css/dist/theme-components.min.css",
     "/assets/plugins/gravityforms/assets/css/dist/theme.min.css"
   ],
-  "script": "//theme/build/app.js"
+  "script": "/assets/theme/build/app.js"
 }
