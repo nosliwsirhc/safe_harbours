@@ -61,6 +61,19 @@ a.button-secondary {
     text-align: left !important;
     padding: 14px 28px !important;
   }
+  /* Contact Us CTA (last item, a gold pill): it was small (14px) and centered,
+     clashing with the left-aligned 21px items. Make it a prominent left-aligned
+     button with breathing room above. */
+  .off-canvas-wrapper .site-navigation > li:last-child {
+    text-align: left !important;
+    margin-top: 22px !important;
+  }
+  .off-canvas-wrapper .site-navigation > li:last-child > a {
+    display: inline-block !important;
+    margin-left: 28px !important;
+    font-size: 1.0625rem !important;
+    padding: 15px 44px !important;
+  }
   /* Submenu chevron (e.g. Program Description): the theme's 16px ::after pinned
      to the screen edge — make it bigger and inset to line up with item padding. */
   .off-canvas-wrapper .site-navigation > li.menu-item-has-children::after {
