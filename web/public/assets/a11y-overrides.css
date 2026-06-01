@@ -39,40 +39,44 @@ a.button-secondary {
 .m-h5 { font-size: 20px; line-height: 28px; }
 .m-h6 { font-size: 16px; line-height: 22.4px; }
 
-/* Mobile off-canvas menu polish. The theme spreads items over a full-height
-   flex column (justify-content:flex-end, height:100vh, 32px li margins,
-   right-aligned) which reads as huge awkward gaps. Tighten to a clean,
-   top-aligned, left-aligned list with comfortable rows. */
-.off-canvas-wrapper .site-navigation {
-  justify-content: flex-start !important;
-  height: auto !important;
-  align-items: stretch !important;
-  /* top padding clears the absolutely-positioned logo + close button header */
-  padding: 104px 0 32px !important;
+/* Mobile off-canvas menu polish. SCOPED to mobile only (max-width:1023px) —
+   the desktop nav shares the .site-navigation class inside .off-canvas-wrapper,
+   so these MUST NOT leak to desktop (they did: the chevron landed over text).
+   The off-canvas panel only appears below Foundation's "large" (1024px) breakpoint.
+   The theme spreads items over a full-height flex column (flex-end, 100vh, 32px
+   margins, right-aligned) — tighten to a clean top/left-aligned list. */
+@media screen and (max-width: 1023px) {
+  .off-canvas-wrapper .site-navigation {
+    justify-content: flex-start !important;
+    height: auto !important;
+    align-items: stretch !important;
+    /* top padding clears the absolutely-positioned logo + close button header */
+    padding: 104px 0 32px !important;
+  }
+  .off-canvas-wrapper .site-navigation > li {
+    margin-bottom: 2px !important;
+    height: auto !important;
+  }
+  .off-canvas-wrapper .site-navigation a {
+    text-align: left !important;
+    padding: 14px 28px !important;
+  }
+  /* Submenu chevron (e.g. Program Description): the theme's 16px ::after pinned
+     to the screen edge — make it bigger and inset to line up with item padding. */
+  .off-canvas-wrapper .site-navigation > li.menu-item-has-children::after {
+    width: 24px !important;
+    height: 24px !important;
+    right: 24px !important;
+    background-size: 24px 24px !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+  }
+  /* The panel moves focus to the logo on open, painting an ugly box around it.
+     The logo is an obvious, large target; drop its focus ring (items keep theirs). */
+  .off-canvas-wrapper .site-header__logo:focus { outline: none; }
+  .off-canvas-wrapper a:focus:not(:focus-visible),
+  .off-canvas-wrapper button:focus:not(:focus-visible) { outline: none; }
 }
-.off-canvas-wrapper .site-navigation > li {
-  margin-bottom: 2px !important;
-  height: auto !important;
-}
-.off-canvas-wrapper .site-navigation a {
-  text-align: left !important;
-  padding: 14px 28px !important;
-}
-/* Submenu chevron (e.g. Program Description) is a 16px ::after pinned to the
-   screen edge — make it bigger and inset it to line up with the item padding. */
-.off-canvas-wrapper .site-navigation > li.menu-item-has-children::after {
-  width: 24px !important;
-  height: 24px !important;
-  right: 24px !important;
-  background-size: 24px 24px !important;
-  background-repeat: no-repeat !important;
-  background-position: center !important;
-}
-/* The panel moves focus to the logo on open, painting an ugly box around it.
-   The logo is an obvious, large target; drop its focus ring (menu items keep theirs). */
-.off-canvas-wrapper .site-header__logo:focus { outline: none; }
-.off-canvas-wrapper a:focus:not(:focus-visible),
-.off-canvas-wrapper button:focus:not(:focus-visible) { outline: none; }
 
 /* Contrast: the coral eyebrow labels (.banner-subtitle, e.g. "WHY SAFE
    HARBOURS") were salmon #f78f8b on white = 2.27:1 (fails WCAG AA). Darken to
