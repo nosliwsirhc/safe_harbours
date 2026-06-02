@@ -4,11 +4,9 @@
 # asset handler auto-drops trailing slashes (so /about-fostering/ -> /about-fostering
 # and /resources/<slug>/ -> /resources/<slug> resolve without rules here).
 # These cover common aliases / shortcuts that may be linked externally.
-
-# Canonicalize the apex to www (site canonical is https://www.safeharbours.ca).
-# Requires the apex to reach this Worker — add safeharbours.ca as a Custom Domain
-# too (see docs/go-live.md). A zone-level Redirect Rule also works if preferred.
-https://safeharbours.ca/*   https://www.safeharbours.ca/:splat   301
+# NOTE: Workers static-asset _redirects only allow RELATIVE URLs, so the
+# apex→www (cross-host) redirect can't live here — it's a zone Redirect Rule
+# (see docs/go-live.md).
 
 /home/        /                                  301
 /contact      /contact-us                        301

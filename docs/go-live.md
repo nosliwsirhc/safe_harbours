@@ -48,9 +48,14 @@ In the Cloudflare dashboard → Workers & Pages → `safe-harbours-web` →
 Settings → Domains & Routes → **Add → Custom Domain**:
 - [ ] Add `www.safeharbours.ca` — accept the prompt to **override** the existing
       WP Engine record.
-- [ ] Add `safeharbours.ca` (apex) — same override. (Apex 301s to www via
-      `public/_redirects`; or skip the apex Custom Domain and use a zone Redirect
-      Rule `safeharbours.ca/* → https://www.safeharbours.ca/$1`.)
+- [ ] Add `safeharbours.ca` (apex) — same override.
+- [ ] **Apex → www redirect (zone Redirect Rule, NOT _redirects).** Workers
+      static-asset `_redirects` only allow relative URLs, so the cross-host
+      redirect must be a zone rule. Dashboard → the `safeharbours.ca` zone →
+      Rules → Redirect Rules → Create (or use the "Redirect from root to www"
+      template): when `http.host eq "safeharbours.ca"`, redirect to dynamic
+      `concat("https://www.safeharbours.ca", http.request.uri.path)`, status 301.
+      It fires at the edge before the Worker.
 - [ ] Wait for "Active" + cert issued (usually 1-2 min).
 - [ ] Verify TLS/SSL mode is Full or Full (strict).
 
