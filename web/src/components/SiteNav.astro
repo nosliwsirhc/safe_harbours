@@ -1,0 +1,46 @@
+---
+// Renders one navigation menu (a <ul> of NavItems) with WordPress-faithful
+// markup. The item whose href matches the current path gets `current-menu-item
+// active` + aria-current="page" (the original theme never *styled* the active
+// state, but aria-current is a free accessibility win and matches WP semantics).
+//
+// `withLiIds` toggles the per-<li> id attribute: the off-canvas and footer
+// menus carry them; the desktop header menu does not (it keeps only the class).
+import type { NavItem } from '../data/nav';
+import { normalizePath } from '../data/nav';
+
+interface Props {
+  items: NavItem[];
+  ulId: string;
+  ulClass: string;
+  withLiIds?: boolean;
+  path: string;
+}
+const { items, ulId, ulClass, withLiIds = false, path } = Astro.props;
+const here = normalizePath(path);
+const isActive = (href: string) => href.startsWith('/') && normalizePath(href) === here;
+---
+<ul id={ulId} class={ulClass}>
+  {items.map((item) => {
+    const active = isActive(item.href);
+    const liClass = active ? `${item.liClass} current-menu-item active` : item.liClass;
+    return (
+      <li id={withLiIds ? item.id : undefined} class={liClass}>
+        <a rel={item.rel} href={item.href} aria-current={active ? 'page' : undefined}>{item.label}</a>
+        {item.children && item.children.length > 0 && (
+          <ul class="sub-menu">
+            {item.children.map((child) => {
+              const cActive = isActive(child.href);
+              const cClass = cActive ? `${child.liClass} current-menu-item active` : child.liClass;
+              return (
+                <li id={withLiIds ? child.id : undefined} class={cClass}>
+                  <a rel={child.rel} href={child.href} aria-current={cActive ? 'page' : undefined}>{child.label}</a>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </li>
+    );
+  })}
+</ul>

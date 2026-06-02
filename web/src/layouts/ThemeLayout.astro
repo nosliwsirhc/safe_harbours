@@ -4,11 +4,16 @@
 // page verbatim, self-hosting the theme CSS/JS + assets under /wp/.
 import { site } from '../data/site';
 import ConsentBanner from '../components/ConsentBanner.astro';
+import SiteHead from '../components/SiteHead.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import OffCanvasNav from '../components/OffCanvasNav.astro';
 
-// Inline the mirrored markup at BUILD time (Vite ?raw) — the Cloudflare
-// prerender runtime has no node:fs, so we can't read files at render time.
-const heads = import.meta.glob('../../_mirror/*.head.html', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
-const bodies = import.meta.glob('../../_mirror/*.body.html', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+// Inline the per-page <main> content at BUILD time (Vite ?raw) — the Cloudflare
+// prerender runtime has no node:fs, so we can't read files at render time. The
+// surrounding chrome (head styles, header, footer, off-canvas) is now composed
+// from components rather than injected as a blob.
+const mains = import.meta.glob('../../_mirror/*.main.html', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 const metas = import.meta.glob('../../_mirror/*.meta.json', { import: 'default', eager: true }) as Record<string, any>;
 
 interface Props {
@@ -18,12 +23,11 @@ interface Props {
 }
 const { name, title, description } = Astro.props;
 
-const headStyles = heads[`../../_mirror/${name}.head.html`] ?? '';
-const bodyHtml = bodies[`../../_mirror/${name}.body.html`] ?? '';
+const mainHtml = mains[`../../_mirror/${name}.main.html`] ?? '';
 const meta = metas[`../../_mirror/${name}.meta.json`];
 if (!meta) {
   throw new Error(
-    `ThemeLayout: no mirror found for "${name}". Run \`node scripts/mirror-from-raw.mjs\` (or scripts/mirror.mjs) to generate _mirror/${name}.{head,body}.html + .meta.json.`
+    `ThemeLayout: no mirror found for "${name}". Expected _mirror/${name}.main.html + .meta.json.`
   );
 }
 
@@ -109,10 +113,20 @@ const orgSchema = {
     />
     {meta.styles.map((href: string) => <link rel="stylesheet" href={href} />)}
     <link rel="stylesheet" href={ver('/assets/a11y-overrides.css')} />
-    <Fragment set:html={headStyles} />
+    <SiteHead />
   </head>
   <body class={meta.bodyClass}>
-    <Fragment set:html={bodyHtml} />
+    <a class="a11y-skip-content-link" href="#content">Skip To Content</a>
+    <div class="off-canvas-wrapper">
+      <OffCanvasNav path={cleanPath} />
+      <div class="off-canvas-content" data-off-canvas-content>
+        <SiteHeader path={cleanPath} />
+        <main class="site-content">
+          <div id="content" class="site-content__start" set:html={mainHtml} />
+        </main>
+        <SiteFooter path={cleanPath} />
+      </div>
+    </div>
     <ConsentBanner />
     <script is:inline define:vars={{ turnstileKey }}>window.__TS_KEY = turnstileKey;</script>
     <script src={meta.script} defer is:inline></script>

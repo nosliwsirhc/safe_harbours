@@ -1,0 +1,25 @@
+---
+// Mobile off-canvas menu panel (#offCanvas). Foundation binds to the id +
+// data-off-canvas / data-transition attributes, so they're preserved exactly.
+// Uses the same mainMenu as the desktop header, but as ul#menu-header-menu-1
+// with per-<li> ids (matching the captured theme).
+import SiteNav from './SiteNav.astro';
+import { mainMenu } from '../data/nav';
+
+interface Props { path: string }
+const { path } = Astro.props;
+---
+<div class="off-canvas position-right hide-for-large" id="offCanvas" data-off-canvas data-transition="overlap">
+  <div class="cell shrink">
+    <a href="/" rel="home" class="site-header__logo">
+      <img alt="safe-harbours-logo" class="svg" src="/assets/uploads/2024/10/safe-harbours-logo.svg" decoding="async" loading="lazy" />
+    </a>
+  </div>
+  <button class="close-button" aria-label="Close menu" type="button" data-close>
+    <svg xmlns="http://www.w3.org/2000/svg" width="31" height="29" viewBox="0 0 31 29" fill="none">
+      <path d="M29 2L2 26.8936" stroke="#484E5E" stroke-width="3" stroke-linecap="round"></path>
+      <path d="M29 26.8936L2 1.99994" stroke="#484E5E" stroke-width="3" stroke-linecap="round"></path>
+    </svg>
+  </button>
+  <SiteNav items={mainMenu} ulId="menu-header-menu-1" ulClass="site-navigation" withLiIds={true} path={path} />
+</div>

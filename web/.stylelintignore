@@ -9,3 +9,12 @@ public/assets/theme/
 public/assets/plugins/
 public/assets/includes/
 **/*.min.css
+
+# Chrome components reproduce the WordPress theme markup verbatim (incl. vendor
+# inline styles) — not hand-authored CSS, so not ours to restyle. ConsentBanner
+# (real authored <style>) stays linted.
+src/components/SiteHeader.astro
+src/components/SiteFooter.astro
+src/components/OffCanvasNav.astro
+src/components/SiteNav.astro
+src/components/SiteHead.astro

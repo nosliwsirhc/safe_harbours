@@ -1,0 +1,35 @@
+---
+// Site header: logo, desktop nav (show-for-large), and the off-canvas hamburger
+// toggle (hide-for-large). Markup mirrors the captured theme verbatim so
+// Foundation's off-canvas (data-toggle="offCanvas") and the .site-navigation
+// styles keep working. The desktop menu uses ul#menu-header-menu-2 with no
+// per-<li> ids (the off-canvas variant carries the ids).
+import SiteNav from './SiteNav.astro';
+import { mainMenu } from '../data/nav';
+
+interface Props { path: string }
+const { path } = Astro.props;
+---
+<header class="site-header" role="banner">
+  <div class="grid-container">
+    <div class="grid-x grid-padding-x align-middle">
+      <div class="cell shrink">
+        <a href="/" rel="home" class="site-header__logo">
+          <img alt="safe-harbours-logo" class="svg" src="/assets/uploads/2024/10/safe-harbours-logo.svg" decoding="async" loading="eager" />
+        </a>
+      </div>
+      <nav class="site-navigation-container cell show-for-large auto">
+        <SiteNav items={mainMenu} ulId="menu-header-menu-2" ulClass="site-navigation" path={path} />
+      </nav>
+      <div class="off-canvas__toggle-container cell auto hide-for-large text-right">
+        <button class="off-canvas__toggle" type="button" data-toggle="offCanvas" aria-label="Menu">
+          <svg xmlns="http://www.w3.org/2000/svg" width="51" height="26" viewBox="0 0 51 26" fill="none">
+            <path d="M49 2L2 2" stroke="#484E5E" stroke-width="3" stroke-linecap="round"></path>
+            <path d="M49 13L17 13" stroke="#484E5E" stroke-width="3" stroke-linecap="round"></path>
+            <path d="M49 24L2 24" stroke="#484E5E" stroke-width="3" stroke-linecap="round"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>

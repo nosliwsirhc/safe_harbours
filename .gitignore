@@ -47,8 +47,8 @@ Thumbs.db
 web/_drafts/
 
 # Only the committed mirror output (*.head.html / *.body.html) is tracked;
-# ignore any other local capture artifacts under _mirror/.
+# Only the per-page <main> content (*.main.html) is tracked; ignore any other
+# local capture artifacts under _mirror/ (raw blobs, full-page captures, etc.).
 web/_mirror/*.html
-!web/_mirror/*.head.html
-!web/_mirror/*.body.html
+!web/_mirror/*.main.html
 web/_mirror/raw.json

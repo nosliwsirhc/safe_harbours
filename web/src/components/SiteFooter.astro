@@ -1,0 +1,101 @@
+---
+// Site footer: logo, footer link menu, contact info, social menu, the newsletter
+// Gravity Form (bound by forms.js + Turnstile via #gform_wrapper_1), credits, and
+// the decorative SVG. Markup mirrors the captured theme; the only changes from the
+// original are: the meaningless server-sniffed `gf_browser_*` class is dropped,
+// and the NVISION backlink utm_source is derived from the current path.
+import SiteNav from './SiteNav.astro';
+import { footerMenu, socialMenu } from '../data/nav';
+
+interface Props { path: string }
+const { path } = Astro.props;
+
+// WordPress emitted the backlink utm with the page's own path (trailing slash).
+let utmPath = path.replace(/\/index\.html$/, '/').replace(/\.html$/, '/');
+if (!utmPath.endsWith('/')) utmPath += '/';
+const backlink = `//nvision.co/?utm_source=www.safeharbours.ca${utmPath}&utm_medium=client_backlink`;
+---
+<footer class="site-footer">
+  <div class="grid-container">
+    <div class="grid-x grid-padding-x">
+      <div class="cell small-12 medium-order-1 large-2">
+        <div class="logo-wrap">
+          <a href="/" rel="home" class="site-footer__logo">
+            <img alt="home-logo-alt" class="svg" src="/assets/uploads/2024/10/home-logo-alt.svg" decoding="async" loading="lazy" />
+          </a>
+        </div>
+      </div>
+      <div class="cell small-12 medium-3 medium-order-2 large-offset-1 large-2">
+        <div class="footer-menu-row">
+          <div class="footer-column">
+            <div class="menu-footer-menu-1-container">
+              <SiteNav items={footerMenu} ulId="menu-footer-menu-1" ulClass="footer-menu" withLiIds={true} path={path} />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cell small-12 medium-3 medium-order-3 large-2">
+        <ul class="footer-contact-info">
+          <li>Phone <a href="tel:9052942137">905-294-2137</a></li>
+          <li><a href="mailto:info@safeharbours.ca">info@safeharbours.ca</a></li>
+          <li>
+            <a href="https://maps.app.goo.gl/zjUJBSDxJW9s57MR9" target="_blank">
+              <span style="white-space:nowrap">517 Upper Sherman Ave.,</span><br />
+              Hamilton, Ontario,  <span style="white-space:nowrap">L8V 3L7</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="cell small-12 medium-4 medium-order-5 medium-offset-4 large-offset-0 large-order-2 large-1">
+        <div class="footer-social">
+          <div class="menu-footer-menu-2-container">
+            <SiteNav items={socialMenu} ulId="menu-footer-menu-2" ulClass="footer-menu" withLiIds={true} path={path} />
+          </div>
+        </div>
+      </div>
+      <div class="cell medium-6 medium-order-4 show-for-medium large-offset-1 large-3">
+        <div class="gform_wrapper gravity-theme gform-theme--no-framework" data-form-theme="gravity-theme" data-form-index="0" id="gform_wrapper_1">
+          <div id="gf_1" class="gform_anchor" tabindex="-1"></div>
+          <div class="gform_heading">
+            <h2 class="gform_title">Subscribe to our newsletter</h2>
+          </div>
+          <form class="sh-form" data-endpoint="/api/subscribe" data-source="Newsletter (footer)" data-success="Thanks — you're subscribed!" novalidate>
+            <div class="sh-field">
+              <label for="nl-name">Your Name</label>
+              <input data-1p-ignore="true" data-lpignore="true" data-bwignore="true" data-form-type="other" id="nl-name" name="name" type="text" autocomplete="name" />
+            </div>
+            <div class="sh-field">
+              <label for="nl-email">Your Email <span class="sh-req" aria-hidden="true">*</span></label>
+              <input data-1p-ignore="true" data-lpignore="true" data-bwignore="true" data-form-type="other" id="nl-email" name="email" type="email" required aria-required="true" autocomplete="email" />
+              <span class="sh-err" role="alert"></span>
+            </div>
+            <p class="sh-form-disclaimer">By entering your email, you agree to our Terms &amp; Conditions and Privacy Policy, including receipt of emails. You can unsubscribe at any time.</p>
+            <div class="cf-turnstile" data-size="flexible"></div>
+            <p class="sh-hp" aria-hidden="true">
+              <label>Leave this field empty<input data-1p-ignore="true" data-lpignore="true" data-bwignore="true" data-form-type="other" type="text" name="company" tabindex="-1" autocomplete="off" /></label>
+            </p>
+            <button type="submit" class="button">Submit</button>
+            <p class="sh-form-error" role="alert"></p>
+          </form>
+        </div>
+        <iframe style="display:none;width:0px;height:0px;" src="about:blank" name="gform_ajax_frame_1" id="gform_ajax_frame_1" title="This iframe contains the logic required to handle Ajax powered Gravity Forms."></iframe>
+      </div>
+    </div>
+    <section class="credits">
+      <div class="grid-container">
+        <div class="grid-x grid-padding-x">
+          <div class="cell medium-auto text-center medium-text-left">
+            <p class="credits__text">&copy; 2026 Safe Harbours. All Rights Reserved.</p>
+          </div>
+          <div class="cell medium-shrink text-center medium-text-right">
+            <p class="credits__text">Web Design by <a href={backlink} target="_blank" rel="noopener nofollow" title="Digital Marketing & Web Design Company">NVISION</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <svg class="footer-svg show-for-large" xmlns="http://www.w3.org/2000/svg" width="216" height="171" viewBox="0 0 216 171" fill="none">
+    <circle cx="85.145" cy="85.1451" r="75.362" transform="rotate(-98.025 85.145 85.1451)" fill="#F88E8A" fill-opacity="0.85"></circle>
+    <circle cx="165.232" cy="110.067" r="44.0854" transform="rotate(-98.025 165.232 110.067)" fill="#ECD455" fill-opacity="0.3"></circle>
+  </svg>
+</footer>
