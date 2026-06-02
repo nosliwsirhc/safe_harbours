@@ -5,8 +5,13 @@
 // facet placeholders (empty divs filled by facetwp JS at runtime), and the
 // newsletter signup form. Only change from the capture: the meaningless
 // gf_browser_* server-sniff class is dropped.
+import { getCollection } from 'astro:content';
 import PostCard from './PostCard.astro';
-import { indexOrder } from '../data/articles';
+
+// The index grid: articles with an `indexOrder`, in that order.
+const indexPosts = (await getCollection('resources'))
+  .filter((p) => p.data.indexOrder !== undefined)
+  .sort((a, b) => (a.data.indexOrder ?? 0) - (b.data.indexOrder ?? 0));
 
 const featuredHref = '/resources/eligibility-and-requirements-for-becoming-a-foster-parent-in-ontario/';
 const featuredTitle = 'Eligibility and Requirements for Becoming a Foster Parent in Ontario';
@@ -64,9 +69,9 @@ const featuredTitle = 'Eligibility and Requirements for Becoming a Foster Parent
       </div>
     </div>
     <div class="grid-x grid-padding-x grid-padding-y">
-      {indexOrder.map((slug, i) => (
+      {indexPosts.map((p, i) => (
         <div class="cell medium-6 large-4">
-          <PostCard slug={slug} variant={i === 0 ? 'index' : 'related'} />
+          <PostCard slug={p.id} variant={i === 0 ? 'index' : 'related'} />
         </div>
       ))}
     </div>

@@ -1,29 +1,29 @@
 ---
-// A resource post card, rendered from the article registry (single source of
-// truth). `variant` controls the title heading: related-posts use <h4>, the
-// /resources index uses <h3 class="m-h4">. Title/excerpt/meta are emitted as raw
-// HTML because the registry preserves the original entities (e.g. &#8217;).
-import { articles } from '../data/articles';
+// A resource post card, rendered from the resources content collection (single
+// source of truth). `variant` controls the title heading: related-posts use
+// <h4>, the /resources index's first card uses <h3 class="m-h4">.
+import { getEntry } from 'astro:content';
+import { cardMeta } from '../lib/format';
 
 interface Props {
   slug: string;
   variant?: 'related' | 'index';
 }
 const { slug, variant = 'related' } = Astro.props;
-const a = articles[slug];
-if (!a) throw new Error(`PostCard: unknown article slug "${slug}"`);
+const entry = await getEntry('resources', slug);
+if (!entry) throw new Error(`PostCard: unknown article slug "${slug}"`);
+const a = entry.data;
+const meta = cardMeta(a.date, a.author);
 ---
-<a class="post-card" href={`/resources/${a.slug}/`}>
+<a class="post-card" href={`/resources/${slug}/`}>
   <div class="thumbnail-wrap">
     <div class="post-card__thumbnail" style={`background-image: url(${a.thumbnail});`}></div>
   </div>
   <div class="content">
     <div class="title">
-      {variant === 'index'
-        ? <h3 class="m-h4" set:html={a.cardTitle} />
-        : <h4 set:html={a.cardTitle} />}
+      {variant === 'index' ? <h3 class="m-h4">{a.title}</h3> : <h4>{a.title}</h4>}
     </div>
-    <div class="excerpt" set:html={a.excerpt} />
-    <div class="meta"><p set:html={a.meta} /></div>
+    <div class="excerpt">{a.excerpt}</div>
+    <div class="meta"><p>{meta}</p></div>
   </div>
 </a>

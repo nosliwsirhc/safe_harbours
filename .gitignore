@@ -46,10 +46,9 @@ Thumbs.db
 # Drafts inbox (local only)
 web/_drafts/
 
-# Only the committed mirror output (*.head.html / *.body.html) is tracked;
-# Only the per-page <main> content (*.main.html) is tracked; ignore any other
-# local capture artifacts under _mirror/ (raw blobs, full-page captures, etc.).
+# Only the per-page <main> content (*.main.html) for not-yet-componentized pages
+# is tracked; ignore any other local capture artifacts under _mirror/. (Resource
+# articles now live as Markdown in src/content/resources/.)
 web/_mirror/*.html
 !web/_mirror/*.main.html
-!web/_mirror/*.article.html
 web/_mirror/raw.json

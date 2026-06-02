@@ -1,31 +1,29 @@
 ---
-// Full resource-article body: hero + prose + author/share footer + related
-// posts. Driven entirely by the article registry (hero/related) and the per-
-// article prose fragment in _mirror/<slug>.article.html. Resource pages render
-// just <ResourceArticle slug="…"/> inside <ThemeLayout>.
+// Resource-article body template: hero + prose (via <slot/>) + author/share
+// footer + related posts. Content comes from the resources collection — the
+// page renders <ResourceArticle …><Content/></ResourceArticle>. The prose lands
+// inside <article> so the theme's `.blog-single article h2/p/ul` styles apply.
 import { site } from '../data/site';
-import { articles } from '../data/articles';
 import ArticleHero from './ArticleHero.astro';
 import AuthorCard from './AuthorCard.astro';
 import ShareLinks from './ShareLinks.astro';
 import RelatedPosts from './RelatedPosts.astro';
 
-// Prose fragments inlined at build time (Cloudflare prerender has no fs).
-const proseFragments = import.meta.glob('../../_mirror/*.article.html', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
-
-interface Props { slug: string }
-const { slug } = Astro.props;
-const a = articles[slug];
-if (!a) throw new Error(`ResourceArticle: unknown slug "${slug}"`);
-const prose = proseFragments[`../../_mirror/${slug}.article.html`] ?? '';
+interface Props {
+  slug: string;
+  title: string;
+  heroImage: string;
+  related: string[];
+}
+const { slug, title, heroImage, related } = Astro.props;
 const shareUrl = `${site.url}/resources/${slug}/`;
 ---
-<ArticleHero title={a.heroTitle} image={a.heroImage} />
+<ArticleHero title={title} image={heroImage} />
 <section class="blog-single">
   <article>
     <div class="grid-container">
       <div class="grid-x">
-        <div class="cell large-11" set:html={prose} />
+        <div class="cell large-11"><slot /></div>
         <footer class="cell large-11">
           <div class="wrap">
             <strong class="author-card-title">Author</strong>
@@ -39,7 +37,7 @@ const shareUrl = `${site.url}/resources/${slug}/`;
   <div class="grid-container">
     <div class="grid-x">
       <div class="cell">
-        <RelatedPosts slugs={a.related} />
+        <RelatedPosts slugs={related} />
       </div>
     </div>
   </div>
