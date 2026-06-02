@@ -15,13 +15,13 @@ export default defineConfig({
   // slash — keeps the served URL matching our no-slash canonicals.
   build: { format: 'file' },
   // imageService 'compile' transforms images at build time for prerendered
-  // routes instead of using a runtime Cloudflare Images binding. We already
-  // pre-generate every image and use passthroughImageService below, so this
-  // just avoids requiring an IMAGES binding on the Worker.
+  // routes instead of using a runtime Cloudflare Images binding. Combined with
+  // passthroughImageService below, this avoids requiring an IMAGES binding on
+  // the Worker.
   adapter: cloudflare({ imageService: 'compile' }),
   integrations: [sitemap()],
-  // Images live in public/ and are referenced directly, so we don't need
-  // sharp-based optimization. Passthrough avoids the native sharp dependency.
+  // Images are served as-is from public/ (the mirror writes them under
+  // public/assets/), so no build-time image transformation is needed.
   image: { service: passthroughImageService() },
   prefetch: { prefetchAll: true },
   // We don't use Astro sessions. Without an explicit driver the Cloudflare

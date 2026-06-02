@@ -38,8 +38,9 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
 
-      # --ignore-scripts skips sharp's native postinstall (not needed — the
-      # build uses passthroughImageService and images are pre-generated).
+      # --ignore-scripts skips sharp's native postinstall (sharp is pulled in
+      # transitively by astro/@astrojs/cloudflare; it fails to build here and the
+      # build doesn't need it — images are served as-is via passthroughImageService).
       - name: Install dependencies
         working-directory: web
         run: npm ci --ignore-scripts

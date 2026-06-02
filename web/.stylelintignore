@@ -1,0 +1,11 @@
+# Lint only hand-authored CSS. Everything below is either build output, a
+# faithful WordPress mirror, or minified vendor CSS — not ours to restyle.
+node_modules/
+dist/
+.astro/
+.wrangler/
+_mirror/
+public/assets/theme/
+public/assets/plugins/
+public/assets/includes/
+**/*.min.css

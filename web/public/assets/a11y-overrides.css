@@ -9,6 +9,7 @@ a.button,
 a.button-secondary {
   position: relative;
 }
+
 .button::after,
 .button-secondary::after {
   content: "";
@@ -45,22 +46,26 @@ a.button-secondary {
    The off-canvas panel only appears below Foundation's "large" (1024px) breakpoint.
    The theme spreads items over a full-height flex column (flex-end, 100vh, 32px
    margins, right-aligned) — tighten to a clean top/left-aligned list. */
-@media screen and (max-width: 1023px) {
+@media screen and (width <= 1023px) {
   .off-canvas-wrapper .site-navigation {
     justify-content: flex-start !important;
     height: auto !important;
     align-items: stretch !important;
+
     /* top padding clears the absolutely-positioned logo + close button header */
     padding: 104px 0 32px !important;
   }
+
   .off-canvas-wrapper .site-navigation > li {
     margin-bottom: 2px !important;
     height: auto !important;
   }
+
   .off-canvas-wrapper .site-navigation a {
     text-align: left !important;
     padding: 14px 28px !important;
   }
+
   /* Contact Us CTA (last item, a gold pill): it was small (14px) and centered,
      clashing with the left-aligned 21px items. Make it a prominent left-aligned
      button with breathing room above. */
@@ -68,12 +73,14 @@ a.button-secondary {
     text-align: left !important;
     margin-top: 22px !important;
   }
+
   .off-canvas-wrapper .site-navigation > li:last-child > a {
     display: inline-block !important;
     margin-left: 28px !important;
     font-size: 1.0625rem !important;
     padding: 15px 44px !important;
   }
+
   /* Submenu chevron (e.g. Program Description): the theme's 16px ::after pinned
      to the screen edge — make it bigger and inset to line up with item padding. */
   .off-canvas-wrapper .site-navigation > li.menu-item-has-children::after {
@@ -84,9 +91,11 @@ a.button-secondary {
     background-repeat: no-repeat !important;
     background-position: center !important;
   }
+
   /* The panel moves focus to the logo on open, painting an ugly box around it.
      The logo is an obvious, large target; drop its focus ring (items keep theirs). */
   .off-canvas-wrapper .site-header__logo:focus { outline: none; }
+
   .off-canvas-wrapper a:focus:not(:focus-visible),
   .off-canvas-wrapper button:focus:not(:focus-visible) { outline: none; }
 }
@@ -122,10 +131,11 @@ a.button-secondary {
   font-weight: 700 !important;
   letter-spacing: 0.02em;
   padding: 4px 12px !important;
-  border: 1px solid rgba(255, 199, 0, 0.45);
+  border: 1px solid rgb(255 199 0 / 45%);
   border-radius: 999px;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
+
 .site-footer #menu-item-files > a::before {
   content: "";
   width: 16px;
@@ -134,12 +144,14 @@ a.button-secondary {
   background: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='%23ffc700'%3E%3Cpath%20d='M10%204H4c-1.1%200-2%20.9-2%202v12c0%201.1.9%202%202%202h16c1.1%200%202-.9%202-2V8c0-1.1-.9-2-2-2h-8l-2-2z'/%3E%3C/svg%3E") center / contain no-repeat;
   transition: background-image 0.15s ease;
 }
+
 .site-footer #menu-item-files > a:hover,
 .site-footer #menu-item-files > a:focus-visible {
   background-color: #ffc700;
   color: #394254 !important;
   text-decoration: none;
 }
+
 /* swap the folder glyph to slate on hover so it stays visible on the gold fill */
 .site-footer #menu-item-files > a:hover::before,
 .site-footer #menu-item-files > a:focus-visible::before {
@@ -155,18 +167,21 @@ a.button-secondary {
    =========================================================================== */
 .sh-form { width: 100%; }
 .sh-form .sh-field { margin: 0 0 16px; text-align: left; }
+
 .sh-form .sh-field > label {
   display: block;
   font-family: 'Source Sans 3', sans-serif;
   font-weight: 600;
   font-size: 0.95rem;
   margin-bottom: 6px;
+
   /* Set explicitly: the theme sets a dark label colour that would otherwise win
      over inheritance (made footer labels black-on-slate). Light page sections
      keep slate; the footer override below switches to white. */
   color: #394254;
 }
 .sh-form .sh-req { color: #e74c3c; }
+
 .sh-form input[type='text'],
 .sh-form input[type='email'],
 .sh-form input[type='tel'],
@@ -185,18 +200,22 @@ a.button-secondary {
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .sh-form textarea { min-height: 120px; resize: vertical; }
+
 .sh-form input::placeholder,
 .sh-form textarea::placeholder { color: #8b93a3; }
+
 .sh-form input:focus,
 .sh-form textarea:focus,
 .sh-form select:focus {
   outline: none;
   border-color: #f78f8c;
-  box-shadow: 0 0 0 3px rgba(247, 143, 140, 0.35);
+  box-shadow: 0 0 0 3px rgb(247 143 140 / 35%);
 }
+
 .sh-form .sh-field--err input,
 .sh-form .sh-field--err textarea,
 .sh-form .sh-field--err select { border-color: #d93025; }
+
 .sh-form .sh-err {
   display: block;
   min-height: 0;
@@ -209,13 +228,17 @@ a.button-secondary {
 .sh-form .sh-form-row { display: flex; gap: 16px; flex-wrap: wrap; }
 .sh-form .sh-form-row > .sh-field { flex: 1 1 200px; }
 .sh-form .sh-form-disclaimer { font-size: 0.8rem; opacity: 0.85; margin: 4px 0 14px; }
+
 /* visually-hidden honeypot */
 .sh-form .sh-hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; overflow: hidden; }
+
 /* the Turnstile widget gets a little breathing room above the button */
 .sh-form .cf-turnstile { margin: 4px 0 14px; }
+
 .sh-form button[type='submit'],
 .sh-form input[type='submit'] { cursor: pointer; }
 .sh-form button[type='submit'][disabled] { opacity: 0.6; cursor: default; }
+
 .sh-form .sh-form-error {
   margin: 12px 0 0;
   font-weight: 700;
@@ -231,16 +254,19 @@ a.button-secondary {
   animation: sh-ok-in 0.3s ease both;
 }
 .sh-form-ok p { margin: 12px 0 0; font-size: 1.05rem; line-height: 1.5; }
+
 .sh-ok-check {
   width: 56px; height: 56px;
   stroke: #2e7d32; stroke-width: 3; fill: none;
   stroke-linecap: round; stroke-linejoin: round;
 }
+
 @keyframes sh-ok-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 /* On the dark slate footer the newsletter form needs lighter error text + a
    readable disclaimer; labels already inherit the footer's white text. */
 .site-footer .sh-form .sh-field > label { color: #fff; }
+
 /* The footer keeps the theme's dark input fill, so the TEXT must be white — the
    email field was rendering slate-on-slate (invisible). !important + the
    -webkit- property override the theme (and fix Safari, which honours
@@ -251,13 +277,15 @@ a.button-secondary {
   -webkit-text-fill-color: #fff !important;
   caret-color: #fff !important;
 }
+
 .site-footer .sh-form input::placeholder,
 .site-footer .sh-form textarea::placeholder {
-  color: rgba(255, 255, 255, 0.55);
-  -webkit-text-fill-color: rgba(255, 255, 255, 0.55);
+  color: rgb(255 255 255 / 55%);
+  -webkit-text-fill-color: rgb(255 255 255 / 55%);
 }
+
 .site-footer .sh-form .sh-err,
 .site-footer .sh-form .sh-form-error { color: #ffb4ab; }
-.site-footer .sh-form .sh-form-disclaimer { color: rgba(255, 255, 255, 0.8); }
+.site-footer .sh-form .sh-form-disclaimer { color: rgb(255 255 255 / 80%); }
 .site-footer .sh-form-ok p { color: #fff; }
 .site-footer .sh-ok-check { stroke: #ffc700; }
