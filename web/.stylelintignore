@@ -18,3 +18,4 @@ src/components/SiteFooter.astro
 src/components/OffCanvasNav.astro
 src/components/SiteNav.astro
 src/components/SiteHead.astro
+src/components/ResourcesIndex.astro
