@@ -4,6 +4,7 @@
 // <h4>, the /resources index's first card uses <h3 class="m-h4">.
 import { getEntry } from 'astro:content';
 import { cardMeta } from '../lib/format';
+import { bgImageSet } from '../lib/img';
 
 interface Props {
   slug: string;
@@ -17,7 +18,7 @@ const meta = cardMeta(a.date, a.author);
 ---
 <a class="post-card" href={`/resources/${slug}/`}>
   <div class="thumbnail-wrap">
-    <div class="post-card__thumbnail" style={`background-image: url(${a.thumbnail});`}></div>
+    <div class="post-card__thumbnail" style={`background-image: ${bgImageSet(a.thumbnail!, 800)};`}></div>
   </div>
   <div class="content">
     <div class="title">

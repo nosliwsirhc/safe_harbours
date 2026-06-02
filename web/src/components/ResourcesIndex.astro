@@ -7,6 +7,7 @@
 // gf_browser_* server-sniff class is dropped.
 import { getCollection } from 'astro:content';
 import PostCard from './PostCard.astro';
+import { bgImageSet } from '../lib/img';
 
 // The index grid: articles with an `indexOrder`, in that order.
 const indexPosts = (await getCollection('resources'))
@@ -19,7 +20,7 @@ const featuredTitle = 'Eligibility and Requirements for Becoming a Foster Parent
 <div class="page-hero blog">
   <div class="grid-container">
     <div class="overlay"></div>
-    <div class="background-image" style="background-image: url('/assets/uploads/2024/10/blog-hero-scaled.jpg');"></div>
+    <div class="background-image" style={`background-image: ${bgImageSet('/assets/uploads/2024/10/blog-hero-scaled.jpg')};`}></div>
     <div class="grid-x">
       <div class="cell medium-10">
         <div class="content">
@@ -47,7 +48,7 @@ const featuredTitle = 'Eligibility and Requirements for Becoming a Foster Parent
       <div class="cell medium-6 large-7">
         <a class="feature-post__thumbnail-wrap" href={featuredHref} title={featuredTitle}>
           <p class="badge">Featured Post - (Most Recent)</p>
-          <div class="feature-post__thumbnail" style="background-image: url(/assets/uploads/2026/02/foster6.jpg);"></div>
+          <div class="feature-post__thumbnail" style={`background-image: ${bgImageSet('/assets/uploads/2026/02/foster6.jpg', 800)};`}></div>
         </a>
       </div>
       <div class="cell medium-6 large-5 align-center-middle">
