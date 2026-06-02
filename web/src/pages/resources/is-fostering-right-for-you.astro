@@ -1,4 +1,9 @@
 ---
-import ThemeLayout from '../../layouts/ThemeLayout.astro';
+import ThemeLayout from "../../layouts/ThemeLayout.astro";
+import ResourceArticle from "../../components/ResourceArticle.astro";
+
+const slug = "is-fostering-right-for-you";
 ---
-<ThemeLayout name="is-fostering-right-for-you" title="Is Fostering Right for You? | Safe Harbours" />
+<ThemeLayout name={slug} title="Is Fostering Right for You? | Safe Harbours">
+  <ResourceArticle slug={slug} />
+</ThemeLayout>

@@ -1,0 +1,21 @@
+---
+// "Related Posts" grid for a resource article — a row of post cards plus a
+// "View All Resources" button. Card data comes from the article registry.
+import PostCard from './PostCard.astro';
+
+interface Props { slugs: string[] }
+const { slugs } = Astro.props;
+---
+<aside class="related-posts">
+  <h4 class="text-center" style="margin-bottom: 50px;">Related Posts</h4>
+  <div role="list" class="archive-cards grid-x grid-padding-x">
+    {slugs.map((slug) => (
+      <div class="cell medium-6 large-4">
+        <PostCard slug={slug} variant="related" />
+      </div>
+    ))}
+  </div>
+</aside>
+<div style="margin-top: 50px;" class="cell text-center">
+  <a class="button" href="/resources/">View All Resources</a>
+</div>

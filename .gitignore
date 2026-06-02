@@ -51,4 +51,5 @@ web/_drafts/
 # local capture artifacts under _mirror/ (raw blobs, full-page captures, etc.).
 web/_mirror/*.html
 !web/_mirror/*.main.html
+!web/_mirror/*.article.html
 web/_mirror/raw.json

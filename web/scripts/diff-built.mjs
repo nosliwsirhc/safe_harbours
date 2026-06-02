@@ -55,6 +55,8 @@ function normalize(html) {
     .replace(/&#0?38;/g, '&amp;')
     // attribute quote style
     .replace(/=\s*'([^']*)'/g, '="$1"')
+    // empty attribute value ≡ bare boolean attribute in HTML5 (e.g. alt="" → alt)
+    .replace(/(\s[\w-]+)=""/g, '$1')
     // collapse whitespace inside class="…" (holes left by removed active classes)
     .replace(/class="([^"]*)"/g, (_, c) => `class="${c.replace(/\s+/g, ' ').trim()}"`)
     // trailing whitespace inside a tag (WP quirk) / before a self-close

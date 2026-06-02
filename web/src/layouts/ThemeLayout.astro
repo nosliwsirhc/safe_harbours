@@ -122,7 +122,9 @@ const orgSchema = {
       <div class="off-canvas-content" data-off-canvas-content>
         <SiteHeader path={cleanPath} />
         <main class="site-content">
-          <div id="content" class="site-content__start" set:html={mainHtml} />
+          <div id="content" class="site-content__start">
+            {Astro.slots.has('default') ? <slot /> : <Fragment set:html={mainHtml} />}
+          </div>
         </main>
         <SiteFooter path={cleanPath} />
       </div>

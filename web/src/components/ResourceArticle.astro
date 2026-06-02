@@ -1,0 +1,46 @@
+---
+// Full resource-article body: hero + prose + author/share footer + related
+// posts. Driven entirely by the article registry (hero/related) and the per-
+// article prose fragment in _mirror/<slug>.article.html. Resource pages render
+// just <ResourceArticle slug="…"/> inside <ThemeLayout>.
+import { site } from '../data/site';
+import { articles } from '../data/articles';
+import ArticleHero from './ArticleHero.astro';
+import AuthorCard from './AuthorCard.astro';
+import ShareLinks from './ShareLinks.astro';
+import RelatedPosts from './RelatedPosts.astro';
+
+// Prose fragments inlined at build time (Cloudflare prerender has no fs).
+const proseFragments = import.meta.glob('../../_mirror/*.article.html', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+
+interface Props { slug: string }
+const { slug } = Astro.props;
+const a = articles[slug];
+if (!a) throw new Error(`ResourceArticle: unknown slug "${slug}"`);
+const prose = proseFragments[`../../_mirror/${slug}.article.html`] ?? '';
+const shareUrl = `${site.url}/resources/${slug}/`;
+---
+<ArticleHero title={a.heroTitle} image={a.heroImage} />
+<section class="blog-single">
+  <article>
+    <div class="grid-container">
+      <div class="grid-x">
+        <div class="cell large-11" set:html={prose} />
+        <footer class="cell large-11">
+          <div class="wrap">
+            <strong class="author-card-title">Author</strong>
+            <AuthorCard />
+          </div>
+          <ShareLinks url={shareUrl} />
+        </footer>
+      </div>
+    </div>
+  </article>
+  <div class="grid-container">
+    <div class="grid-x">
+      <div class="cell">
+        <RelatedPosts slugs={a.related} />
+      </div>
+    </div>
+  </div>
+</section>

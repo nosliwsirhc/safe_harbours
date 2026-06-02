@@ -1,4 +1,9 @@
 ---
-import ThemeLayout from '../../layouts/ThemeLayout.astro';
+import ThemeLayout from "../../layouts/ThemeLayout.astro";
+import ResourceArticle from "../../components/ResourceArticle.astro";
+
+const slug = "eligibility-and-requirements-for-becoming-a-foster-parent-in-ontario";
 ---
-<ThemeLayout name="eligibility-and-requirements-for-becoming-a-foster-parent-in-ontario" title="Eligibility and Requirements for Becoming a Foster Parent in Ontario | Safe Harbours" />
+<ThemeLayout name={slug} title="Eligibility and Requirements for Becoming a Foster Parent in Ontario | Safe Harbours">
+  <ResourceArticle slug={slug} />
+</ThemeLayout>

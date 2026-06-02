@@ -1,0 +1,24 @@
+---
+// Resource-article hero: a "Resources" breadcrumb + the article title over a
+// background image, with the theme's decorative circle. Title is raw HTML
+// (registry preserves entities like &#8211;).
+interface Props { title: string; image: string }
+const { title, image } = Astro.props;
+---
+<div class="page-hero blog">
+  <div class="grid-container">
+    <div class="overlay"></div>
+    <div class="background-image" style={`background-image: url('${image}');`}></div>
+    <div class="grid-x">
+      <div class="cell medium-10">
+        <div class="content">
+          <p class="lead"><a class="breadcrumb" href="/resources/">Resources</a></p>
+          <h1 set:html={title} />
+        </div>
+      </div>
+    </div>
+    <svg class="circle-1 show-for-large" xmlns="http://www.w3.org/2000/svg" width="179" height="179" viewBox="0 0 179 179" fill="none">
+      <circle cx="89.2938" cy="89.5107" r="87" transform="rotate(-91.5314 89.2938 89.5107)" fill="#DAB527" fill-opacity="0.89"></circle>
+    </svg>
+  </div>
+</div>

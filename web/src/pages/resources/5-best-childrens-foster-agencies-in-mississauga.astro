@@ -1,4 +1,9 @@
 ---
-import ThemeLayout from '../../layouts/ThemeLayout.astro';
+import ThemeLayout from "../../layouts/ThemeLayout.astro";
+import ResourceArticle from "../../components/ResourceArticle.astro";
+
+const slug = "5-best-childrens-foster-agencies-in-mississauga";
 ---
-<ThemeLayout name="5-best-childrens-foster-agencies-in-mississauga" title="5 Best Children's Foster Agencies in Mississauga | Safe Harbours" />
+<ThemeLayout name={slug} title="5 Best Children's Foster Agencies in Mississauga | Safe Harbours">
+  <ResourceArticle slug={slug} />
+</ThemeLayout>
