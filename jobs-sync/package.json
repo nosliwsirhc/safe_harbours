@@ -1,0 +1,20 @@
+{
+  "name": "jobs-sync",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Projection worker: reads the HR Job Postings SharePoint lists and publishes the gated, override-resolved public set into D1 for the careers board.",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "dev": "wrangler dev --test-scheduled",
+    "deploy": "wrangler deploy",
+    "db:create": "wrangler d1 create safeharbours-jobs",
+    "db:apply": "wrangler d1 execute safeharbours-jobs --remote --file=./schema.sql",
+    "db:apply:local": "wrangler d1 execute safeharbours-jobs --local --file=./schema.sql"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260601.1",
+    "typescript": "^5.6.3",
+    "wrangler": "^4.0.0"
+  }
+}

@@ -1,0 +1,54 @@
+---
+// The live openings list for /careers. Reads the D1 board (graceful: empty list
+// on any error) and renders a card grid, or a warm "no openings" state with a
+// way to reach out. Rendered inside the existing #job_list .cell.
+import JobCard from './JobCard.astro';
+import { listJobs } from '../lib/jobs';
+import { site } from '../data/site';
+
+const jobs = await listJobs();
+---
+<div class="jobs-board">
+  <h2 class="jobs-board__heading">Current Openings</h2>
+
+  {jobs.length > 0 ? (
+    <ul class="jobs-board__grid" role="list">
+      {jobs.map((job) => (
+        <li><JobCard job={job} /></li>
+      ))}
+    </ul>
+  ) : (
+    <div class="jobs-board__empty">
+      <p>We don't have any openings posted right now — but we're often growing our team.</p>
+      <p>
+        Send your resume to <a href={`mailto:${site.email}`}>{site.email}</a> and we'll keep you in mind,
+        or check back soon.
+      </p>
+    </div>
+  )}
+</div>
+
+<style>
+  .jobs-board { text-align: left; }
+  .jobs-board__heading { color: #394254; margin-bottom: 1.5rem; }
+  .jobs-board__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .jobs-board__empty {
+    background: #f3f2f1;
+    border-radius: 14px;
+    padding: 2rem;
+    text-align: center;
+    color: #4f4f4f;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  .jobs-board__empty p { margin: 0 0 0.5rem; font-size: 1.05rem; }
+  .jobs-board__empty p:last-child { margin-bottom: 0; }
+  .jobs-board__empty a { color: #cc4b37; font-weight: 700; }
+</style>

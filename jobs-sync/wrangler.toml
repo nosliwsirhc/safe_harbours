@@ -1,0 +1,33 @@
+name = "jobs-sync"
+main = "src/index.ts"
+compatibility_date = "2026-05-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+# Runs the projection on a schedule (reconcile from SharePoint + expire past-closing
+# rows) as a backstop to the Power Automate webhook. Every 6h.
+[triggers]
+crons = ["0 */6 * * *"]
+
+# Dedicated D1 for the public job board — isolated from FileDrop's database on
+# purpose (the public site only ever reads this one). Create it with
+# `npm run db:create`, then paste the id here and into web/wrangler.jsonc.
+[[d1_databases]]
+binding = "DB"
+database_name = "safeharbours-jobs"
+database_id = "08193517-e7af-4b92-aee7-286865d9e3c0"
+
+# Non-secret config. Reuses FileDrop's "Writer" Entra app (certificate auth — SP
+# REST rejects client-secret app tokens). Secrets are set with `wrangler secret put`:
+#   WRITER_CERT_PRIVATE_KEY  — PKCS#8 PEM private key of the Writer app's certificate
+#   REFRESH_SECRET           — shared secret the Power Automate flow sends to /refresh
+[vars]
+TENANT_ID = "b14fa16f-d99d-4488-941c-dc98f601c9c4"
+WRITER_CLIENT_ID = "dac18a6f-3c75-4f81-8667-a43298482738"
+WRITER_CERT_THUMBPRINT = "052A0D8C88C197F6B8158958A04B1EE303F02AB4"
+SHAREPOINT_HOSTNAME = "safeharbours.sharepoint.com"
+HR_SITE_PATH = "/sites/HumanResources"
+POSTINGS_LIST = "Job Postings"
+TITLES_LIST = "Job Titles"
+# Org timezone for end-of-day closing-date comparisons.
+ORG_TZ = "America/Toronto"

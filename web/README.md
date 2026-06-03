@@ -363,6 +363,20 @@ Going live / DNS cutover details: see **`../docs/go-live.md`**.
 
 ---
 
+## 12b. Careers / jobs board
+
+`/careers` is **SSR** (`prerender = false`): it reads open postings from a dedicated D1
+database (`safeharbours-jobs`, bound via `web/wrangler.jsonc`) and renders the live
+openings into the old job-widget slot, plus per-posting detail pages at
+`/careers/[postingId]` with `JobPosting` structured data. Reads are graceful — any D1
+error falls back to a "no openings" state, so the page never 500s. The site only ever
+*reads* D1; it has no SharePoint credentials.
+
+The data is produced by the **`jobs-sync`** worker (`../jobs-sync/`), which projects the
+HR SharePoint Job Postings lists into that D1 (override resolution + publish gate +
+sanitize), refreshed by a Power Automate webhook and a 6h cron. See
+`../jobs-sync/README.md` and the launch steps in `../docs/jobs-launch-checklist.md`.
+
 ## 13. Gotchas / things to know
 
 - **No `node:fs` at render time** (Cloudflare prerender runs in a Workers

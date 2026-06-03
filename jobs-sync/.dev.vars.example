@@ -1,0 +1,10 @@
+# Local dev secrets for `wrangler dev`. Copy to .dev.vars (gitignored) and fill in.
+# In production these are set with `wrangler secret put <NAME>`.
+
+# PKCS#8 PEM private key of the Writer app's certificate (the FileDrop "Writer"
+# app, thumbprint 052A0D8C…). Multi-line — keep the BEGIN/END lines.
+WRITER_CERT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
+
+# Shared secret the Power Automate flow sends in the `x-refresh-secret` header to
+# POST /refresh. Generate a long random string.
+REFRESH_SECRET="change-me-to-a-long-random-string"

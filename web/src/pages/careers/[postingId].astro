@@ -1,0 +1,138 @@
+---
+// A single job posting (SSR). Reuses the careers page's theme assets (meta key
+// "careers") and renders the full, override-resolved posting + JobPosting JSON-LD
+// for Google for Jobs. Unknown/closed ids return 404 with a friendly fallback.
+export const prerender = false;
+
+import ThemeLayout from '../../layouts/ThemeLayout.astro';
+import { getJob } from '../../lib/jobs';
+import { jobPostingJsonLd } from '../../lib/jobPostingSchema';
+import { site } from '../../data/site';
+
+const { postingId } = Astro.params;
+const job = postingId ? await getJob(postingId) : null;
+if (!job) Astro.response.status = 404;
+
+const canonical = new URL(`/careers/${postingId}`, site.url).href;
+const jsonLd = job ? jobPostingJsonLd(job, canonical) : null;
+
+const money = (n: number) => `$${n.toLocaleString('en-CA', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 })}`;
+const unit = job?.payBasis === 'Annual' ? '/yr' : '/hr';
+const wage = job && (job.wageMin != null || job.wageMax != null)
+  ? (job.wageMin != null && job.wageMax != null && job.wageMin !== job.wageMax
+      ? `${money(job.wageMin)}–${money(job.wageMax)}${unit}`
+      : `${money((job.wageMin ?? job.wageMax)!)}${unit}`)
+  : null;
+const location = job ? [job.city, job.region].filter(Boolean).join(', ') || job.home || 'Ontario' : '';
+const closes = job ? new Date(`${job.closingDate}T12:00:00`).toLocaleDateString('en-CA', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+const facts = job
+  ? ([
+      ['Location', location],
+      ['Department', job.programDepartment],
+      ['Type', job.employmentType],
+      ['Schedule', job.scheduleShift.join(', ') || null],
+      ['Openings', job.numberOfOpenings && job.numberOfOpenings > 1 ? String(job.numberOfOpenings) : null],
+      ['Compensation', wage],
+      ['Language', job.languageRequirement],
+      ['Union', job.unionStatus === 'Union' ? (job.unionClassification || 'Union') : job.unionStatus],
+      ['Closes', closes],
+    ].filter(([, v]) => v) as [string, string][])
+  : [];
+const reqGroups = job
+  ? ([
+      ['Required before hire', [...job.reqBeforeHireCerts, ...job.reqBeforeHireTraining]],
+      ['Education / programs', job.educationPrograms],
+      ['Training we provide', job.providedAfterHireTraining],
+    ].filter(([, v]) => (v as string[]).length) as [string, string[]][])
+  : [];
+const title = job ? `${job.title} | Careers | Safe Harbours` : 'Position closed | Careers | Safe Harbours';
+---
+<ThemeLayout name="careers" title={title} description={job?.shortSummary ?? undefined}>
+  {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />}
+
+  <section class="job">
+    <div class="grid-container">
+      <p class="job__back"><a href="/careers">← All openings</a></p>
+
+      {job ? (
+        <article class="job__body">
+          <header class="job__header">
+            <h1>{job.title}</h1>
+            <p class="job__sub">{location}{wage ? ` · ${wage}` : ''}</p>
+            {job.howToApply && (
+              <a class="button job__apply" href={job.howToApply.url} target="_blank" rel="noopener">
+                {job.howToApply.label && /apply/i.test(job.howToApply.label) ? job.howToApply.label : 'Apply now'}
+              </a>
+            )}
+          </header>
+
+          <dl class="job__facts">
+            {facts.map(([k, v]) => (<><dt>{k}</dt><dd>{v}</dd></>))}
+          </dl>
+
+          {job.shortSummary && <p class="job__summary">{job.shortSummary}</p>}
+          {job.fullDescription && <div class="job__rich" set:html={job.fullDescription} />}
+          {job.standardDuties && (<><h2>Standard duties</h2><div class="job__rich" set:html={job.standardDuties} /></>)}
+          {job.additionalDuties && (<><h2>Additional duties &amp; considerations</h2><div class="job__rich" set:html={job.additionalDuties} /></>)}
+
+          {reqGroups.map(([label, items]) => (
+            <section class="job__reqs">
+              <h2>{label}</h2>
+              <ul>{items.map((it) => <li>{it}</li>)}</ul>
+            </section>
+          ))}
+
+          {job.screeningRequirement && (
+            <p class="job__note"><strong>Screening:</strong> {job.screeningRequirement} required for this role.</p>
+          )}
+          {job.workEligibilityRequired && (
+            <p class="job__note">Applicants must be legally eligible to work in Canada.</p>
+          )}
+          {job.aiScreeningUsed && job.aiDisclosureStatement && (
+            <p class="job__note job__ai"><strong>Use of automated tools:</strong> {job.aiDisclosureStatement}</p>
+          )}
+          {job.accommodationStatement && <p class="job__note job__aoda">{job.accommodationStatement}</p>}
+
+          {job.howToApply && (
+            <p class="job__apply-foot">
+              <a class="button" href={job.howToApply.url} target="_blank" rel="noopener">Apply for this position</a>
+            </p>
+          )}
+        </article>
+      ) : (
+        <div class="job__gone">
+          <h1>This position is no longer available</h1>
+          <p>It may have been filled or closed. See our current openings instead.</p>
+          <p><a class="button" href="/careers">View current openings</a></p>
+        </div>
+      )}
+    </div>
+  </section>
+</ThemeLayout>
+
+<style>
+  .job { padding: 3rem 0 4rem; }
+  .job__back { margin: 0 0 1rem; }
+  .job__back a { color: #767676; text-decoration: none; font-weight: 600; }
+  .job__body { max-width: 760px; }
+  .job__header h1 { color: #394254; margin: 0 0 0.25rem; }
+  .job__sub { font-size: 1.1rem; font-weight: 600; color: #5f5f5f; margin: 0 0 1rem; }
+  .job__apply { display: inline-block; }
+  .job__facts {
+    display: grid; grid-template-columns: max-content 1fr; gap: 0.4rem 1.25rem;
+    margin: 1.5rem 0; padding: 1.25rem 1.5rem; background: #f3f2f1; border-radius: 12px;
+  }
+  .job__facts dt { font-weight: 700; color: #394254; }
+  .job__facts dd { margin: 0; color: #4f4f4f; }
+  .job__summary { font-size: 1.1rem; line-height: 1.6; color: #2a2f39; }
+  .job__rich { line-height: 1.7; color: #3b3b3b; }
+  .job__rich :global(h2), .job__rich :global(h3) { color: #394254; }
+  .job__reqs h2, .job__body > h2 { color: #394254; margin-top: 2rem; }
+  .job__reqs ul { line-height: 1.7; }
+  .job__note { background: #fbfbfa; border-left: 4px solid #ffc700; padding: 0.75rem 1rem; border-radius: 0 8px 8px 0; color: #4f4f4f; }
+  .job__ai { border-left-color: #8a8a8a; }
+  .job__aoda { border-left-color: #cbd2e0; font-size: 0.95rem; }
+  .job__apply-foot { margin-top: 2.5rem; }
+  .job__gone { max-width: 640px; padding: 2rem 0; }
+  .job__gone h1 { color: #394254; }
+</style>

@@ -1,4 +1,21 @@
 ---
+// Careers page. SSR (reads the live jobs board from D1), so it's on-demand.
+// We keep the mirrored marketing sections (hero, "In College?", "Why work…")
+// verbatim and swap ONLY the old Indeed widget for the live <JobsBoard/>.
+export const prerender = false;
+
 import ThemeLayout from '../layouts/ThemeLayout.astro';
+import JobsBoard from '../components/JobsBoard.astro';
+import blob from '../../_mirror/careers.main.html?raw';
+
+// The dead Indeed embed sat inside #job_list .cell; split there and drop it in.
+const WIDGET = "<div class='sk-ww-indeed-jobs' data-embed-id='25480871'></div>";
+const i = blob.indexOf(WIDGET);
+const before = i === -1 ? blob : blob.slice(0, i);
+const after = i === -1 ? '' : blob.slice(i + WIDGET.length);
 ---
-<ThemeLayout name="careers" title="Careers | Safe Harbours" />
+<ThemeLayout name="careers" title="Careers | Safe Harbours">
+  <Fragment set:html={before} />
+  <JobsBoard />
+  <Fragment set:html={after} />
+</ThemeLayout>

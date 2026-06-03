@@ -1,0 +1,16 @@
+{
+  // Read by @astrojs/cloudflare to add bindings to the deployed Worker. The adapter
+  // still supplies main / assets / build settings; this only declares extras.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "safe-harbours-web",
+  "compatibility_date": "2026-04-15",
+  // The public job board (read-only here; written by the jobs-sync worker).
+  // Accessed in SSR via `import { env } from 'cloudflare:workers'` → env.DB.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "safeharbours-jobs",
+      "database_id": "08193517-e7af-4b92-aee7-286865d9e3c0"
+    }
+  ]
+}
