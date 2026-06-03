@@ -11,6 +11,8 @@
     ],
     "declaration-block-single-line-max-declarations": null,
     "no-descending-specificity": null,
+    "selector-id-pattern": null,
+    "selector-pseudo-class-no-unknown": [true, { "ignorePseudoClasses": ["global"] }],
     "plugin/declaration-block-no-ignored-properties": true,
     "plugin/no-low-performance-animation-properties": [
       true,

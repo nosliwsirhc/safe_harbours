@@ -289,3 +289,23 @@ a.button-secondary {
 .site-footer .sh-form .sh-form-disclaimer { color: rgb(255 255 255 / 80%); }
 .site-footer .sh-form-ok p { color: #fff; }
 .site-footer .sh-ok-check { stroke: #ffc700; }
+
+/* Comfortable side gutter so content doesn't hug the edge on narrower desktops.
+   The theme's .grid-container is max-width 80rem + 15px padding, which leaves
+   almost no gutter around ~1280px. This scales the gutter with the viewport,
+   capped at 2.5rem so wide screens are barely affected (content stays centered);
+   mobile keeps the original ~15px. .full / .fluid bleed containers are excluded. */
+.grid-container:not(.full, .fluid) {
+  padding-left: clamp(0.9375rem, 4vw, 2.5rem);
+  padding-right: clamp(0.9375rem, 4vw, 2.5rem);
+}
+
+/* Careers "Current Openings" board. The theme styled #job_list as a fixed 658px
+   grey flex box that centred a fixed-size Indeed embed — that was the empty grey
+   panel. For a card grid, make it a normal full-width, content-height section so
+   the openings span like the sections above. #job_list is careers-only. */
+#job_list {
+  display: block;
+  height: auto;
+  padding-block: 3.5rem;
+}

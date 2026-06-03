@@ -30,7 +30,10 @@ const jobs = await listJobs();
 
 <style>
   .jobs-board { text-align: left; }
-  .jobs-board__heading { color: #394254; margin-bottom: 1.5rem; }
+
+  /* Centered to match the page's other section headings (e.g. "Why Work…"). */
+  .jobs-board__heading { color: #394254; margin-bottom: 1.5rem; text-align: center; }
+
   .jobs-board__grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -39,6 +42,7 @@ const jobs = await listJobs();
     padding: 0;
     list-style: none;
   }
+
   .jobs-board__empty {
     background: #f3f2f1;
     border-radius: 14px;
