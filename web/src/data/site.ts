@@ -10,6 +10,7 @@ export const site = {
   phoneHref: 'tel:+19052942137',
   email: 'info@safeharbours.ca',
   emailHref: 'mailto:info@safeharbours.ca',
+  recruitmentEmail: 'recruitment@safeharbours.ca',
   address: {
     street: '517 Upper Sherman Ave.',
     city: 'Hamilton',
