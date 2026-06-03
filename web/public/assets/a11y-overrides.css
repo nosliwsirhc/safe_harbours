@@ -309,3 +309,11 @@ a.button-secondary {
   height: auto;
   padding-block: 3.5rem;
 }
+
+/* Careers "In College?" banner — the photo is meant to sit flush on the banner's
+   bottom edge. The row is .align-middle (centred), so the image floats with a gap
+   below it; that gap grew once the side gutter above narrowed the image. Anchor
+   the image cell to the bottom so the photo stays flush at any width. */
+.page-template-page-careers .banner .grid-x .cell.medium-order-1 {
+  align-self: flex-end;
+}
