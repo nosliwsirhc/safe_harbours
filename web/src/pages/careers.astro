@@ -6,10 +6,12 @@ export const prerender = false;
 
 import ThemeLayout from '../layouts/ThemeLayout.astro';
 import JobsBoard from '../components/JobsBoard.astro';
+import WhyWork from '../components/WhyWork.astro';
 import blob from '../../_mirror/careers.main.html?raw';
 
-// The mirrored markup order is hero → banner("In College?") → "Why work…" → #job_list.
-// Slice it into hero / marketing / openings and re-emit openings before marketing.
+// The mirrored markup order is hero → banner("In College?") → "Why work…"(.icon-items)
+// → #job_list. Slice into hero / marketing / openings and re-emit: hero → openings →
+// "In College?" → <WhyWork/> (the icon-card triptych is replaced by our component).
 const WIDGET = "<div class='sk-ww-indeed-jobs' data-embed-id='25480871'></div>";
 const bannerStart = blob.indexOf('<div class="banner"'); // end of hero, start of marketing
 const jobsStart = blob.indexOf('<div id="job_list"');    // start of openings (runs to EOF)
@@ -18,6 +20,11 @@ const reorder = bannerStart !== -1 && jobsStart !== -1 && jobsStart > bannerStar
 const hero = reorder ? blob.slice(0, bannerStart) : '';
 const marketing = reorder ? blob.slice(bannerStart, jobsStart) : '';
 const openings = reorder ? blob.slice(jobsStart) : blob; // fallback: whole blob keeps original order
+
+// Split the marketing block at the old "Why work…" triptych: keep the "In College?"
+// banner, drop the .icon-items section (replaced by <WhyWork/>).
+const iconStart = marketing.indexOf('<div class="icon-items"');
+const banner = iconStart === -1 ? marketing : marketing.slice(0, iconStart);
 
 // Inside the openings wrapper, swap the dead Indeed embed for the live board.
 const wi = openings.indexOf(WIDGET);
@@ -29,5 +36,6 @@ const openAfter = wi === -1 ? '' : openings.slice(wi + WIDGET.length);
   <Fragment set:html={openBefore} />
   <JobsBoard />
   <Fragment set:html={openAfter} />
-  <Fragment set:html={marketing} />
+  <Fragment set:html={banner} />
+  <WhyWork />
 </ThemeLayout>

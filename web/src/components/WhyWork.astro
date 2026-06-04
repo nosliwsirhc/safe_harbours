@@ -1,0 +1,134 @@
+---
+// "Why work with Safe Harbours?" — replaces the mirrored icon-card triptych with
+// an editorial, asymmetric layout: intro on the left, a big-numbered 01/02/03 list
+// on the right. Brand: navy headings, gold number rules, coral eyebrow/links.
+const points = [
+  {
+    title: 'Meaningful Impact',
+    body: "Every day, you'll make a direct difference for children facing significant challenges. This is work that changes lives — including yours.",
+  },
+  {
+    title: 'Collaborative Environment',
+    body: 'Our team runs on trust, compassion, and support. We work together for the best outcomes for children, foster parents, and staff alike.',
+  },
+  {
+    title: 'Growth & Development',
+    body: 'Ongoing training and professional development make sure you have the skills and the confidence to thrive in your role.',
+  },
+];
+---
+<section class="whywork" aria-labelledby="whywork-title">
+  <div class="grid-container">
+    <div class="whywork__inner">
+      <div class="whywork__intro">
+        <p class="whywork__eyebrow">Why work here</p>
+        <h2 class="whywork__title" id="whywork-title">Why work with Safe Harbours?</h2>
+        <p class="whywork__lead">
+          We offer a range of positions — from full-time roles to flexible, part-time options.
+          Whether you work directly with foster families or support the team behind the scenes,
+          there's a place for you here.
+        </p>
+        <p class="whywork__cta"><a href="#job_list">See current openings →</a></p>
+      </div>
+
+      <ol class="whywork__list">
+        {points.map((p, i) => (
+          <li class="whywork__item">
+            <div class="whywork__marker">
+              <span class="whywork__num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="whywork__rule" aria-hidden="true"></span>
+            </div>
+            <div class="whywork__body">
+              <h3>{p.title}</h3>
+              <p>{p.body}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .whywork { background: #fff; padding-block: clamp(3.5rem, 8vw, 6.5rem); }
+
+  /* Asymmetric: narrower intro, wider list. Collapses to one column on tablet. */
+  .whywork__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+    gap: clamp(2rem, 6vw, 5.5rem);
+    align-items: start;
+  }
+
+  @media (width <= 820px) {
+    .whywork__inner { grid-template-columns: 1fr; gap: 2.5rem; }
+  }
+
+  .whywork__eyebrow {
+    margin: 0 0 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #cc4b37;
+  }
+
+  .whywork__title {
+    margin: 0 0 1.25rem;
+    color: #394254;
+    font-weight: 800;
+    line-height: 1.04;
+    font-size: clamp(2rem, 1.1rem + 3.4vw, 3.25rem);
+    letter-spacing: -0.01em;
+  }
+
+  .whywork__lead {
+    margin: 0 0 1.5rem;
+    max-width: 34ch;
+    color: #4a4f5c;
+    font-size: 1.08rem;
+    line-height: 1.65;
+  }
+  .whywork__cta { margin: 0; }
+  .whywork__cta a { color: #cc4b37; font-weight: 700; text-decoration: none; }
+
+  .whywork__cta a:hover,
+  .whywork__cta a:focus-visible { text-decoration: underline; }
+
+  .whywork__list { margin: 0; padding: 0; list-style: none; }
+
+  .whywork__item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: clamp(1rem, 3vw, 2.5rem);
+    padding-block: clamp(1.5rem, 3vw, 2.25rem);
+    border-top: 1px solid #ece9e4;
+  }
+  .whywork__item:first-child { border-top: 0; padding-top: 0; }
+
+  .whywork__marker { display: flex; flex-direction: column; gap: 0.6rem; }
+
+  .whywork__num {
+    font-size: clamp(2.4rem, 1.4rem + 3vw, 3.75rem);
+    font-weight: 800;
+    line-height: 0.9;
+    color: #394254;
+    font-variant-numeric: tabular-nums;
+  }
+  .whywork__rule { width: 34px; height: 3px; border-radius: 2px; background: #ffc700; }
+
+  .whywork__body h3 {
+    margin: 0 0 0.45rem;
+    color: #394254;
+    font-weight: 700;
+    font-size: 1.35rem;
+  }
+
+  .whywork__body p {
+    margin: 0;
+    max-width: 48ch;
+    color: #4a4f5c;
+    font-size: 1.04rem;
+    line-height: 1.6;
+  }
+</style>
