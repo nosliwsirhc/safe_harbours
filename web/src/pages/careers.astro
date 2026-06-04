@@ -10,26 +10,41 @@ import WhyWork from '../components/WhyWork.astro';
 import blob from '../../_mirror/careers.main.html?raw';
 
 // The mirrored markup order is hero → banner("In College?") → "Why work…"(.icon-items)
-// → #job_list. Slice into hero / marketing / openings and re-emit: hero → openings →
-// "In College?" → <WhyWork/> (the icon-card triptych is replaced by our component).
+// → #job_list. We slice it into hero / banner / openings and re-emit:
+//   hero → openings(JobsBoard) → "In College?" → <WhyWork/>.
+// The reorder + the icon-card → <WhyWork/> swap ONLY fire when EVERY marker we depend
+// on is present and correctly ordered. If the mirror is ever regenerated with different
+// markup, we fall back to the original layout (blob as-is, the dead Indeed embed swapped
+// for the board) — never a duplicated or missing "Why work" section.
 const WIDGET = "<div class='sk-ww-indeed-jobs' data-embed-id='25480871'></div>";
-const bannerStart = blob.indexOf('<div class="banner"'); // end of hero, start of marketing
-const jobsStart = blob.indexOf('<div id="job_list"');    // start of openings (runs to EOF)
-const reorder = bannerStart !== -1 && jobsStart !== -1 && jobsStart > bannerStart;
+const bannerStart = blob.indexOf('<div class="banner"');
+const jobsStart = blob.indexOf('<div id="job_list"');
+const widgetAt = blob.indexOf(WIDGET);
 
-const hero = reorder ? blob.slice(0, bannerStart) : '';
-const marketing = reorder ? blob.slice(bannerStart, jobsStart) : '';
-const openings = reorder ? blob.slice(jobsStart) : blob; // fallback: whole blob keeps original order
-
-// Split the marketing block at the old "Why work…" triptych: keep the "In College?"
-// banner, drop the .icon-items section (replaced by <WhyWork/>).
+const marketing =
+  bannerStart !== -1 && jobsStart !== -1 && jobsStart > bannerStart
+    ? blob.slice(bannerStart, jobsStart)
+    : '';
 const iconStart = marketing.indexOf('<div class="icon-items"');
-const banner = iconStart === -1 ? marketing : marketing.slice(0, iconStart);
+const canReorder = marketing !== '' && iconStart !== -1 && widgetAt > jobsStart;
 
-// Inside the openings wrapper, swap the dead Indeed embed for the live board.
-const wi = openings.indexOf(WIDGET);
-const openBefore = wi === -1 ? openings : openings.slice(0, wi);
-const openAfter = wi === -1 ? '' : openings.slice(wi + WIDGET.length);
+let hero = '';
+let banner = '';
+let openBefore = '';
+let openAfter = '';
+
+if (canReorder) {
+  hero = blob.slice(0, bannerStart);
+  banner = marketing.slice(0, iconStart); // "In College?" only; drop the .icon-items triptych
+  const openings = blob.slice(jobsStart); // #job_list wrapper → EOF
+  const wi = openings.indexOf(WIDGET);
+  openBefore = openings.slice(0, wi);
+  openAfter = openings.slice(wi + WIDGET.length);
+} else {
+  // Safe fallback: original order, board swapped in at the widget, no <WhyWork/>.
+  openBefore = widgetAt === -1 ? blob : blob.slice(0, widgetAt);
+  openAfter = widgetAt === -1 ? '' : blob.slice(widgetAt + WIDGET.length);
+}
 ---
 <ThemeLayout name="careers" title="Careers | Safe Harbours">
   <Fragment set:html={hero} />
@@ -37,5 +52,5 @@ const openAfter = wi === -1 ? '' : openings.slice(wi + WIDGET.length);
   <JobsBoard />
   <Fragment set:html={openAfter} />
   <Fragment set:html={banner} />
-  <WhyWork />
+  {canReorder && <WhyWork />}
 </ThemeLayout>
