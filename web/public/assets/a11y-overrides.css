@@ -318,6 +318,28 @@ a.button-secondary {
   text-align: left;
 }
 
+/* Job detail page: the theme renders section headings (Standard duties, Required
+   before hire, etc.) at ~66px — larger than the 48px H1. Scale them down so the job
+   title leads and the section labels read as subordinate. The page-template prefix
+   gives enough specificity to beat the theme's h2 rule. */
+.page-template-page-careers .job h2 {
+  font-size: clamp(1.35rem, 1.05rem + 1.4vw, 1.65rem);
+  line-height: 1.25;
+}
+
+.page-template-page-careers .job .job__rich h3 {
+  font-size: clamp(1.1rem, 0.95rem + 0.7vw, 1.3rem);
+  line-height: 1.3;
+}
+
+/* The job-detail facts card uses position:sticky, which is broken by any
+   overflow-clipping ancestor — and the theme's .off-canvas-wrapper sets
+   overflow:hidden (for the mobile menu). That menu is inline at >=1024px, so it's
+   safe to un-clip there. Scoped to the careers pages and desktop only. */
+@media (width >= 1024px) {
+  .page-template-page-careers .off-canvas-wrapper { overflow: visible; }
+}
+
 /* Careers "In College?" banner — the photo is meant to sit flush on the banner's
    bottom edge. The row is .align-middle (centred), so the image floats with a gap
    below it; that gap grew once the side gutter above narrowed the image. Anchor
