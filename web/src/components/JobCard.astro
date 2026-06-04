@@ -1,5 +1,6 @@
 ---
-// One opening, as a card on the careers board. Links to the SSR detail page.
+// One opening, as a wide full-width row on the careers board. Links to the SSR
+// detail page. (Filename kept; it is the openings row.)
 import type { JobPosting } from '../lib/jobs';
 interface Props { job: JobPosting }
 const { job } = Astro.props;
@@ -14,50 +15,68 @@ const wage = job.wageMin != null && job.wageMax != null && job.wageMax !== job.w
 const closes = new Date(`${job.closingDate}T12:00:00`).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
 const chips = [job.programDepartment, job.employmentType, ...job.scheduleShift].filter(Boolean) as string[];
 ---
-<a class="job-card" href={`/careers/${job.postingId}`}>
-  <h3 class="job-card__title">{job.title}</h3>
-  <p class="job-card__location">{location}{wage ? ` · ${wage}` : ''}</p>
-  {chips.length > 0 && (
-    <ul class="job-card__chips" aria-label="Details">
-      {chips.map((c) => <li>{c}</li>)}
-    </ul>
-  )}
-  {job.shortSummary && <p class="job-card__summary">{job.shortSummary}</p>}
-  <span class="job-card__foot">
-    <span class="job-card__closes">Closes {closes}</span>
-    <span class="job-card__cta">View &amp; apply →</span>
+<a class="job-row" href={`/careers/${job.postingId}`}>
+  <span class="job-row__main">
+    <span class="job-row__title">{job.title}</span>
+    <span class="job-row__meta">{location}{wage ? ` · ${wage}` : ''}</span>
+    {chips.length > 0 && (
+      <span class="job-row__chips" aria-label="Details">
+        {chips.map((c) => <span class="job-row__chip">{c}</span>)}
+      </span>
+    )}
+  </span>
+  <span class="job-row__aside">
+    <span class="job-row__closes">Closes {closes}</span>
+    <span class="job-row__cta">View &amp; apply →</span>
   </span>
 </a>
 
 <style>
-  .job-card {
+  .job-row {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    height: 100%;
-    padding: 1.5rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    flex-wrap: wrap;
+    padding: 1.25rem 1.5rem;
     background: #fff;
     border: 1px solid #e6e6e6;
     border-radius: 14px;
-    box-shadow: 0 10px 30px -18px rgb(13 24 33 / 35%);
+    box-shadow: 0 8px 24px -20px rgb(13 24 33 / 35%);
     text-decoration: none;
     color: #2a2f39;
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
   }
 
-  .job-card:hover,
-  .job-card:focus-visible {
-    transform: translateY(-3px);
-    box-shadow: 0 18px 40px -18px rgb(13 24 33 / 45%);
+  .job-row:hover,
+  .job-row:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 34px -20px rgb(13 24 33 / 45%);
     border-color: #ffc700;
   }
-  .job-card__title { margin: 0; font-size: 1.25rem; line-height: 1.25; color: #394254; }
-  .job-card__location { margin: 0; font-weight: 600; color: #5f5f5f; font-size: 0.95rem; }
-  .job-card__chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.15rem 0 0; padding: 0; list-style: none; }
-  .job-card__chips li { font-size: 0.78rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 999px; background: #f3f2f1; color: #394254; }
-  .job-card__summary { margin: 0.25rem 0 0; font-size: 0.95rem; line-height: 1.5; color: #4f4f4f; }
-  .job-card__foot { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: auto; padding-top: 0.75rem; }
-  .job-card__closes { font-size: 0.82rem; color: #767676; }
-  .job-card__cta { font-weight: 700; color: #394254; white-space: nowrap; }
-  .job-card:hover .job-card__cta { color: #cc4b37; }
+
+  .job-row__main { display: flex; flex-direction: column; gap: 0.4rem; min-width: 0; flex: 1 1 22rem; }
+  .job-row__title { font-size: 1.3rem; font-weight: 700; color: #394254; line-height: 1.2; }
+  .job-row__meta { font-weight: 600; color: #5f5f5f; font-size: 0.95rem; }
+  .job-row__chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.15rem; }
+  .job-row__chip { font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 999px; background: #f3f2f1; color: #394254; }
+
+  .job-row__aside { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; text-align: right; }
+  .job-row__closes { font-size: 0.82rem; color: #767676; }
+  .job-row__cta { font-weight: 700; color: #394254; white-space: nowrap; }
+  .job-row:hover .job-row__cta { color: #cc4b37; }
+
+  /* On phones: drop the right column under the content, spread it full width. */
+  @media (width <= 560px) {
+    .job-row__aside {
+      flex-basis: 100%;
+      width: 100%;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;
+      border-top: 1px solid #f0efed;
+      padding-top: 0.75rem;
+    }
+  }
 </style>

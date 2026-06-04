@@ -1,22 +1,31 @@
 ---
 // The live openings list for /careers. Reads the D1 board (graceful: empty list
-// on any error) and renders a card grid, or a warm "no openings" state with a
-// way to reach out. Rendered inside the existing #job_list .cell.
+// on any error) and renders a stacked list of wide rows, or a warm "no openings"
+// state. Rendered inside the existing #job_list section.
 import JobCard from './JobCard.astro';
 import { listJobs } from '../lib/jobs';
 import { site } from '../data/site';
 
 const jobs = await listJobs();
+const n = jobs.length;
 ---
 <div class="jobs-board">
-  <h2 class="jobs-board__heading">Current Openings</h2>
+  <header class="jobs-board__head">
+    <h2 class="jobs-board__heading">Current Openings</h2>
+    {n > 0 && <p class="jobs-board__count">{n} open role{n === 1 ? '' : 's'} right now</p>}
+  </header>
 
-  {jobs.length > 0 ? (
-    <ul class="jobs-board__grid" role="list">
-      {jobs.map((job) => (
-        <li><JobCard job={job} /></li>
-      ))}
-    </ul>
+  {n > 0 ? (
+    <>
+      <ul class="jobs-board__list" role="list">
+        {jobs.map((job) => (
+          <li><JobCard job={job} /></li>
+        ))}
+      </ul>
+      <p class="jobs-board__invite">
+        Don't see your fit? Send your resume to <a href={`mailto:${site.recruitmentEmail}`}>{site.recruitmentEmail}</a> and we'll keep you in mind.
+      </p>
+    </>
   ) : (
     <div class="jobs-board__empty">
       <p>We don't have any openings posted right now — but we're often growing our team.</p>
@@ -29,28 +38,34 @@ const jobs = await listJobs();
 </div>
 
 <style>
-  .jobs-board { text-align: left; }
+  /* Constrained, left-aligned column centered in the openings band. */
+  .jobs-board { max-width: 880px; margin-inline: auto; text-align: left; }
 
-  /* Centered to match the page's other section headings (e.g. "Why Work…"). */
-  .jobs-board__heading { color: #394254; margin-bottom: 1.5rem; text-align: center; }
+  .jobs-board__head { margin-bottom: 1.5rem; }
 
-  .jobs-board__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem;
+  /* Font-size + left alignment are forced in a11y-overrides.css (#job_list h2 is
+     an id selector in the theme and would otherwise win). */
+  .jobs-board__heading { color: #394254; margin: 0; }
+  .jobs-board__count { margin: 0.35rem 0 0; color: #5f5f5f; font-weight: 600; }
+
+  .jobs-board__list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
+  .jobs-board__invite { margin: 1.5rem 0 0; color: #5f5f5f; font-size: 0.95rem; }
+  .jobs-board__invite a { color: #cc4b37; font-weight: 700; }
+
   .jobs-board__empty {
-    background: #f3f2f1;
+    background: #fff;
     border-radius: 14px;
     padding: 2rem;
-    text-align: center;
     color: #4f4f4f;
     max-width: 640px;
-    margin: 0 auto;
   }
   .jobs-board__empty p { margin: 0 0 0.5rem; font-size: 1.05rem; }
   .jobs-board__empty p:last-child { margin-bottom: 0; }
