@@ -24,7 +24,10 @@ const wage = job && (job.wageMin != null || job.wageMax != null)
       : `${money((job.wageMin ?? job.wageMax)!)}${unit}`)
   : null;
 const location = job ? [job.city, job.region].filter(Boolean).join(', ') || job.home || 'Ontario' : '';
-const closes = job ? new Date(`${job.closingDate}T12:00:00`).toLocaleDateString('en-CA', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+const closesDate = job ? new Date(`${job.closingDate}T12:00:00`) : null;
+const closes = closesDate && !Number.isNaN(closesDate.getTime())
+  ? closesDate.toLocaleDateString('en-CA', { month: 'long', day: 'numeric', year: 'numeric' })
+  : null;
 const facts = job
   ? ([
       ['Location', location],
@@ -41,99 +44,202 @@ const facts = job
 const reqGroups = job
   ? ([
       ['Required before hire', [...job.reqBeforeHireCerts, ...job.reqBeforeHireTraining]],
-      ['Education / programs', job.educationPrograms],
+      ['Education', job.educationPrograms],
       ['Training we provide', job.providedAfterHireTraining],
     ].filter(([, v]) => (v as string[]).length) as [string, string[]][])
   : [];
+const eyebrow = job ? [job.programDepartment, job.employmentType].filter(Boolean).join(' · ') : '';
+const applyLabel = job?.howToApply?.label && /apply/i.test(job.howToApply.label) ? job.howToApply.label : 'Apply now';
+// For a mailto: apply link, pre-fill the subject with the posting code + title so
+// HR can triage applications (leaves https:// apply URLs and any existing subject
+// untouched). %-encoded per RFC 6068 (encodeURIComponent → %20, not "+").
+const applyUrl = (() => {
+  const raw = job?.howToApply?.url ?? '';
+  if (!/^mailto:/i.test(raw) || /[?&]subject=/i.test(raw)) return raw;
+  const subject = encodeURIComponent(`Application: ${job!.postingId} — ${job!.title}`);
+  return `${raw}${raw.includes('?') ? '&' : '?'}subject=${subject}`;
+})();
 const title = job ? `${job.title} | Careers | Safe Harbours` : 'Position closed | Careers | Safe Harbours';
 ---
 <ThemeLayout name="careers" title={title} description={job?.shortSummary ?? undefined}>
   {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />}
 
-  <section class="job">
-    <div class="grid-container">
-      <p class="job__back"><a href="/careers">← All openings</a></p>
+  {job ? (
+    <section class="job">
+      <div class="job-hero">
+        <span class="job-hero__circle job-hero__circle--gold" aria-hidden="true"></span>
+        <span class="job-hero__circle job-hero__circle--coral" aria-hidden="true"></span>
+        <div class="grid-container">
+          <p class="job-hero__back"><a href="/careers">← All openings</a></p>
+          <div class="job-hero__inner">
+            {eyebrow && <p class="job-hero__eyebrow">{eyebrow}</p>}
+            <h1 class="job-hero__title">{job.title}</h1>
+            <p class="job-hero__sub">{location}{wage ? ` · ${wage}` : ''}</p>
+          </div>
+        </div>
+      </div>
 
-      {job ? (
-        <article class="job__body">
-          <header class="job__header">
-            <h1>{job.title}</h1>
-            <p class="job__sub">{location}{wage ? ` · ${wage}` : ''}</p>
-            {job.howToApply && (
-              <a class="button job__apply" href={job.howToApply.url} target="_blank" rel="noopener">
-                {job.howToApply.label && /apply/i.test(job.howToApply.label) ? job.howToApply.label : 'Apply now'}
-              </a>
+      <div class="grid-container">
+        <div class="job-grid">
+          <article class="job__body">
+            {job.shortSummary && <p class="job__summary">{job.shortSummary}</p>}
+            {job.fullDescription && <div class="job__rich" set:html={job.fullDescription} />}
+            {job.standardDuties && (<><h2>Standard duties</h2><div class="job__rich" set:html={job.standardDuties} /></>)}
+            {job.additionalDuties && (<><h2>Additional duties &amp; considerations</h2><div class="job__rich" set:html={job.additionalDuties} /></>)}
+
+            {reqGroups.map(([label, items]) => (
+              <section class="job__reqs">
+                <h2>{label}</h2>
+                <ul>{items.map((it) => <li>{it}</li>)}</ul>
+              </section>
+            ))}
+
+            {job.screeningRequirement && (
+              <p class="job__note"><strong>Screening:</strong> {job.screeningRequirement} required for this role.</p>
             )}
-          </header>
+            {job.workEligibilityRequired && (
+              <p class="job__note">Applicants must be legally eligible to work in Canada.</p>
+            )}
+            {job.aiScreeningUsed && job.aiDisclosureStatement && (
+              <p class="job__note job__ai"><strong>Use of automated tools:</strong> {job.aiDisclosureStatement}</p>
+            )}
+            {job.accommodationStatement && <p class="job__note job__aoda">{job.accommodationStatement}</p>}
 
-          <dl class="job__facts">
-            {facts.map(([k, v]) => (<><dt>{k}</dt><dd>{v}</dd></>))}
-          </dl>
+            {job.howToApply && (
+              <p class="job__apply-foot">
+                <a class="button" href={applyUrl} target="_blank" rel="noopener">{applyLabel}</a>
+              </p>
+            )}
+          </article>
 
-          {job.shortSummary && <p class="job__summary">{job.shortSummary}</p>}
-          {job.fullDescription && <div class="job__rich" set:html={job.fullDescription} />}
-          {job.standardDuties && (<><h2>Standard duties</h2><div class="job__rich" set:html={job.standardDuties} /></>)}
-          {job.additionalDuties && (<><h2>Additional duties &amp; considerations</h2><div class="job__rich" set:html={job.additionalDuties} /></>)}
-
-          {reqGroups.map(([label, items]) => (
-            <section class="job__reqs">
-              <h2>{label}</h2>
-              <ul>{items.map((it) => <li>{it}</li>)}</ul>
-            </section>
-          ))}
-
-          {job.screeningRequirement && (
-            <p class="job__note"><strong>Screening:</strong> {job.screeningRequirement} required for this role.</p>
-          )}
-          {job.workEligibilityRequired && (
-            <p class="job__note">Applicants must be legally eligible to work in Canada.</p>
-          )}
-          {job.aiScreeningUsed && job.aiDisclosureStatement && (
-            <p class="job__note job__ai"><strong>Use of automated tools:</strong> {job.aiDisclosureStatement}</p>
-          )}
-          {job.accommodationStatement && <p class="job__note job__aoda">{job.accommodationStatement}</p>}
-
-          {job.howToApply && (
-            <p class="job__apply-foot">
-              <a class="button" href={job.howToApply.url} target="_blank" rel="noopener">Apply for this position</a>
-            </p>
-          )}
-        </article>
-      ) : (
+          <aside class="job__aside">
+            <div class="job-facts-card">
+              <p class="job-facts-card__heading">At a glance</p>
+              <dl class="job__facts">
+                {facts.map(([k, v]) => (<><dt>{k}</dt><dd>{v}</dd></>))}
+              </dl>
+              {job.howToApply && (
+                <a class="button job-facts-card__apply" href={applyUrl} target="_blank" rel="noopener">{applyLabel}</a>
+              )}
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  ) : (
+    <section class="job">
+      <div class="grid-container">
         <div class="job__gone">
           <h1>This position is no longer available</h1>
           <p>It may have been filled or closed. See our current openings instead.</p>
           <p><a class="button" href="/careers">View current openings</a></p>
         </div>
-      )}
-    </div>
-  </section>
+      </div>
+    </section>
+  )}
 </ThemeLayout>
 
 <style>
-  .job { padding: 3rem 0 4rem; }
-  .job__back { margin: 0 0 1rem; }
-  .job__back a { color: #767676; text-decoration: none; font-weight: 600; }
-  .job__body { max-width: 760px; }
-  .job__header h1 { color: #394254; margin: 0 0 0.25rem; }
-  .job__sub { font-size: 1.1rem; font-weight: 600; color: #5f5f5f; margin: 0 0 1rem; }
-  .job__apply { display: inline-block; }
+  .job { padding-bottom: clamp(2.5rem, 5vw, 4rem); }
 
-  .job__facts {
-    display: grid; grid-template-columns: max-content 1fr; gap: 0.4rem 1.25rem;
-    margin: 1.5rem 0; padding: 1.25rem 1.5rem; background: #f3f2f1; border-radius: 12px;
+  /* Navy hero band — echoes the careers page hero, with the brand circle motif. */
+  .job-hero {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+
+    /* Large top padding clears the theme's fixed 123px header (its own hero uses
+       12.5rem); normal bottom padding. */
+    padding-top: clamp(7.5rem, 5rem + 6vw, 11rem);
+    padding-bottom: clamp(2.5rem, 5vw, 4rem);
+    background: #394254;
+    color: #fff;
   }
-  .job__facts dt { font-weight: 700; color: #394254; }
-  .job__facts dd { margin: 0; color: #4f4f4f; }
-  .job__summary { font-size: 1.1rem; line-height: 1.6; color: #2a2f39; }
+  .job-hero__back { position: relative; z-index: 2; margin: 0 0 1.5rem; }
+  .job-hero__back a { color: rgb(255 255 255 / 80%); text-decoration: none; font-weight: 600; }
+
+  .job-hero__back a:hover,
+  .job-hero__back a:focus-visible { color: #ffc700; }
+  .job-hero__inner { position: relative; z-index: 2; max-width: 760px; }
+
+  .job-hero__eyebrow {
+    margin: 0 0 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #ffc700;
+  }
+
+  .job-hero__title {
+    margin: 0 0 0.6rem;
+    color: #fff;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    font-size: clamp(2rem, 1.2rem + 3vw, 3.25rem);
+  }
+  .job-hero__sub { margin: 0; font-size: 1.15rem; font-weight: 600; color: rgb(255 255 255 / 85%); }
+
+  .job-hero__circle { position: absolute; z-index: 1; border-radius: 50%; pointer-events: none; }
+  .job-hero__circle--gold { width: 300px; height: 300px; background: #ecd455; opacity: 0.14; top: -90px; right: -40px; }
+  .job-hero__circle--coral { width: 170px; height: 170px; background: #f88e8a; opacity: 0.16; right: 130px; bottom: -70px; }
+
+  /* Two-column body: content + a sticky facts/apply card. */
+  .job-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: clamp(2rem, 5vw, 4rem);
+
+    /* aside stretches to the content height (default), giving the sticky card room
+       to travel; align-items:start would collapse it and break the stick. */
+  }
+  .job__body { min-width: 0; }
+
+  .job-facts-card {
+    position: sticky;
+
+    /* clears the fixed header (123px) so the card doesn't slide under it */
+    top: 8.5rem;
+    padding: 1.5rem 1.5rem 1.75rem;
+    background: #fff;
+    border: 1px solid #e8e6e2;
+    border-radius: 16px;
+    box-shadow: 0 18px 44px -30px rgb(13 24 33 / 40%);
+  }
+
+  .job-facts-card__heading {
+    margin: 0 0 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #c0392b;
+  }
+  .job-facts-card .job__facts { margin: 0; padding: 0; background: none; border-radius: 0; }
+  .job-facts-card__apply { display: block; margin-top: 1.5rem; text-align: center; }
+
+  /* Single column below the desktop breakpoint where the off-canvas menu is active
+     (the sticky card's overflow un-clip is scoped to >=1024px). */
+  @media (width <= 1023px) {
+    .job-grid { grid-template-columns: 1fr; }
+    .job__aside { order: -1; }
+    .job-facts-card { position: static; }
+  }
+
+  .job__facts { display: grid; grid-template-columns: max-content 1fr; gap: 0.55rem 1rem; }
+  .job__facts dt { font-weight: 700; color: #394254; font-size: 0.92rem; }
+  .job__facts dd { margin: 0; color: #4f4f4f; font-size: 0.92rem; }
+
+  .job__summary { margin-top: 0; font-size: 1.15rem; line-height: 1.6; color: #2a2f39; }
   .job__rich { line-height: 1.7; color: #3b3b3b; }
   .job__rich :global(h2), .job__rich :global(h3) { color: #394254; }
   .job__reqs h2, .job__body > h2 { color: #394254; margin-top: 2rem; }
   .job__reqs ul { line-height: 1.7; }
-  .job__note { background: #fbfbfa; border-left: 4px solid #ffc700; padding: 0.75rem 1rem; border-radius: 0 8px 8px 0; color: #4f4f4f; }
+  .job__note { margin: 1rem 0; padding: 0.75rem 1rem; background: #fbfbfa; border-left: 4px solid #ffc700; border-radius: 0 8px 8px 0; color: #4f4f4f; }
   .job__ai { border-left-color: #8a8a8a; }
   .job__aoda { border-left-color: #cbd2e0; font-size: 0.95rem; }
   .job__apply-foot { margin-top: 2.5rem; }
-  .job__gone { max-width: 640px; padding: 2rem 0; }
+  .job__gone { max-width: 640px; padding: 3rem 0; }
   .job__gone h1 { color: #394254; }
 </style>
