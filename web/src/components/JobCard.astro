@@ -12,21 +12,27 @@ const wage = job.wageMin != null && job.wageMax != null && job.wageMax !== job.w
   ? `${money(job.wageMin)}–${money(job.wageMax)}${unit}`
   : job.wageMin != null ? `${money(job.wageMin)}${unit}`
   : job.wageMax != null ? `${money(job.wageMax)}${unit}` : null;
-const closes = new Date(`${job.closingDate}T12:00:00`).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
+const closesDate = new Date(`${job.closingDate}T12:00:00`);
+const closes = Number.isNaN(closesDate.getTime())
+  ? null
+  : closesDate.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
 const chips = [job.programDepartment, job.employmentType, ...job.scheduleShift].filter(Boolean) as string[];
+// Concise accessible name for the whole-row link (the inner text would otherwise
+// concatenate title + meta + every chip + CTA into one long, repetitive label).
+const linkLabel = [job.title, location, wage].filter(Boolean).join(', ');
 ---
-<a class="job-row" href={`/careers/${job.postingId}`}>
+<a class="job-row" href={`/careers/${job.postingId}`} aria-label={linkLabel}>
   <span class="job-row__main">
-    <span class="job-row__title">{job.title}</span>
+    <h3 class="job-row__title">{job.title}</h3>
     <span class="job-row__meta">{location}{wage ? ` · ${wage}` : ''}</span>
     {chips.length > 0 && (
-      <span class="job-row__chips" aria-label="Details">
+      <span class="job-row__chips">
         {chips.map((c) => <span class="job-row__chip">{c}</span>)}
       </span>
     )}
   </span>
   <span class="job-row__aside">
-    <span class="job-row__closes">Closes {closes}</span>
+    {closes && <span class="job-row__closes">Closes {closes}</span>}
     <span class="job-row__cta">View &amp; apply →</span>
   </span>
 </a>
@@ -56,7 +62,7 @@ const chips = [job.programDepartment, job.employmentType, ...job.scheduleShift].
   }
 
   .job-row__main { display: flex; flex-direction: column; gap: 0.4rem; min-width: 0; flex: 1 1 22rem; }
-  .job-row__title { font-size: 1.3rem; font-weight: 700; color: #394254; line-height: 1.2; }
+  .job-row__title { margin: 0; font-size: 1.3rem; font-weight: 700; color: #394254; line-height: 1.2; }
   .job-row__meta { font-weight: 600; color: #5f5f5f; font-size: 0.95rem; }
   .job-row__chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.15rem; }
   .job-row__chip { font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 999px; background: #f3f2f1; color: #394254; }
