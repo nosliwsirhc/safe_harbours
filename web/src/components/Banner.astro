@@ -3,9 +3,9 @@
 // copied from the mirror so the theme CSS styles it identically.
 import type { BannerData } from '../lib/content';
 type Props = BannerData;
-const { heading = '', body = '' } = Astro.props;
+const { heading = '', body = '', shorten = true } = Astro.props;
 ---
-<div class="banner-bar shorten">
+<div class:list={['banner-bar', { shorten }]}>
   <div class="grid-container">
     <div class="content-wrap">
       <div class="grid-x grid-padding-x">

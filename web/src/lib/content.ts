@@ -58,6 +58,23 @@ export interface CtaData {
 export interface BannerData {
   heading?: string;
   body?: string;
+  shorten?: boolean; // the narrow "shorten" variant (default true)
+}
+
+/** page-text-block: a wide single column of long-form content (privacy, terms). */
+export interface TextBlockData {
+  heading?: string;
+  body?: string;
+}
+
+/** faqs: a heading + an accordion of question/answer items. */
+export interface FaqItem {
+  q?: string;
+  a?: string;
+}
+export interface FaqsData {
+  heading?: string;
+  items?: FaqItem[];
 }
 
 /** icon-item-row: a heading + a grid of coloured icon cards. */

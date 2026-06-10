@@ -324,6 +324,7 @@ const config = {
       banner: { label: 'Banner', fields: [
         { n: 'heading', t: 'plain', l: 'Heading' },
         { n: 'body', t: 'rich', l: 'Text' },
+        { n: 'shorten', t: 'toggle', l: 'Narrow band' },
       ] },
       valueCards: { label: 'Value cards', fields: [
         { n: 'heading', t: 'plain', l: 'Section heading' },
@@ -391,6 +392,17 @@ const config = {
         ] },
         { n: 'important', t: 'rich', l: 'Callout' },
       ] },
+      textBlock: { label: 'Long-form text', fields: [
+        { n: 'heading', t: 'plain', l: 'Heading' },
+        { n: 'body', t: 'rich', l: 'Body' },
+      ] },
+      faqs: { label: 'FAQ accordion', fields: [
+        { n: 'heading', t: 'plain', l: 'Section heading' },
+        { n: 'items', t: 'repeater', l: 'Questions', addLabel: 'question', item: [
+          { n: 'q', t: 'plain', l: 'Question' },
+          { n: 'a', t: 'rich', l: 'Answer' },
+        ] },
+      ] },
     };
     const DEFAULTS = {
       hero: { lead: '', heading: 'New heading', intro: '<p></p>', bg: '' },
@@ -398,7 +410,7 @@ const config = {
       text: { html: '<p>Write something…</p>' },
       imageText: { reverse: false, heading: 'New section', body: '<p></p>', img: {} },
       cta: { heading: 'Ready to get started?', body: '<p></p>', label: 'Get started', href: '/contact-us' },
-      banner: { heading: 'New heading', body: '<p></p>' },
+      banner: { heading: 'New heading', body: '<p></p>', shorten: true },
       valueCards: { heading: 'Our Values', cards: [{ img: {}, title: 'Title', text: '<p></p>', style: 'navy' }] },
       imageBlock: { img: {}, heading: 'New heading', body: '<p></p>' },
       team: { heading: 'Our Team', members: [{ bg: '', name: 'Name', role: 'Role' }], label: '', href: '' },
@@ -408,6 +420,8 @@ const config = {
       steps: { heading: 'How it Works', steps: [{ reverse: false, heading: 'Step', body: '<p></p>', img: {} }] },
       largeList: { heading: 'Section heading', items: [{ heading: 'Term', text: 'Description' }], label: '', href: '' },
       safety: { content: '<p></p>', cards: [{ text: '<p></p>' }], important: '<p></p>' },
+      textBlock: { heading: 'New heading', body: '<p></p>' },
+      faqs: { heading: 'Frequently Asked Questions', items: [{ q: 'Question?', a: '<p></p>' }] },
     };
     // Default value for a freshly-added repeater sub-field.
     const subDefault = (sf) => sf.t === 'image' ? {} : sf.t === 'toggle' ? false : sf.t === 'rich' ? '<p></p>' : sf.t === 'select' ? (sf.opts[0] ? sf.opts[0][0] : '') : '';

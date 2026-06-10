@@ -1,0 +1,27 @@
+---
+// faqs: a heading + a Foundation accordion of question/answer items (a repeater).
+// Markup/classes copied from the mirror so the theme JS (loaded per page) wires
+// up the expand/collapse and the theme CSS styles it identically.
+import type { FaqsData } from '../lib/content';
+type Props = FaqsData;
+const { heading = '', items = [] } = Astro.props;
+---
+<section class="faqs">
+  <div class="grid-container">
+    <div class="grid-x grid-padding-x align-center">
+      <div class="cell large-10 text-center">
+        <div class="section-title text-center">
+          <h3 data-cms-field="heading">{heading}</h3>
+        </div>
+        <ul class="accordion" data-accordion data-multi-expand="true" data-allow-all-closed="true">
+          {items.map((it, i) => (
+            <li class={`accordion-item${i === 0 ? ' is-active' : ''}`} data-accordion-item data-cms-item={i}>
+              <a href="#" class="accordion-title" data-cms-field="q">{it.q}</a>
+              <div class="accordion-content" data-tab-content data-cms-field="a" set:html={it.a}></div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

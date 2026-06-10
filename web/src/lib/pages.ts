@@ -24,13 +24,16 @@ export type BlockKind =
   | 'heroForm'
   | 'steps'
   | 'largeList'
-  | 'safety';
+  | 'safety'
+  | 'textBlock'
+  | 'faqs';
 
 /** Every general-purpose block kind the composer can add (the default palette). */
 export const ALL_KINDS: BlockKind[] = [
   'hero',
   'heading',
   'text',
+  'textBlock',
   'banner',
   'imageText',
   'imageBlock',
@@ -39,6 +42,7 @@ export const ALL_KINDS: BlockKind[] = [
   'testimonials',
   'steps',
   'largeList',
+  'faqs',
   'cta',
   'logos',
 ];
@@ -78,7 +82,23 @@ export const EDITABLE_PAGES: EditablePage[] = [
     name: 'Our Impact',
     path: '/our-impact',
     blurb: 'Build the page from sections — add, edit, reorder, publish.',
-    palette: ['hero', 'heading', 'text', 'imageText', 'cta'],
+    palette: ALL_KINDS,
+  },
+  {
+    key: 'privacy-policy',
+    slot: 'main',
+    name: 'Privacy Policy',
+    path: '/privacy-policy',
+    blurb: 'The full privacy policy text.',
+    palette: ALL_KINDS,
+  },
+  {
+    key: 'terms-conditions',
+    slot: 'main',
+    name: 'Terms & Conditions',
+    path: '/terms-conditions',
+    blurb: 'The full terms & conditions text.',
+    palette: ALL_KINDS,
   },
 ];
 

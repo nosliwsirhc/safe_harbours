@@ -15,6 +15,8 @@ import HeroForm from './HeroForm.astro';
 import Steps from './Steps.astro';
 import LargeList from './LargeList.astro';
 import Safety from './Safety.astro';
+import TextBlock from './TextBlock.astro';
+import Faqs from './Faqs.astro';
 import type {
   Hero as HeroData,
   ZigRow,
@@ -29,6 +31,8 @@ import type {
   StepsData,
   LargeListData,
   SafetyData,
+  TextBlockData,
+  FaqsData,
 } from '../lib/content';
 
 interface Props {
@@ -60,6 +64,8 @@ const heroForm = block.kind === 'heroForm' ? parse<HeroFormData>(block.body) : n
 const steps = block.kind === 'steps' ? parse<StepsData>(block.body) : null;
 const largeList = block.kind === 'largeList' ? parse<LargeListData>(block.body) : null;
 const safety = block.kind === 'safety' ? parse<SafetyData>(block.body) : null;
+const textBlock = block.kind === 'textBlock' ? parse<TextBlockData>(block.body) : null;
+const faqs = block.kind === 'faqs' ? parse<FaqsData>(block.body) : null;
 ---
 <div class="cms-block-wrap" data-cms-block={index}>
   {hero && <Hero lead={hero.lead} heading={hero.heading} intro={hero.intro} bg={hero.bg} />}
@@ -86,7 +92,7 @@ const safety = block.kind === 'safety' ? parse<SafetyData>(block.body) : null;
     </div>
   )}
 
-  {banner && <Banner heading={banner.heading} body={banner.body} />}
+  {banner && <Banner heading={banner.heading} body={banner.body} shorten={banner.shorten ?? true} />}
 
   {valueCards && <ValueCards heading={valueCards.heading} cards={valueCards.cards} />}
 
@@ -105,6 +111,10 @@ const safety = block.kind === 'safety' ? parse<SafetyData>(block.body) : null;
   {largeList && <LargeList heading={largeList.heading} items={largeList.items} label={largeList.label} href={largeList.href} />}
 
   {safety && <Safety content={safety.content} cards={safety.cards} important={safety.important} />}
+
+  {textBlock && <TextBlock heading={textBlock.heading} body={textBlock.body} />}
+
+  {faqs && <Faqs heading={faqs.heading} items={faqs.items} />}
 </div>
 
 <style is:global>
