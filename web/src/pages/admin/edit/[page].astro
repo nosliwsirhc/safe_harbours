@@ -419,6 +419,9 @@ const config = {
         { n: 'body', t: 'rich', l: 'Text' },
         { n: 'calendlyUrl', t: 'plain', l: 'Calendly URL' },
       ] },
+      richSection: { label: 'Custom section', fields: [
+        { n: 'body', t: 'rich', l: 'Content' },
+      ] },
     };
     const DEFAULTS = {
       hero: { lead: '', heading: 'New heading', intro: '<p></p>', bg: '' },
@@ -441,6 +444,7 @@ const config = {
       contactHero: { heading: 'Contact Us', description: '', phone: '', email: '', address: '<p></p>', bg: '' },
       map: { embed: '' },
       eventSection: { eyebrow: 'Start Here.', heading: 'Book a call', body: '<p></p>', calendlyUrl: '' },
+      richSection: { sectionClass: 'editor-content', body: '<p></p>' },
     };
     // Default value for a freshly-added repeater sub-field.
     const subDefault = (sf) => sf.t === 'image' ? {} : sf.t === 'toggle' ? false : sf.t === 'rich' ? '<p></p>' : sf.t === 'select' ? (sf.opts[0] ? sf.opts[0][0] : '') : '';

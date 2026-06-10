@@ -20,6 +20,7 @@ import Faqs from './Faqs.astro';
 import ContactHero from './ContactHero.astro';
 import Map from './Map.astro';
 import EventSection from './EventSection.astro';
+import RichSection from './RichSection.astro';
 import type {
   Hero as HeroData,
   ZigRow,
@@ -39,6 +40,7 @@ import type {
   ContactHeroData,
   MapData,
   EventSectionData,
+  RichSectionData,
 } from '../lib/content';
 
 interface Props {
@@ -75,6 +77,7 @@ const faqs = block.kind === 'faqs' ? parse<FaqsData>(block.body) : null;
 const contactHero = block.kind === 'contactHero' ? parse<ContactHeroData>(block.body) : null;
 const map = block.kind === 'map' ? parse<MapData>(block.body) : null;
 const eventSection = block.kind === 'eventSection' ? parse<EventSectionData>(block.body) : null;
+const richSection = block.kind === 'richSection' ? parse<RichSectionData>(block.body) : null;
 ---
 <div class="cms-block-wrap" data-cms-block={index}>
   {hero && <Hero lead={hero.lead} heading={hero.heading} intro={hero.intro} bg={hero.bg} variant={hero.variant} />}
@@ -150,6 +153,8 @@ const eventSection = block.kind === 'eventSection' ? parse<EventSectionData>(blo
   {map && <Map embed={map.embed} />}
 
   {eventSection && <EventSection eyebrow={eventSection.eyebrow} heading={eventSection.heading} body={eventSection.body} calendlyUrl={eventSection.calendlyUrl} bg={eventSection.bg} />}
+
+  {richSection && <RichSection sectionClass={richSection.sectionClass} body={richSection.body} />}
 </div>
 
 <style is:global>

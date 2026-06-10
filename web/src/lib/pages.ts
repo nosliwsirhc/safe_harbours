@@ -29,7 +29,8 @@ export type BlockKind =
   | 'faqs'
   | 'contactHero'
   | 'map'
-  | 'eventSection';
+  | 'eventSection'
+  | 'richSection';
 
 /** Every general-purpose block kind the composer can add (the default palette). */
 export const ALL_KINDS: BlockKind[] = [
@@ -134,6 +135,22 @@ export const EDITABLE_PAGES: EditablePage[] = [
     path: '/book-an-appointment',
     blurb: 'The booking landing page — hero, Calendly, steps, and contact.',
     palette: ['heroForm', 'contactHero', 'eventSection', 'map', ...ALL_KINDS],
+  },
+  {
+    key: 'program-description',
+    slot: 'main',
+    name: 'Program Description',
+    path: '/program-description',
+    blurb: 'The program details — hero and the service sections.',
+    palette: ['richSection', ...ALL_KINDS],
+  },
+  {
+    key: 'complaints',
+    slot: 'main',
+    name: 'Complaints Process',
+    path: '/program-description/complaints',
+    blurb: 'The complaints process — hero and the steps.',
+    palette: ['richSection', ...ALL_KINDS],
   },
 ];
 

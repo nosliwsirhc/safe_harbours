@@ -95,6 +95,12 @@ export interface MapData {
   embed?: string;
 }
 
+/** A bespoke editorial region: theme section classes + a block of rich HTML. */
+export interface RichSectionData {
+  sectionClass?: string;
+  body?: string;
+}
+
 /** icon-item-row: a heading + a grid of coloured icon cards. */
 export interface ValueCard {
   img?: ZigImage;
