@@ -17,6 +17,8 @@ import LargeList from './LargeList.astro';
 import Safety from './Safety.astro';
 import TextBlock from './TextBlock.astro';
 import Faqs from './Faqs.astro';
+import ContactHero from './ContactHero.astro';
+import Map from './Map.astro';
 import type {
   Hero as HeroData,
   ZigRow,
@@ -33,6 +35,8 @@ import type {
   SafetyData,
   TextBlockData,
   FaqsData,
+  ContactHeroData,
+  MapData,
 } from '../lib/content';
 
 interface Props {
@@ -66,6 +70,8 @@ const largeList = block.kind === 'largeList' ? parse<LargeListData>(block.body) 
 const safety = block.kind === 'safety' ? parse<SafetyData>(block.body) : null;
 const textBlock = block.kind === 'textBlock' ? parse<TextBlockData>(block.body) : null;
 const faqs = block.kind === 'faqs' ? parse<FaqsData>(block.body) : null;
+const contactHero = block.kind === 'contactHero' ? parse<ContactHeroData>(block.body) : null;
+const map = block.kind === 'map' ? parse<MapData>(block.body) : null;
 ---
 <div class="cms-block-wrap" data-cms-block={index}>
   {hero && <Hero lead={hero.lead} heading={hero.heading} intro={hero.intro} bg={hero.bg} />}
@@ -124,6 +130,10 @@ const faqs = block.kind === 'faqs' ? parse<FaqsData>(block.body) : null;
   {textBlock && <TextBlock heading={textBlock.heading} body={textBlock.body} />}
 
   {faqs && <Faqs heading={faqs.heading} items={faqs.items} />}
+
+  {contactHero && <ContactHero heading={contactHero.heading} phone={contactHero.phone} email={contactHero.email} address={contactHero.address} bg={contactHero.bg} />}
+
+  {map && <Map embed={map.embed} />}
 </div>
 
 <style is:global>

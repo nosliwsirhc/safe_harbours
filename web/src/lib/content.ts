@@ -77,6 +77,20 @@ export interface FaqsData {
   items?: FaqItem[];
 }
 
+/** The Contact Us hero: contact details beside the website contact form. */
+export interface ContactHeroData {
+  heading?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  bg?: string;
+}
+
+/** A full-width Google Maps embed. */
+export interface MapData {
+  embed?: string;
+}
+
 /** icon-item-row: a heading + a grid of coloured icon cards. */
 export interface ValueCard {
   img?: ZigImage;

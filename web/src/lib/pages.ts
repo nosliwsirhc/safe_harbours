@@ -26,7 +26,9 @@ export type BlockKind =
   | 'largeList'
   | 'safety'
   | 'textBlock'
-  | 'faqs';
+  | 'faqs'
+  | 'contactHero'
+  | 'map';
 
 /** Every general-purpose block kind the composer can add (the default palette). */
 export const ALL_KINDS: BlockKind[] = [
@@ -115,6 +117,14 @@ export const EDITABLE_PAGES: EditablePage[] = [
     path: '/about-fostering',
     blurb: 'The whole About Fostering page — intro, values, FAQs, and more.',
     palette: ALL_KINDS,
+  },
+  {
+    key: 'contact-us',
+    slot: 'main',
+    name: 'Contact Us',
+    path: '/contact-us',
+    blurb: 'Contact details, the contact form, and the map.',
+    palette: ['contactHero', 'map', ...ALL_KINDS],
   },
 ];
 
