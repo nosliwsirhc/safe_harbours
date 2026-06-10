@@ -64,13 +64,31 @@ export interface EditablePage {
   addLabel?: string; // palette button label override (single-kind palettes)
 }
 
+// Ordered for the admin list: the front page first, then the about/marketing
+// pages, the program pages, the action pages, and the legal/utility pages last.
 export const EDITABLE_PAGES: EditablePage[] = [
+  {
+    key: 'home',
+    slot: 'main',
+    name: 'Home',
+    path: '/',
+    blurb: 'The front page — hero, why foster, how it works, and testimonials.',
+    palette: ['homeHero', 'richSection', ...ALL_KINDS],
+  },
   {
     key: 'our-story',
     slot: 'main',
     name: 'Our Story',
     path: '/our-story',
-    blurb: 'The whole Our Story page — edit every section, reorder, add or remove.',
+    blurb: 'The agency’s history, mission, and the people behind it.',
+    palette: ALL_KINDS,
+  },
+  {
+    key: 'about-fostering',
+    slot: 'main',
+    name: 'About Fostering',
+    path: '/about-fostering',
+    blurb: 'What fostering involves — values, FAQs, and what to expect.',
     palette: ALL_KINDS,
   },
   {
@@ -78,7 +96,7 @@ export const EDITABLE_PAGES: EditablePage[] = [
     slot: 'main',
     name: 'Become a Foster Parent',
     path: '/become-a-foster-parent',
-    blurb: 'The whole Become a Foster Parent page — edit every section, reorder, add or remove.',
+    blurb: 'Who can foster, how the process works, and the sign-up form.',
     palette: ['heroForm', ...ALL_KINDS, 'safety'],
   },
   {
@@ -86,7 +104,47 @@ export const EDITABLE_PAGES: EditablePage[] = [
     slot: 'main',
     name: 'Our Impact',
     path: '/our-impact',
-    blurb: 'Build the page from sections — add, edit, reorder, publish.',
+    blurb: 'Stories, numbers, and outcomes from the agency’s work.',
+    palette: ALL_KINDS,
+  },
+  {
+    key: 'program-description',
+    slot: 'main',
+    name: 'Program Description',
+    path: '/program-description',
+    blurb: 'The therapeutic program and its service sections.',
+    palette: ['richSection', ...ALL_KINDS],
+  },
+  {
+    key: 'complaints',
+    slot: 'main',
+    name: 'Complaints Process',
+    path: '/program-description/complaints',
+    blurb: 'How families and partners can raise a concern.',
+    palette: ['richSection', ...ALL_KINDS],
+  },
+  {
+    key: 'book-an-appointment',
+    slot: 'main',
+    name: 'Book an Appointment',
+    path: '/book-an-appointment',
+    blurb: 'The booking page — intro, Calendly scheduler, and next steps.',
+    palette: ['heroForm', 'contactHero', 'eventSection', 'map', ...ALL_KINDS],
+  },
+  {
+    key: 'contact-us',
+    slot: 'main',
+    name: 'Contact Us',
+    path: '/contact-us',
+    blurb: 'Contact details, the enquiry form, and the map.',
+    palette: ['contactHero', 'map', ...ALL_KINDS],
+  },
+  {
+    key: 'thank-you-fostering',
+    slot: 'main',
+    name: 'Thank You (fostering)',
+    path: '/thank-you-fostering',
+    blurb: 'The confirmation page shown after the foster-parent form.',
     palette: ALL_KINDS,
   },
   {
@@ -104,62 +162,6 @@ export const EDITABLE_PAGES: EditablePage[] = [
     path: '/terms-conditions',
     blurb: 'The full terms & conditions text.',
     palette: ALL_KINDS,
-  },
-  {
-    key: 'thank-you-fostering',
-    slot: 'main',
-    name: 'Thank You (fostering)',
-    path: '/thank-you-fostering',
-    blurb: 'The confirmation page shown after the foster-parent form.',
-    palette: ALL_KINDS,
-  },
-  {
-    key: 'about-fostering',
-    slot: 'main',
-    name: 'About Fostering',
-    path: '/about-fostering',
-    blurb: 'The whole About Fostering page — intro, values, FAQs, and more.',
-    palette: ALL_KINDS,
-  },
-  {
-    key: 'contact-us',
-    slot: 'main',
-    name: 'Contact Us',
-    path: '/contact-us',
-    blurb: 'Contact details, the contact form, and the map.',
-    palette: ['contactHero', 'map', ...ALL_KINDS],
-  },
-  {
-    key: 'book-an-appointment',
-    slot: 'main',
-    name: 'Book an Appointment',
-    path: '/book-an-appointment',
-    blurb: 'The booking landing page — hero, Calendly, steps, and contact.',
-    palette: ['heroForm', 'contactHero', 'eventSection', 'map', ...ALL_KINDS],
-  },
-  {
-    key: 'home',
-    slot: 'main',
-    name: 'Home',
-    path: '/',
-    blurb: 'The home page — hero, why-foster, how-it-works, testimonials and more.',
-    palette: ['homeHero', 'richSection', ...ALL_KINDS],
-  },
-  {
-    key: 'program-description',
-    slot: 'main',
-    name: 'Program Description',
-    path: '/program-description',
-    blurb: 'The program details — hero and the service sections.',
-    palette: ['richSection', ...ALL_KINDS],
-  },
-  {
-    key: 'complaints',
-    slot: 'main',
-    name: 'Complaints Process',
-    path: '/program-description/complaints',
-    blurb: 'The complaints process — hero and the steps.',
-    palette: ['richSection', ...ALL_KINDS],
   },
 ];
 

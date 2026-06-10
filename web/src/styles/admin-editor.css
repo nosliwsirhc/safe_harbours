@@ -6,7 +6,7 @@
 .errbar:not([hidden]) { display: flex; }
 .errbar button { font: inherit; font-weight: 600; cursor: pointer; border: 1px solid var(--danger); background: #fff; color: var(--danger); border-radius: 6px; padding: 0.2rem 0.6rem; }
 
-.editor { display: grid; grid-template-columns: minmax(400px, 520px) 1fr; height: calc(100dvh - 53px); }
+.editor { display: grid; grid-template-columns: minmax(440px, 600px) 1fr; height: calc(100dvh - 53px); }
 .pane { min-height: 0; }
 .pane--edit { overflow-y: auto; padding: 1.25rem 1.5rem 4rem; border-right: 1px solid var(--line); background: var(--bg); }
 
@@ -19,7 +19,9 @@
 .livenote { margin: 0 0 1.25rem; font-size: 0.9rem; }
 .livenote[data-pending='true'] { color: var(--warn); font-weight: 600; }
 .livenote[data-pending='false'] { color: var(--ok); }
-.btn--primary:disabled { opacity: 0.45; cursor: default; }
+/* Disabled Publish recedes to a quiet outline — it only blooms to solid clay
+   when there are real changes to publish, so it stops competing with the content. */
+.btn--primary:disabled { background: transparent; color: var(--muted); border: 1px solid var(--line); opacity: 1; cursor: default; }
 
 .save { font-size: 0.82rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 999px; }
 .save[data-state='saved'] { color: var(--ok); background: var(--ok-bg); }
@@ -27,9 +29,23 @@
 .save[data-state='error'] { color: var(--danger); background: var(--danger-bg); }
 
 .pane--preview { display: flex; flex-direction: column; background: #fff; }
-.preview__bar { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; border-bottom: 1px solid var(--line); font-size: 0.85rem; }
+.preview__bar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.5rem 1rem; border-bottom: 1px solid var(--line); font-size: 0.85rem; align-self: stretch; flex-shrink: 0; }
 .preview__bar a { font-weight: 600; text-decoration: none; }
+.preview__bar-right { display: flex; align-items: center; gap: 0.85rem; }
 #preview { flex: 1; width: 100%; border: 0; }
+
+/* Viewport size toggle (Desktop / Tablet / Mobile) */
+.preview__viewport { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+.preview__viewport button { font: inherit; font-size: 0.76rem; font-weight: 600; padding: 0.25rem 0.65rem; border: 0; border-left: 1px solid var(--line); background: #fff; color: var(--muted); cursor: pointer; }
+.preview__viewport button:first-child { border-left: 0; }
+.preview__viewport button:hover { background: #f3f4f7; }
+.preview__viewport button[aria-pressed='true'] { background: var(--control-active); color: var(--brand-deep); }
+
+/* When previewing a narrower viewport, centre the frame on a backdrop. */
+.pane--preview[data-viewport='tablet'],
+.pane--preview[data-viewport='mobile'] { align-items: center; background: #e7e9ee; overflow: auto; }
+.pane--preview[data-viewport='tablet'] #preview,
+.pane--preview[data-viewport='mobile'] #preview { width: 100%; margin: 1rem auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 22px rgb(42 47 58 / 18%); }
 
 @media (width <= 920px) {
   .editor { grid-template-columns: 1fr; height: auto; }

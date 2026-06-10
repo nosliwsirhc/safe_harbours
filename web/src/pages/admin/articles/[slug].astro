@@ -44,67 +44,77 @@ const previewSrc = `/resources/${slug}?preview=1`;
       </p>
 
       <form id="form" autocomplete="off">
-        <label for="f-title">Title</label>
-        <input id="f-title" data-f value={article.title} />
+        <section class="group">
+          <h2 class="group-head">Basics</h2>
+          <label for="f-title">Title</label>
+          <input id="f-title" data-f value={article.title} />
 
-        <label>Web address</label>
-        <p class="urlnote muted">/resources/{slug}</p>
+          <label for="f-excerpt">Excerpt <span class="muted">— the one-line summary shown on the cards</span></label>
+          <textarea id="f-excerpt" data-f rows="3">{article.excerpt}</textarea>
+        </section>
 
-        <label>Hero image</label>
-        <div class="img" data-img>
-          <img class="thumb" src={article.heroImage} alt="" hidden={!article.heroImage} />
-          <input type="hidden" id="f-heroImage" data-f data-imgval value={article.heroImage} />
-          <button type="button" class="btn btn--ghost up">Upload image…</button>
-          <button type="button" class="btn btn--quiet rm" hidden>Remove</button>
-          <span class="upmsg muted"></span>
-          <input type="file" class="file" accept="image/jpeg,image/png" hidden />
-        </div>
-
-        <label>Card thumbnail <span class="muted">(optional — defaults to the hero)</span></label>
-        <div class="img" data-img>
-          <img class="thumb" src={article.thumbnail} alt="" hidden={!article.thumbnail} />
-          <input type="hidden" id="f-thumbnail" data-f data-imgval value={article.thumbnail} />
-          <button type="button" class="btn btn--ghost up">Upload image…</button>
-          <button type="button" class="btn btn--quiet rm" hidden>Remove</button>
-          <span class="upmsg muted"></span>
-          <input type="file" class="file" accept="image/jpeg,image/png" hidden />
-        </div>
-
-        <label for="f-excerpt">Excerpt <span class="muted">(the card summary)</span></label>
-        <textarea id="f-excerpt" data-f rows="3">{article.excerpt}</textarea>
-
-        <div class="two">
-          <div>
-            <label for="f-date">Date</label>
-            <input id="f-date" data-f type="date" value={dateStr} />
+        <section class="group">
+          <h2 class="group-head">Images</h2>
+          <label>Hero image <span class="muted">— the banner at the top of the article</span></label>
+          <div class="img" data-img>
+            <img class="thumb" src={article.heroImage} alt="" hidden={!article.heroImage} />
+            <input type="hidden" id="f-heroImage" data-f data-imgval value={article.heroImage} />
+            <button type="button" class="btn btn--ghost up">Upload image…</button>
+            <button type="button" class="btn btn--quiet rm" hidden>Remove</button>
+            <span class="upmsg muted"></span>
+            <input type="file" class="file" accept="image/jpeg,image/png" hidden />
           </div>
-          <div>
-            <label for="f-author">Author</label>
-            <input id="f-author" data-f value={article.author} />
+
+          <label>Card thumbnail <span class="muted">— optional; defaults to the hero</span></label>
+          <div class="img" data-img>
+            <img class="thumb" src={article.thumbnail} alt="" hidden={!article.thumbnail} />
+            <input type="hidden" id="f-thumbnail" data-f data-imgval value={article.thumbnail} />
+            <button type="button" class="btn btn--ghost up">Upload image…</button>
+            <button type="button" class="btn btn--quiet rm" hidden>Remove</button>
+            <span class="upmsg muted"></span>
+            <input type="file" class="file" accept="image/jpeg,image/png" hidden />
           </div>
-        </div>
+        </section>
 
-        <label for="f-category">Category</label>
-        <input id="f-category" data-f list="cats" value={article.category} />
-        <datalist id="cats">{categories.map((c) => <option value={c}></option>)}</datalist>
+        <section class="group">
+          <h2 class="group-head">Listing &amp; details</h2>
+          <label>Web address <span class="muted">— set automatically, can’t be changed</span></label>
+          <p class="urlnote">/resources/{slug}</p>
 
-        <div class="two">
-          <div>
-            <label for="f-indexOrder">List position <span class="muted">(blank = hidden)</span></label>
-            <input id="f-indexOrder" data-f type="number" value={article.indexOrder ?? ''} />
+          <div class="two">
+            <div>
+              <label for="f-date">Date</label>
+              <input id="f-date" data-f type="date" value={dateStr} />
+            </div>
+            <div>
+              <label for="f-author">Author</label>
+              <input id="f-author" data-f value={article.author} />
+            </div>
           </div>
-          <label class="check"><input type="checkbox" id="f-featured" data-f checked={article.featured} /> Feature at the top of Resources</label>
-        </div>
 
-        <label for="f-related">Related articles</label>
-        <select id="f-related" data-f multiple size="5">
-          {others.map((a) => (
-            <option value={a.slug} selected={article.related.includes(a.slug)}>{a.title || a.slug}</option>
-          ))}
-        </select>
+          <label for="f-category">Category</label>
+          <input id="f-category" data-f list="cats" value={article.category} />
+          <datalist id="cats">{categories.map((c) => <option value={c}></option>)}</datalist>
 
-        <label id="body-label">Body</label>
-        <div class="rt" data-rt-label="Article body">
+          <div class="two">
+            <div>
+              <label for="f-indexOrder">List position <span class="muted">(blank = hidden)</span></label>
+              <input id="f-indexOrder" data-f type="number" value={article.indexOrder ?? ''} />
+            </div>
+            <label class="check"><input type="checkbox" id="f-featured" data-f checked={article.featured} /> Feature at the top of Resources</label>
+          </div>
+
+          <label for="f-related">Related articles</label>
+          <select id="f-related" data-f multiple size="5">
+            {others.map((a) => (
+              <option value={a.slug} selected={article.related.includes(a.slug)}>{a.title || a.slug}</option>
+            ))}
+          </select>
+        </section>
+
+        <section class="group group--content">
+          <h2 class="group-head">Article content</h2>
+          <div class="rt" data-rt-label="Article body">
           <div class="rt-toolbar" role="toolbar" aria-label="Text formatting">
             <button type="button" data-rt="h2" title="Heading" aria-label="Heading">H2</button>
             <button type="button" data-rt="h3" title="Subheading" aria-label="Subheading">H3</button>
@@ -118,13 +128,21 @@ const previewSrc = `/resources/${slug}?preview=1`;
           <div class="rt-editor"></div>
           <input type="hidden" id="f-body" class="rt-value" data-f value={article.body} />
         </div>
+        </section>
       </form>
     </section>
 
     <section class="pane pane--preview">
       <div class="preview__bar">
-        <span class="muted">Live preview <span class="muted">(draft — not public until you publish)</span></span>
-        <a href={`/resources/${slug}`} target="_blank" rel="noopener">Open live page ↗</a>
+        <span class="muted">Live preview</span>
+        <div class="preview__bar-right">
+          <div class="preview__viewport" role="group" aria-label="Preview width">
+            <button type="button" data-vp="desktop" aria-pressed="true" title="Desktop">Desktop</button>
+            <button type="button" data-vp="tablet" aria-pressed="false" title="Tablet">Tablet</button>
+            <button type="button" data-vp="mobile" aria-pressed="false" title="Mobile">Mobile</button>
+          </div>
+          <a href={`/resources/${slug}`} target="_blank" rel="noopener">Open ↗</a>
+        </div>
       </div>
       <iframe id="preview" src={previewSrc} title="Article preview"></iframe>
     </section>
@@ -134,7 +152,16 @@ const previewSrc = `/resources/${slug}?preview=1`;
     form label { display: block; font-weight: 600; font-size: 0.85rem; margin: 1rem 0 0.35rem; }
     form input, form textarea, form select { width: 100%; font: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 0.55rem 0.65rem; background: #fff; color: var(--ink); }
     form input:focus, form textarea:focus, form select:focus { outline: 2px solid var(--brand); border-color: var(--brand); }
-    .urlnote { margin: 0; font-size: 0.9rem; }
+
+    /* Grouped sections so the form reads as Basics / Images / Listing / Content
+       instead of one flat stack — and the body gets its own prominent block. */
+    .group { margin: 0 0 0.5rem; }
+    .group-head { font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin: 1.5rem 0 0.75rem; padding-top: 1.1rem; border-top: 1px solid var(--line); }
+    .group:first-of-type .group-head { margin-top: 0.25rem; padding-top: 0; border-top: 0; }
+    .group--content .group-head { color: var(--brand-deep); font-size: 0.82rem; }
+    .group--content .rt-editor { min-height: 22rem; }
+
+    .urlnote { margin: 0; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 0.84rem; color: var(--muted); background: var(--bg); border: 1px solid var(--line); border-radius: 7px; padding: 0.4rem 0.65rem; display: inline-block; }
     .two { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: end; }
     .check { display: flex; align-items: center; gap: 0.4rem; font-weight: 600; font-size: 0.85rem; }
     .check input { width: auto; }
@@ -157,7 +184,9 @@ const previewSrc = `/resources/${slug}?preview=1`;
 
   <script>
     import { initRichText } from '../../../lib/rich-text-client';
+    import { initPreviewViewport } from '../../../lib/preview-viewport';
     initRichText();
+    initPreviewViewport();
   </script>
   <script is:inline define:vars={{ slug }}>
     const saveEl = document.getElementById('save');

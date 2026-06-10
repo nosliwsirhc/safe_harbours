@@ -31,6 +31,7 @@ const MANAGED_ELSEWHERE = [
         <li>
           <a class="page" href={`/admin/edit/${p.key}`}>
             <span class="page__name">{p.name}</span>
+            <span class="page__path muted">{p.path}</span>
             <span class="page__blurb muted">{p.blurb}</span>
             <span class="page__go" aria-hidden="true">Edit →</span>
           </a>
@@ -66,8 +67,9 @@ const MANAGED_ELSEWHERE = [
       text-decoration: none; color: inherit; box-shadow: var(--shadow); transition: border-color 0.15s ease, transform 0.15s ease; }
     a.page:hover { border-color: var(--brand); transform: translateY(-1px); }
     .page--soon { opacity: 0.6; box-shadow: none; }
-    .page__name { font-family: Montserrat, sans-serif; font-weight: 600; font-size: 1.05rem; }
-    .page__blurb { grid-column: 1; font-size: 0.9rem; }
-    .page__go { grid-column: 2; grid-row: 1 / span 2; color: var(--accent); font-weight: 600; }
+    .page__name { grid-column: 1; font-family: Montserrat, sans-serif; font-weight: 600; font-size: 1.05rem; }
+    .page__path { grid-column: 1; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 0.76rem; }
+    .page__blurb { grid-column: 1; font-size: 0.9rem; margin-top: 0.15rem; }
+    .page__go { grid-column: 2; grid-row: 1 / span 3; color: var(--accent); font-weight: 600; }
   </style>
 </AdminLayout>

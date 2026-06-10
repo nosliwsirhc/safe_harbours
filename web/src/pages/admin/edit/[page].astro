@@ -83,8 +83,15 @@ const config = {
 
     <section class="pane pane--preview">
       <div class="preview__bar">
-        <span class="muted">Live preview <span class="muted">(draft — not public until you publish)</span></span>
-        <a href={page.path} target="_blank" rel="noopener">Open live page ↗</a>
+        <span class="muted">Live preview</span>
+        <div class="preview__bar-right">
+          <div class="preview__viewport" role="group" aria-label="Preview width">
+            <button type="button" data-vp="desktop" aria-pressed="true" title="Desktop">Desktop</button>
+            <button type="button" data-vp="tablet" aria-pressed="false" title="Tablet">Tablet</button>
+            <button type="button" data-vp="mobile" aria-pressed="false" title="Mobile">Mobile</button>
+          </div>
+          <a href={page.path} target="_blank" rel="noopener">Open ↗</a>
+        </div>
       </div>
       <iframe id="preview" src={previewSrc} title={`Preview of ${page.name}`}></iframe>
     </section>
@@ -159,7 +166,9 @@ const config = {
   <script src="/assets/sortable.min.js" is:inline></script>
   <script>
     import { initRichText } from '../../../lib/rich-text-client';
+    import { initPreviewViewport } from '../../../lib/preview-viewport';
     initRichText();
+    initPreviewViewport();
   </script>
   <script is:inline define:vars={{ pageKey: page.key, slot: page.slot, config, blocks }}>
     const saveEl = document.getElementById('save');
