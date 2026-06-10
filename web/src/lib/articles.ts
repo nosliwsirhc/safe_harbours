@@ -178,10 +178,15 @@ export async function saveArticleDraft(a: Article): Promise<void> {
   await upsert('draft', a);
 }
 
-/** Promote the draft to published. */
+/** Promote the draft to published. Keeps a single featured article live. */
 export async function publishArticle(slug: string): Promise<void> {
   const draft = await getArticle(slug, 'draft');
-  if (draft) await upsert('published', draft);
+  if (!draft) return;
+  await upsert('published', draft);
+  if (draft.featured) {
+    const d = db();
+    if (d) await d.prepare("UPDATE articles SET featured = 0 WHERE slug != ? AND state = 'published'").bind(slug).run();
+  }
 }
 
 /** Remove an article entirely (both states). */

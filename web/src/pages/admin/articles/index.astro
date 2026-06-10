@@ -1,0 +1,84 @@
+---
+// Admin: the list of resource articles. Create / edit / delete; status shows
+// whether an article is live (published) or a draft. Authoring happens in the
+// per-article editor.
+export const prerender = false;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { isAuthed } from '../../../lib/admin';
+import { listAdminArticles } from '../../../lib/articles';
+
+if (!isAuthed(Astro.request)) return Astro.redirect('/admin/login');
+
+const articles = await listAdminArticles();
+const fmt = (d: Date) => (Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' }));
+---
+<AdminLayout title="Resources" active="articles">
+  <main class="wrap">
+    <div class="head">
+      <h1>Resource articles</h1>
+      <button type="button" class="btn btn--primary" id="new">+ New article</button>
+    </div>
+    <p class="muted intro">Create and edit the articles on the Resources page. Changes save as a private draft; publish to put them live.</p>
+
+    {articles.length === 0 && <p class="empty muted">No articles yet. Click “New article” to write your first one.</p>}
+
+    <ul class="list" role="list">
+      {articles.map((a) => (
+        <li class="row">
+          <a class="row__main" href={`/admin/articles/${a.slug}`}>
+            <span class="row__title">{a.title || a.slug}</span>
+            <span class="row__meta muted">{[fmt(a.date), a.category].filter(Boolean).join(' · ')}</span>
+          </a>
+          <span class:list={['badge', a.published ? 'badge--live' : 'badge--draft']}>{a.published ? 'Live' : 'Draft'}</span>
+          <a class="btn btn--ghost row__edit" href={`/admin/articles/${a.slug}`}>Edit</a>
+          <button type="button" class="btn btn--quiet row__del" data-slug={a.slug} data-title={a.title || a.slug}>Delete</button>
+        </li>
+      ))}
+    </ul>
+  </main>
+
+  <style>
+    .wrap { max-width: 820px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+    .head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    h1 { font-size: 1.6rem; margin: 0; }
+    .intro { margin: 0.4rem 0 1.75rem; }
+    .empty { padding: 2rem 0; }
+    .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+    .row { display: flex; align-items: center; gap: 0.85rem; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 0.75rem 1rem; box-shadow: var(--shadow); }
+    .row__main { flex: 1; min-width: 0; text-decoration: none; color: inherit; display: grid; gap: 0.15rem; }
+    .row__title { font-weight: 600; }
+    .row__meta { font-size: 0.85rem; }
+    .badge { font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.03em; }
+    .badge--live { color: var(--ok); background: #e8f2ec; }
+    .badge--draft { color: #8a5a16; background: #f6ecdb; }
+    .row__edit { padding: 0.35rem 0.8rem; }
+  </style>
+
+  <script is:inline>
+    {
+      document.getElementById('new').addEventListener('click', async () => {
+        const title = prompt('Article title');
+        if (!title || !title.trim()) return;
+        const res = await fetch('/api/admin/articles', {
+          method: 'POST', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ action: 'create', title: title.trim() }),
+        });
+        const data = await res.json();
+        if (data.ok && data.slug) location.href = `/admin/articles/${data.slug}`;
+        else alert('Could not create the article.');
+      });
+      for (const btn of document.querySelectorAll('.row__del')) {
+        btn.addEventListener('click', async () => {
+          if (!confirm(`Delete “${btn.dataset.title}”? This removes it from the site.`)) return;
+          const res = await fetch('/api/admin/articles', {
+            method: 'POST', headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ action: 'delete', slug: btn.dataset.slug }),
+          });
+          if ((await res.json()).ok) btn.closest('.row').remove();
+          else alert('Could not delete.');
+        });
+      }
+    }
+  </script>
+</AdminLayout>

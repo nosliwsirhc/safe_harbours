@@ -13,7 +13,6 @@ if (!isAuthed(Astro.request)) return Astro.redirect('/admin/login');
 // Careers comes from the jobs board, Resources from the articles collection.
 const MANAGED_ELSEWHERE = [
   { name: 'Careers', where: 'Managed from the jobs board.' },
-  { name: 'Resources', where: 'Managed from the articles collection.' },
 ];
 ---
 <AdminLayout title="Pages" active="pages">

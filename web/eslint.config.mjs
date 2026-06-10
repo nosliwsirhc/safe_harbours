@@ -47,6 +47,7 @@ export default tseslint.config(
         Sortable: 'readonly',
         pageKey: 'readonly',
         slot: 'readonly',
+        slug: 'readonly',
         config: 'readonly',
         blocks: 'readonly',
       },

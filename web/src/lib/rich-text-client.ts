@@ -4,8 +4,10 @@
 // hidden input and a bubbling `input` event is dispatched — so the page's
 // orchestration script (autosave/preview) treats it like any other field.
 // Bridges via the hidden input so the two scripts stay decoupled.
-import { createEditor, $getRoot, $getSelection, $isRangeSelection, $insertNodes, FORMAT_TEXT_COMMAND } from 'lexical';
-import { registerRichText } from '@lexical/rich-text';
+import { createEditor, $getRoot, $getSelection, $isRangeSelection, $insertNodes, $createParagraphNode, FORMAT_TEXT_COMMAND } from 'lexical';
+import { registerRichText, HeadingNode, QuoteNode, $createHeadingNode } from '@lexical/rich-text';
+import { ListNode, ListItemNode, registerList, INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND } from '@lexical/list';
+import { $setBlocksType } from '@lexical/selection';
 import { LinkNode, $toggleLink } from '@lexical/link';
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import { mergeRegister } from '@lexical/utils';
@@ -22,13 +24,13 @@ function attach(rt: Element) {
 
   const editor = createEditor({
     namespace: 'sh-rich',
-    nodes: [LinkNode],
+    nodes: [LinkNode, HeadingNode, QuoteNode, ListNode, ListItemNode],
     onError: (e) => { console.error('[rich-text]', e); },
   });
   editor.setRootElement(surface);
   editor.setEditable(true);
   surface.setAttribute('contenteditable', 'true');
-  mergeRegister(registerRichText(editor));
+  mergeRegister(registerRichText(editor), registerList(editor));
 
   // Mirror edits to the hidden input + fire `input` so the page autosaves/previews.
   const startTracking = () => {
@@ -66,6 +68,20 @@ function attach(rt: Element) {
     const cmd = btn.dataset.rt;
     if (cmd === 'bold' || cmd === 'italic') {
       editor.dispatchCommand(FORMAT_TEXT_COMMAND, cmd);
+    } else if (cmd === 'h2' || cmd === 'h3') {
+      editor.update(() => {
+        const sel = $getSelection();
+        if ($isRangeSelection(sel)) $setBlocksType(sel, () => $createHeadingNode(cmd));
+      });
+    } else if (cmd === 'p') {
+      editor.update(() => {
+        const sel = $getSelection();
+        if ($isRangeSelection(sel)) $setBlocksType(sel, () => $createParagraphNode());
+      });
+    } else if (cmd === 'ul') {
+      editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
+    } else if (cmd === 'ol') {
+      editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
     } else if (cmd === 'link') {
       const url = prompt('Link address (https://…)');
       if (url !== null) {
