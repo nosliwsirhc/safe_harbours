@@ -19,6 +19,10 @@ const resources = defineCollection({
     related: z.array(z.string()).default([]),
     // Position on the /resources index grid (omit to keep an article off the index).
     indexOrder: z.number().optional(),
+    // Topic, used by the /resources category filter.
+    category: z.string().default('Fostering Basics'),
+    // The one article shown in the index's "Featured Post" slot.
+    featured: z.boolean().default(false),
   }),
 });
 

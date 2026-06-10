@@ -7,6 +7,7 @@ date: 2026-03-03
 author: "Safe Harbours"
 related: ["best-childrens-foster-agencies-in-toronto", "5-best-childrens-foster-agencies-in-mississauga", "what-is-it-like-to-be-a-foster-parent-guide-for-ontario"]
 indexOrder: 2
+category: "Choosing an Agency"
 ---
 Choosing a foster agency is one of the most important decisions you’ll make as a prospective foster parent, because the agency you work with will shape your experience, your training, and the support you receive.
 

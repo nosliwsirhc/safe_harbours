@@ -7,6 +7,7 @@ date: 2026-03-03
 author: "Safe Harbours"
 related: ["best-childrens-foster-agencies-in-toronto", "5-best-childrens-foster-agencies-in-mississauga", "4-best-childrens-foster-agencies-in-hamilton"]
 indexOrder: 7
+category: "During a Placement"
 ---
 Foster care is built on the idea of fit, and the system recognizes that even well-prepared, caring homes may encounter placements that cannot continue safely or sustainably. Knowing that you can end a foster placement, when needed, allows you to foster with honesty and responsibility rather than fear.
 

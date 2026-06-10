@@ -7,6 +7,7 @@ date: 2026-03-03
 author: "Safe Harbours"
 related: ["best-childrens-foster-agencies-in-toronto", "5-best-childrens-foster-agencies-in-mississauga", "4-best-childrens-foster-agencies-in-hamilton"]
 indexOrder: 6
+category: "During a Placement"
 ---
 ## **Sometimes Foster Placements Don’t Work Out**
 

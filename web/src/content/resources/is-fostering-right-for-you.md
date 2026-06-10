@@ -4,6 +4,10 @@ heroImage: "/assets/uploads/2025/10/right-for-you.jpg"
 date: 2026-03-03
 author: "Safe Harbours"
 related: ["best-childrens-foster-agencies-in-toronto", "5-best-childrens-foster-agencies-in-mississauga", "4-best-childrens-foster-agencies-in-hamilton"]
+category: "Getting Started"
+indexOrder: 11
+thumbnail: "/assets/uploads/2025/10/right-for-you.jpg"
+excerpt: "Fostering means providing temporary care for children who can’t live safely with their families. A look at what’s involved, so you can decide if it’s right for you."
 ---
 ## **Fostering Children in Ontario**
 
