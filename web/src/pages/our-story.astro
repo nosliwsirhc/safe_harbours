@@ -1,28 +1,17 @@
 ---
-// SSR. The hero is now a real, data-driven component (editable from /admin); the
-// rest of the page is still the mirrored markup (those sections become their own
-// components next). If the hero has no data yet, we render the original mirror
-// hero unchanged — so this can never regress to a blank page.
+// Fully composed from D1 blocks (editable from /admin), rendered by BlockRenderer
+// — the hero, purpose banner, values, founder, team, testimonials, CTA and logos
+// are all data now. Draft shown only inside the authed admin preview (?preview=1).
 export const prerender = false;
 
 import ThemeLayout from '../layouts/ThemeLayout.astro';
-import Hero from '../components/Hero.astro';
-import { getHeroForView } from '../lib/content';
+import BlockRenderer from '../components/BlockRenderer.astro';
+import { getBlocksForView } from '../lib/content';
 import { isAuthed } from '../lib/admin';
-import blob from '../../_mirror/our-story.main.html?raw';
 
-// Show the draft only inside the admin preview (authed + ?preview=1); the public
-// always sees published.
 const preview = Astro.url.searchParams.get('preview') === '1' && isAuthed(Astro.request);
-const hero = await getHeroForView('our-story', preview);
-const seam = blob.indexOf('<div id="" class="banner-bar');
-const afterHero = seam !== -1 ? blob.slice(seam) : blob;
+const blocks = await getBlocksForView('our-story', 'main', preview);
 ---
 <ThemeLayout name="our-story" title="Our Story | Safe Harbours">
-  {hero && (
-    <div class="cms-block-wrap" data-cms-block="0">
-      <Hero lead={hero.lead} heading={hero.heading} intro={hero.intro} bg={hero.bg} />
-    </div>
-  )}
-  <Fragment set:html={hero ? afterHero : blob} />
+  {blocks.map((b, i) => <BlockRenderer block={b} index={i} />)}
 </ThemeLayout>

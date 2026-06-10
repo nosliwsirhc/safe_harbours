@@ -9,7 +9,33 @@
 //                remove / reorder; e.g. a hero). Mutually exclusive with palette.
 //   • numbered — label + number the blocks as ordered steps ("Step 1", "Step 2")
 //   • addLabel — override the palette button label for a single-kind palette
-export type BlockKind = 'hero' | 'heading' | 'text' | 'imageText' | 'cta';
+export type BlockKind =
+  | 'hero'
+  | 'heading'
+  | 'text'
+  | 'imageText'
+  | 'cta'
+  | 'banner'
+  | 'valueCards'
+  | 'imageBlock'
+  | 'team'
+  | 'testimonials'
+  | 'logos';
+
+/** Every block kind the composer can add — the default palette for a rich page. */
+export const ALL_KINDS: BlockKind[] = [
+  'hero',
+  'heading',
+  'text',
+  'banner',
+  'imageText',
+  'imageBlock',
+  'valueCards',
+  'team',
+  'testimonials',
+  'cta',
+  'logos',
+];
 
 export interface EditablePage {
   key: string; // matches content_blocks.page
@@ -26,12 +52,11 @@ export interface EditablePage {
 export const EDITABLE_PAGES: EditablePage[] = [
   {
     key: 'our-story',
-    slot: 'hero',
+    slot: 'main',
     name: 'Our Story',
     path: '/our-story',
-    blurb: 'The hero at the top of the Our Story page.',
-    palette: [],
-    single: 'hero',
+    blurb: 'The whole Our Story page — edit every section, reorder, add or remove.',
+    palette: ALL_KINDS,
   },
   {
     key: 'become-a-foster-parent',

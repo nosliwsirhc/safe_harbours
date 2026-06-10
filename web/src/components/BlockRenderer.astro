@@ -1,11 +1,27 @@
 ---
 // Renders one composer block by its `kind`. A page is a list of these. The
-// data-cms-block index + each component's data-cms-field hooks let the editor
-// update the live preview in place.
+// data-cms-block index + each component's data-cms-field / data-cms-item hooks
+// let the editor update the live preview in place.
 import Hero from './Hero.astro';
 import ZigZag from './ZigZag.astro';
 import Cta from './Cta.astro';
-import type { Hero as HeroData, ZigRow, CtaData } from '../lib/content';
+import Banner from './Banner.astro';
+import ValueCards from './ValueCards.astro';
+import ImageBlock from './ImageBlock.astro';
+import Team from './Team.astro';
+import Testimonials from './Testimonials.astro';
+import Logos from './Logos.astro';
+import type {
+  Hero as HeroData,
+  ZigRow,
+  CtaData,
+  BannerData,
+  ValueCardsData,
+  ImageBlockData,
+  TeamData,
+  TestimonialsData,
+  LogosData,
+} from '../lib/content';
 
 interface Props {
   block: { kind: string; body: string };
@@ -26,6 +42,12 @@ const row = block.kind === 'imageText' ? parse<ZigRow>(block.body) : null;
 const cta = block.kind === 'cta' ? parse<CtaData>(block.body) : null;
 const heading = block.kind === 'heading' ? parse<{ text?: string }>(block.body) : null;
 const text = block.kind === 'text' ? parse<{ html?: string }>(block.body) : null;
+const banner = block.kind === 'banner' ? parse<BannerData>(block.body) : null;
+const valueCards = block.kind === 'valueCards' ? parse<ValueCardsData>(block.body) : null;
+const imageBlock = block.kind === 'imageBlock' ? parse<ImageBlockData>(block.body) : null;
+const team = block.kind === 'team' ? parse<TeamData>(block.body) : null;
+const testimonials = block.kind === 'testimonials' ? parse<TestimonialsData>(block.body) : null;
+const logos = block.kind === 'logos' ? parse<LogosData>(block.body) : null;
 ---
 <div class="cms-block-wrap" data-cms-block={index}>
   {hero && <Hero lead={hero.lead} heading={hero.heading} intro={hero.intro} bg={hero.bg} />}
@@ -38,7 +60,7 @@ const text = block.kind === 'text' ? parse<{ html?: string }>(block.body) : null
     </section>
   )}
 
-  {cta && <Cta heading={cta.heading} body={cta.body} label={cta.label} href={cta.href} variant={cta.variant} />}
+  {cta && <Cta heading={cta.heading} body={cta.body} label={cta.label} href={cta.href} />}
 
   {heading && (
     <div class="grid-container">
@@ -51,6 +73,18 @@ const text = block.kind === 'text' ? parse<{ html?: string }>(block.body) : null
       <div class="composed-text" data-cms-field="html" set:html={text.html}></div>
     </div>
   )}
+
+  {banner && <Banner heading={banner.heading} body={banner.body} />}
+
+  {valueCards && <ValueCards heading={valueCards.heading} cards={valueCards.cards} />}
+
+  {imageBlock && <ImageBlock img={imageBlock.img} heading={imageBlock.heading} body={imageBlock.body} />}
+
+  {team && <Team heading={team.heading} members={team.members} label={team.label} href={team.href} />}
+
+  {testimonials && <Testimonials items={testimonials.items} />}
+
+  {logos && <Logos heading={logos.heading} logos={logos.logos} />}
 </div>
 
 <style is:global>

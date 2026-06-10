@@ -170,6 +170,16 @@ const config = {
     .pane--edit .confirm { display: flex; gap: 0.5rem; align-items: center; font-size: 0.85rem; color: #9b1c1c; font-weight: 600; }
     .pane--edit .confirm button { font: inherit; font-weight: 600; cursor: pointer; border-radius: 6px; padding: 0.25rem 0.6rem; border: 1px solid var(--line); background: #fff; }
     .pane--edit .confirm .yes { background: #fde8e8; color: #9b1c1c; border-color: #e3b3b3; }
+
+    /* repeater (a list of sub-item cards inside one block) */
+    .pane--edit .rep { display: grid; gap: 0.6rem; margin: 0.35rem 0 0.6rem; }
+    .pane--edit .rep-item { border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 8px; padding: 0.6rem 0.7rem; background: #fbfbfc; }
+    .pane--edit .rep-item.confirming { border-color: #d99; background: #fdf3f3; }
+    .pane--edit .rep-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem; }
+    .pane--edit .rep-grip { cursor: grab; background: var(--line); border: 0; color: #5b6270; font-size: 1rem; line-height: 1; padding: 0.15rem 0.45rem; border-radius: 6px; }
+    .pane--edit .rep-grip:hover { background: #d7dae1; }
+    .pane--edit .rep-grip:active { cursor: grabbing; }
+    .pane--edit .rep-add { width: 100%; }
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js" is:inline></script>
@@ -226,9 +236,10 @@ const config = {
 
     // Shared image-upload wiring. Opens the file dialog on the "Upload image…"
     // button and POSTs the file to be resized; the returned manifest is written
-    // into `valSel`'s hidden input. `onDone` runs on success (a save+reload, since
-    // adding an image is a structural change).
-    function wireUpload(list, valSel, onDone) {
+    // into the field's hidden input — a `.zz-imgval` (JSON ZigImage, for <picture>
+    // fields) and/or a `.zz-bgval` (a CSS url(), for background-image fields).
+    // `onDone` runs on success (a save+reload, since adding an image is structural).
+    function wireUpload(list, onDone) {
       list.addEventListener('click', (e) => {
         if (e.target.matches('.zz-upload')) e.target.closest('.zz-image').querySelector('.zz-file').click();
       });
@@ -242,7 +253,8 @@ const config = {
           const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
           const d = await res.json();
           if (d.ok) {
-            wrap.querySelector(valSel).value = JSON.stringify(d.img);
+            const jsonEl = wrap.querySelector('.zz-imgval'); if (jsonEl) jsonEl.value = JSON.stringify(d.img);
+            const bgEl = wrap.querySelector('.zz-bgval'); if (bgEl) bgEl.value = `url('${d.img.jpg}')`;
             const t = wrap.querySelector('.zz-thumb'); t.src = d.img.jpg; t.hidden = false;
             msg.textContent = '';
             onDone();
@@ -272,10 +284,11 @@ const config = {
     // (Rich text is handled by Lexical — see lib/rich-text-client. It writes
     // serialized HTML into the hidden .rt-value inputs and fires `input` events.)
 
-    // Inline "Remove → are you sure?" so a misclick can't delete content.
+    // Inline "Remove → are you sure?" so a misclick can't delete content. Works
+    // for both a block card (.section__head) and a repeater item (.rep-head).
     function confirmRemove(li, onYes) {
-      const head = li.querySelector('.section__head');
-      const btn = head.querySelector('[data-remove]');
+      const head = li.querySelector('.section__head') ?? li.querySelector('.rep-head');
+      const btn = head.querySelector('[data-remove]') ?? head.querySelector('[data-rep-remove]');
       btn.style.display = 'none';
       li.classList.add('confirming');
       const wrap = document.createElement('span');
@@ -307,7 +320,47 @@ const config = {
         { n: 'body', t: 'rich', l: 'Text' },
         { n: 'label', t: 'plain', l: 'Button label' },
         { n: 'href', t: 'plain', l: 'Button link' },
-        { n: 'variant', t: 'select', l: 'Style', opts: [['light', 'Light'], ['dark', 'Dark']] },
+      ] },
+      banner: { label: 'Banner', fields: [
+        { n: 'heading', t: 'plain', l: 'Heading' },
+        { n: 'body', t: 'rich', l: 'Text' },
+      ] },
+      valueCards: { label: 'Value cards', fields: [
+        { n: 'heading', t: 'plain', l: 'Section heading' },
+        { n: 'cards', t: 'repeater', l: 'Cards', addLabel: 'card', item: [
+          { n: 'img', t: 'image', l: 'Icon' },
+          { n: 'title', t: 'plain', l: 'Title' },
+          { n: 'text', t: 'rich', l: 'Text' },
+          { n: 'style', t: 'select', l: 'Colour', opts: [['navy', 'Navy'], ['pink', 'Pink'], ['lightpink', 'Light pink']] },
+        ] },
+      ] },
+      imageBlock: { label: 'Large image + text', fields: [
+        { n: 'img', t: 'image', l: 'Image' },
+        { n: 'heading', t: 'plain', l: 'Heading' },
+        { n: 'body', t: 'rich', l: 'Text' },
+      ] },
+      team: { label: 'Team', fields: [
+        { n: 'heading', t: 'plain', l: 'Section heading' },
+        { n: 'members', t: 'repeater', l: 'Team members', addLabel: 'member', item: [
+          { n: 'bg', t: 'bgimage', l: 'Photo' },
+          { n: 'name', t: 'plain', l: 'Name' },
+          { n: 'role', t: 'plain', l: 'Role' },
+        ] },
+        { n: 'label', t: 'plain', l: 'Button label' },
+        { n: 'href', t: 'plain', l: 'Button link' },
+      ] },
+      testimonials: { label: 'Testimonials', fields: [
+        { n: 'items', t: 'repeater', l: 'Quotes', addLabel: 'quote', item: [
+          { n: 'quote', t: 'plain', l: 'Quote' },
+          { n: 'author', t: 'plain', l: 'Name' },
+          { n: 'role', t: 'plain', l: 'Role' },
+        ] },
+      ] },
+      logos: { label: 'Logos', fields: [
+        { n: 'heading', t: 'plain', l: 'Section heading' },
+        { n: 'logos', t: 'repeater', l: 'Logos', addLabel: 'logo', item: [
+          { n: 'img', t: 'image', l: 'Logo' },
+        ] },
       ] },
     };
     const DEFAULTS = {
@@ -315,16 +368,39 @@ const config = {
       heading: { text: 'Section title' },
       text: { html: '<p>Write something…</p>' },
       imageText: { reverse: false, heading: 'New section', body: '<p></p>', img: {} },
-      cta: { heading: 'Ready to get started?', body: '<p></p>', label: 'Get started', href: '/contact-us', variant: 'light' },
+      cta: { heading: 'Ready to get started?', body: '<p></p>', label: 'Get started', href: '/contact-us' },
+      banner: { heading: 'New heading', body: '<p></p>' },
+      valueCards: { heading: 'Our Values', cards: [{ img: {}, title: 'Title', text: '<p></p>', style: 'navy' }] },
+      imageBlock: { img: {}, heading: 'New heading', body: '<p></p>' },
+      team: { heading: 'Our Team', members: [{ bg: '', name: 'Name', role: 'Role' }], label: '', href: '' },
+      testimonials: { items: [{ quote: '', author: 'Name', role: 'Role' }] },
+      logos: { heading: 'Referral Partners', logos: [{ img: {} }] },
     };
+    // Default value for a freshly-added repeater sub-field.
+    const subDefault = (sf) => sf.t === 'image' ? {} : sf.t === 'toggle' ? false : sf.t === 'rich' ? '<p></p>' : sf.t === 'select' ? (sf.opts[0] ? sf.opts[0][0] : '') : '';
     const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    function fieldHtml(f, v) {
-      if (f.t === 'plain') return `<label class="mini">${f.l}</label><input class="field" data-field="${f.n}" value="${esc(v)}">`;
-      if (f.t === 'rich') return `<label class="mini">${f.l}</label><div class="rt"><div class="rt-toolbar"><button type="button" data-rt="bold"><b>B</b></button><button type="button" data-rt="italic"><i>I</i></button><button type="button" data-rt="link">Link</button></div><div class="rt-editor"></div><input type="hidden" class="rt-value" data-field="${f.n}" value="${esc(v)}"></div>`;
-      if (f.t === 'toggle') return `<label class="rev"><input type="checkbox" data-field="${f.n}" ${v ? 'checked' : ''}> ${f.l}</label>`;
-      if (f.t === 'select') return `<label class="mini">${f.l}</label><select class="kind" data-field="${f.n}">${f.opts.map((o) => `<option value="${o[0]}" ${v === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select>`;
-      if (f.t === 'image') { const thumb = (v && (v.src || v.jpg)) || ''; return `<label class="mini">${f.l}</label><div class="zz-image"><img class="zz-thumb" src="${esc(thumb)}" alt="" ${thumb ? '' : 'hidden'}><input type="hidden" class="zz-imgval" data-field="${f.n}" value="${esc(JSON.stringify(v || {}))}"><button type="button" class="btn btn--ghost zz-upload">Upload image…</button><span class="zz-upmsg muted"></span><input type="file" class="zz-file" accept="image/jpeg,image/png" hidden></div>`; }
+    const bgUrl = (v) => { const m = /url\(['"]?([^'")]+)/.exec(v || ''); return m ? m[1] : ''; };
+    // Render one field's editor UI. `attr` is the data-attribute the value input
+    // carries — 'data-field' for a block's own fields, 'data-subfield' for a field
+    // nested inside a repeater item (so the two never collide when we collect).
+    function fieldHtml(f, v, attr = 'data-field') {
+      if (f.t === 'plain') return `<label class="mini">${f.l}</label><input class="field" ${attr}="${f.n}" value="${esc(v)}">`;
+      if (f.t === 'rich') return `<label class="mini">${f.l}</label><div class="rt"><div class="rt-toolbar"><button type="button" data-rt="bold"><b>B</b></button><button type="button" data-rt="italic"><i>I</i></button><button type="button" data-rt="link">Link</button></div><div class="rt-editor"></div><input type="hidden" class="rt-value" ${attr}="${f.n}" value="${esc(v)}"></div>`;
+      if (f.t === 'toggle') return `<label class="rev"><input type="checkbox" ${attr}="${f.n}" ${v ? 'checked' : ''}> ${f.l}</label>`;
+      if (f.t === 'select') return `<label class="mini">${f.l}</label><select class="kind" ${attr}="${f.n}">${f.opts.map((o) => `<option value="${o[0]}" ${v === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select>`;
+      if (f.t === 'image') { const thumb = (v && (v.src || v.jpg)) || ''; return `<label class="mini">${f.l}</label><div class="zz-image"><img class="zz-thumb" src="${esc(thumb)}" alt="" ${thumb ? '' : 'hidden'}><input type="hidden" class="zz-imgval" ${attr}="${f.n}" value="${esc(JSON.stringify(v || {}))}"><button type="button" class="btn btn--ghost zz-upload">Upload image…</button><span class="zz-upmsg muted"></span><input type="file" class="zz-file" accept="image/jpeg,image/png" hidden></div>`; }
+      if (f.t === 'bgimage') { const thumb = bgUrl(v); return `<label class="mini">${f.l}</label><div class="zz-image"><img class="zz-thumb" src="${esc(thumb)}" alt="" ${thumb ? '' : 'hidden'}><input type="hidden" class="zz-bgval" ${attr}="${f.n}" value="${esc(v || '')}"><button type="button" class="btn btn--ghost zz-upload">Upload image…</button><span class="zz-upmsg muted"></span><input type="file" class="zz-file" accept="image/jpeg,image/png" hidden></div>`; }
+      if (f.t === 'repeater') {
+        const items = Array.isArray(v) ? v : [];
+        return `<label class="mini">${f.l}</label><div class="rep" data-rep="${f.n}">${items.map((it) => repeaterItemHtml(f, it)).join('')}</div><button type="button" class="btn btn--ghost rep-add" data-rep-add="${f.n}">+ Add ${f.addLabel || 'item'}</button>`;
+      }
       return '';
+    }
+    // One repeater item card: a drag/remove head + its sub-fields (which use
+    // data-subfield so a block's own collect() never picks them up).
+    function repeaterItemHtml(f, data) {
+      const sub = f.item.map((sf) => fieldHtml(sf, data ? data[sf.n] : undefined, 'data-subfield')).join('');
+      return `<div class="rep-item" data-rep-item><div class="rep-head"><button type="button" class="rep-grip" title="Drag to reorder">⠿</button><span class="head-spacer"></span><button type="button" class="btn btn--quiet" data-rep-remove>Remove</button></div>${sub}</div>`;
     }
     function makeCard(kind, data) {
       const li = document.createElement('li');
@@ -344,17 +420,33 @@ const config = {
       if (!config.numbered) return;
       cards().forEach((li, i) => { const n = li.querySelector('.zz-num'); if (n) n.textContent = 'Step ' + (i + 1); });
     }
+    // Read one field's value off its input (plain/rich/select/bgimage → string,
+    // toggle → bool, image → parsed ZigImage). `sel` is data-field or data-subfield.
+    function readField(scope, f, sel) {
+      const el = scope.querySelector(`[${sel}="${f.n}"]`);
+      if (!el) return undefined;
+      if (f.t === 'toggle') return el.checked;
+      if (f.t === 'image') { try { return JSON.parse(el.value || '{}'); } catch { return {}; } }
+      return el.value;
+    }
+    function collectRepeater(li, f) {
+      const wrap = li.querySelector(`[data-rep="${f.n}"]`);
+      if (!wrap) return [];
+      return [...wrap.querySelectorAll(':scope > [data-rep-item]')].map((item) => {
+        const obj = {};
+        for (const sf of f.item) { const val = readField(item, sf, 'data-subfield'); if (val !== undefined) obj[sf.n] = val; }
+        return obj;
+      });
+    }
     function collect() {
       return cards().map((li) => {
         const kind = li.dataset.kind;
         let body = {};
         try { body = JSON.parse(li.dataset.extra || '{}'); } catch {}
         for (const f of SPECS[kind].fields) {
-          const el = li.querySelector(`[data-field="${f.n}"]`);
-          if (!el) continue;
-          if (f.t === 'toggle') body[f.n] = el.checked;
-          else if (f.t === 'image') { try { body[f.n] = JSON.parse(el.value || '{}'); } catch { body[f.n] = {}; } }
-          else body[f.n] = el.value;
+          if (f.t === 'repeater') { body[f.n] = collectRepeater(li, f); continue; }
+          const val = readField(li, f, 'data-field');
+          if (val !== undefined) body[f.n] = val;
         }
         return { kind, body: JSON.stringify(body) };
       });
@@ -377,19 +469,64 @@ const config = {
       return true;
     }
 
+    // Same as liveText, but for a text field inside a repeater item — addressed in
+    // the preview by [data-cms-item="i"] within the block. Returns false (→ reload)
+    // for non-text sub-fields or when the preview node isn't there yet.
+    function liveSubText(li, subEl) {
+      const name = subEl.getAttribute('data-subfield');
+      const repItem = subEl.closest('[data-rep-item]'); if (!repItem) return false;
+      const repWrap = repItem.closest('[data-rep]'); if (!repWrap) return false;
+      const f = SPECS[li.dataset.kind].fields.find((x) => x.n === repWrap.getAttribute('data-rep'));
+      const sf = f && f.item.find((x) => x.n === name);
+      if (!sf || (sf.t !== 'plain' && sf.t !== 'rich')) return false;
+      const itemIdx = [...repWrap.querySelectorAll(':scope > [data-rep-item]')].indexOf(repItem);
+      const b = cards().indexOf(li);
+      const doc = preview.contentDocument;
+      const block = doc && doc.querySelector(`[data-cms-block="${b}"]`);
+      const itemEl = block && block.querySelector(`[data-cms-item="${itemIdx}"]`);
+      const target = itemEl && itemEl.querySelector(`[data-cms-field="${name}"]`);
+      if (!target) return false;
+      if (sf.t === 'rich') target.innerHTML = subEl.value; else target.textContent = subEl.value;
+      return true;
+    }
+
     list.addEventListener('input', (e) => {
       const li = e.target.closest('[data-block]'); if (!li) return;
+      setState('saving');
+      const subEl = e.target.closest('[data-subfield]');
+      if (subEl) { if (liveSubText(li, subEl)) schedule(save); else schedule(saveAndReload); return; }
       const fieldEl = e.target.closest('[data-field]'); if (!fieldEl) return;
       const name = fieldEl.getAttribute('data-field');
       const f = SPECS[li.dataset.kind].fields.find((x) => x.n === name);
-      setState('saving');
       if (f && (f.t === 'plain' || f.t === 'rich')) {
         if (liveText(li, name)) schedule(save); else schedule(saveAndReload);
       } else schedule(saveAndReload); // toggle / select change the layout → reload
     });
-    wireUpload(list, '.zz-imgval', saveAndReload);
+    wireUpload(list, saveAndReload);
+
+    // Repeater item drag-reorder — one Sortable per repeater container, set up lazily.
+    const repSortables = new WeakSet();
+    function ensureRepSortable(wrap) {
+      if (!window.Sortable || repSortables.has(wrap)) return;
+      repSortables.add(wrap);
+      new Sortable(wrap, { handle: '.rep-grip', animation: 150, ghostClass: 'dragging', onEnd: saveAndReload });
+    }
+    const initRepSortables = (scope) => scope.querySelectorAll('[data-rep]').forEach(ensureRepSortable);
+
     list.addEventListener('click', (e) => {
-      if (e.target.matches('[data-remove]')) { const li = e.target.closest('[data-block]'); confirmRemove(li, () => { li.remove(); renumber(); saveAndReload(); }); }
+      if (e.target.matches('[data-remove]')) { const li = e.target.closest('[data-block]'); confirmRemove(li, () => { li.remove(); renumber(); saveAndReload(); }); return; }
+      if (e.target.matches('[data-rep-remove]')) { const item = e.target.closest('[data-rep-item]'); confirmRemove(item, () => { item.remove(); saveAndReload(); }); return; }
+      if (e.target.matches('[data-rep-add]')) {
+        const li = e.target.closest('[data-block]');
+        const f = SPECS[li.dataset.kind].fields.find((x) => x.n === e.target.getAttribute('data-rep-add'));
+        const wrap = li.querySelector(`[data-rep="${f.n}"]`);
+        const def = {}; for (const sf of f.item) def[sf.n] = subDefault(sf);
+        const tmp = document.createElement('div'); tmp.innerHTML = repeaterItemHtml(f, def);
+        const node = tmp.firstElementChild; wrap.appendChild(node);
+        ensureRepSortable(wrap);
+        const first = node.querySelector('[data-subfield]'); if (first && first.focus) first.focus();
+        saveAndReload();
+      }
     });
     list.addEventListener('focusin', (e) => {
       const li = e.target.closest('[data-block]'); if (!li) return;
@@ -407,8 +544,8 @@ const config = {
         b.textContent = '+ ' + (config.addLabel || SPECS[kind].label);
         b.addEventListener('click', () => {
           const li = makeCard(kind, JSON.parse(JSON.stringify(DEFAULTS[kind])));
-          list.appendChild(li); renumber();
-          const first = li.querySelector('[data-field]'); if (first && first.focus) first.focus();
+          list.appendChild(li); renumber(); initRepSortables(li);
+          const first = li.querySelector('[data-field], [data-subfield]'); if (first && first.focus) first.focus();
           saveAndReload();
         });
         paletteEl.appendChild(b);
@@ -423,5 +560,6 @@ const config = {
       list.appendChild(makeCard(config.single, JSON.parse(JSON.stringify(DEFAULTS[config.single]))));
     }
     renumber();
+    initRepSortables(list);
   </script>
 </AdminLayout>

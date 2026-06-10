@@ -1,0 +1,23 @@
+---
+// large-image-block: a big image beside a heading + rich body. Markup/classes
+// copied from the mirror so the theme CSS styles it identically.
+import CmsImage from './CmsImage.astro';
+import type { ImageBlockData } from '../lib/content';
+type Props = ImageBlockData;
+const { img = {}, heading = '', body = '' } = Astro.props;
+---
+<section class="large-image-block">
+  <div class="large-image-block-container">
+    <div class="cell image-container medium-5 medium-order-2">
+      <div class="image">
+        <CmsImage img={img} />
+      </div>
+    </div>
+    <div class="medium-6 large-6 medium-order-1  content-container">
+      <div class="content">
+        <h3 data-cms-field="heading">{heading}</h3>
+        <div data-cms-field="body" set:html={body}></div>
+      </div>
+    </div>
+  </div>
+</section>

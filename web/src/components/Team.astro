@@ -1,0 +1,35 @@
+---
+// team-members: a heading + headshot cards + a button. Each member is a repeater
+// item. Headshots are CSS background-images (the theme styles a fixed box), so
+// `bg` holds the full CSS background-image value. Markup copied from the mirror.
+import type { TeamData } from '../lib/content';
+type Props = TeamData;
+const { heading = '', members = [], label = '', href = '' } = Astro.props;
+---
+<section class="team-members">
+  <div class="grid-container">
+    <div class="grid-x grid-padding-x">
+      <div class="cell small-12">
+        <div class="section-title text-center">
+          <h3 style="color: #2D3648;" data-cms-field="heading">{heading}</h3>
+        </div>
+      </div>
+      {members.map((m, i) => (
+        <div class="cell medium-6 large-4" data-cms-item={i}>
+          <div class="team-member">
+            <div class="team-member__headshot" style={`background-image: ${m.bg ?? ''};`}></div>
+            <div class="creds">
+              <p class="name" data-cms-field="name">{m.name}</p>
+              <p class="role" data-cms-field="role">{m.role}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+      {label && (
+        <div class="cell text-center">
+          <a class="button" href={href || '#'} target="_self" data-cms-field="label">{label}</a>
+        </div>
+      )}
+    </div>
+  </div>
+</section>

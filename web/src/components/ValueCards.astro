@@ -1,0 +1,34 @@
+---
+// icon-item-row: a heading + a grid of coloured icon cards. Each card is a
+// repeater item (icon + title + text + a colour-preset). Markup/classes copied
+// from the mirror; data-cms-item / data-cms-field hooks drive the editor.
+import CmsImage from './CmsImage.astro';
+import { VALUE_CARD_STYLES, type ValueCardsData } from '../lib/content';
+type Props = ValueCardsData;
+const { heading = '', cards = [] } = Astro.props;
+const palette = (style?: string) => VALUE_CARD_STYLES[style ?? 'navy'] ?? VALUE_CARD_STYLES.navy;
+---
+<section class="icon-item-row alt-background" style="background-image: url('');">
+  <div class="grid-container">
+    <div class="grid-x grid-padding-x grid-padding-y align-center">
+      <div class="cell section-title text-center">
+        <h3 data-cms-field="heading">{heading}</h3>
+      </div>
+      {cards.map((c, i) => (
+        <div class="cell medium-6 large-4" data-cms-item={i}>
+          <div class="card " style={`color:${palette(c.style).color}; background:${palette(c.style).bg}; `}>
+            <div class="card-header">
+              <CmsImage img={c.img} alt="Icon" />
+              <strong class="title" data-cms-field="title">{c.title}</strong>
+            </div>
+            <div class="card-text" data-cms-field="text" set:html={c.text}></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+  <svg class="circle-set show-for-large" xmlns="http://www.w3.org/2000/svg" width="211" height="314" viewBox="0 0 211 314" fill="none">
+    <circle class="circle-1" cx="75.1209" cy="125.121" r="104.056" transform="rotate(13.2389 75.1209 125.121)" fill="#DAB527" fill-opacity="0.65"></circle>
+    <circle class="circle-2" cx="132.207" cy="235.004" r="65.1846" transform="rotate(13.2389 132.207 235.004)" fill="#F9A5A2"></circle>
+  </svg>
+</section>

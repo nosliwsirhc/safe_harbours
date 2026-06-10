@@ -1,0 +1,21 @@
+---
+// banner-bar (white rounded band): a heading beside a paragraph. Markup/classes
+// copied from the mirror so the theme CSS styles it identically.
+import type { BannerData } from '../lib/content';
+type Props = BannerData;
+const { heading = '', body = '' } = Astro.props;
+---
+<div class="banner-bar shorten">
+  <div class="grid-container">
+    <div class="content-wrap">
+      <div class="grid-x grid-padding-x">
+        <div class="cell medium-6 large-5">
+          <h2 data-cms-field="heading">{heading}</h2>
+        </div>
+        <div class="cell medium-6 large-7 editor-content">
+          <div data-cms-field="body" set:html={body}></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

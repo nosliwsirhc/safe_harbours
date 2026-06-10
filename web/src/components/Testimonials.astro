@@ -1,0 +1,29 @@
+---
+// testimonial cards: a row of quote + author + role cards. Each is a repeater
+// item; every other card is tinted gold via `.middle-child`. Markup/classes +
+// the decorative quote SVG are copied from the mirror.
+import type { TestimonialsData } from '../lib/content';
+type Props = TestimonialsData;
+const { items = [] } = Astro.props;
+---
+<div class="testimonial">
+  <div class="grid-container">
+    <div class="grid-x grid-padding-x grid-padding-y" data-equalizer data-equalize-on-stack="true">
+      {items.map((t, i) => (
+        <div class="cell medium-6 large-4" data-cms-item={i}>
+          <div class={`testimonial-card ${i % 2 === 1 ? 'middle-child' : ''}`} data-equalizer-watch>
+            <div class="quote" data-cms-field="quote">{t.quote}</div>
+            <div class="creds">
+              <div class="author" data-cms-field="author">{t.author}</div>
+              <div class="role" data-cms-field="role">{t.role}</div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="74" height="64" viewBox="0 0 74 64" fill="none">
+                <path d="M55.9749 0.00159073C65.4209 0.0127096 73.0741 7.84042 73.0847 17.4996V17.5869C73.0847 17.6441 73.0922 17.7315 73.0983 17.8459C73.4487 24.2011 72.4337 41.3592 55.4599 63.3444C55.1019 63.8067 54.4449 63.8861 53.9918 63.5192C53.6459 63.238 53.5084 62.7662 53.6504 62.3374C53.6987 62.1912 58.3372 47.9813 55.1684 34.9769C45.7284 34.5242 38.4362 26.3312 38.8787 16.6768C39.3077 7.34007 46.8385 -0.00476293 55.9794 2.31741e-06H55.9749V0.00159073Z" fill="#F88E8A"></path>
+                <path d="M17.1154 0.00159073C26.5614 0.0127096 34.2146 7.84042 34.2252 17.4996V17.5869C34.2252 17.6441 34.2327 17.7315 34.2388 17.8459C34.5892 24.2011 33.5742 41.3592 16.6004 63.3444C16.2424 63.8067 15.5854 63.8861 15.1323 63.5192C14.7864 63.238 14.6489 62.7662 14.7909 62.3374C14.8392 62.1912 19.4777 47.9813 16.3089 34.9769C6.86889 34.5258 -0.424809 26.3328 0.0192469 16.6784C0.446689 7.34007 7.97752 -0.00476293 17.1199 2.31741e-06H17.1154V0.00159073Z" fill="#F88E8A"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>

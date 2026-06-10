@@ -1,24 +1,48 @@
 ---
-// Call-to-action band, using the theme's .global-cta styling. `variant` tints it
-// light or dark. data-cms-field hooks let the composer update the preview live.
+// global-cta band: heading + rich body + a link, beside the decorative
+// "Get Started" illustration. Markup/classes + the decorative circles/image are
+// copied from the mirror so the theme CSS styles it identically. The illustration
+// is fixed design furniture; only the text + link are editable.
 import type { CtaData } from '../lib/content';
 type Props = CtaData;
-const { heading = '', body = '', label = '', href = '', variant = 'light' } = Astro.props;
+const { heading = '', body = '', label = '', href = '' } = Astro.props;
 ---
-<section class={`global-cta cta--${variant}`}>
+<section class="global-cta">
   <div class="grid-container">
-    <div class="content">
-      <h3 data-cms-field="heading">{heading}</h3>
-      <div class="cta-body" data-cms-field="body" set:html={body}></div>
-      {label && (
-        <p><a href={href || '#'} class="cta-link">{label}</a></p>
-      )}
+    <div class="grid-x grid-padding-x">
+      <div class="medium-6 medium-order-2 content-container">
+        <div class="content">
+          <h3 data-cms-field="heading">{heading}</h3>
+          <div data-cms-field="body" set:html={body}></div>
+          {label && (
+            <p><a href={href || '#'} data-cms-field="label">{label}</a></p>
+          )}
+        </div>
+      </div>
+      <div class="medium-6 medium-order-1">
+        <div class="image">
+          <span class="circle-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="261" height="261" viewBox="0 0 261 261" fill="none">
+              <path d="M251.597 177.225C225.787 244.054 150.689 277.307 83.8591 251.498C17.0296 225.688 -16.2237 150.59 9.5858 83.7602C35.3953 16.9308 110.494 -16.3225 177.323 9.48695C244.153 35.2964 277.406 110.395 251.597 177.225Z" fill="#F88E8A" fill-opacity="0.85"></path>
+            </svg>
+          </span>
+          <span class="circle-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="341" height="341" viewBox="0 0 341 341" fill="none">
+              <circle cx="170.5" cy="170.5" r="170.5" fill="#DAB527" fill-opacity="0.89"></circle>
+            </svg>
+          </span>
+          <span class="circle-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="168" height="168" viewBox="0 0 168 168" fill="none">
+              <circle opacity="0.7" cx="83.7881" cy="84.284" r="83.3794" transform="rotate(21.1165 83.7881 84.284)" fill="#ECD455"></circle>
+            </svg>
+          </span>
+          <picture>
+            <source type="image/avif" srcset="/assets/uploads/2024/10/GetStarted-Global-640.avif 640w, /assets/uploads/2024/10/GetStarted-Global-1024.avif 1024w, /assets/uploads/2024/10/GetStarted-Global-1440.avif 1440w, /assets/uploads/2024/10/GetStarted-Global-1920.avif 1920w" sizes="100vw" />
+            <source type="image/webp" srcset="/assets/uploads/2024/10/GetStarted-Global-640.webp 640w, /assets/uploads/2024/10/GetStarted-Global-1024.webp 1024w, /assets/uploads/2024/10/GetStarted-Global-1440.webp 1440w, /assets/uploads/2024/10/GetStarted-Global-1920.webp 1920w" sizes="100vw" />
+            <img alt="" src="/assets/uploads/2024/10/GetStarted-Global.png" decoding="async" loading="lazy" width="2629" height="2018" />
+          </picture>
+        </div>
+      </div>
     </div>
   </div>
 </section>
-
-<style is:global>
-  .cta--dark { background: #2a2f3a; color: #fff; }
-  .cta--dark a { color: #f4c542; }
-  .global-cta .cta-link { display: inline-block; margin-top: 0.5rem; font-weight: 700; }
-</style>

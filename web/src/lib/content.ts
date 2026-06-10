@@ -52,6 +52,84 @@ export interface CtaData {
   variant?: 'light' | 'dark';
 }
 
+// --- Richer page-section blocks (used on the fully-composed pages) ---
+
+/** banner-bar: a heading + paragraph in the white rounded band. */
+export interface BannerData {
+  heading?: string;
+  body?: string;
+}
+
+/** icon-item-row: a heading + a grid of coloured icon cards. */
+export interface ValueCard {
+  img?: ZigImage;
+  title?: string;
+  text?: string;
+  style?: 'navy' | 'pink' | 'lightpink'; // preset colour scheme
+}
+
+/** Map a value-card style preset → its text + background colours. */
+export const VALUE_CARD_STYLES: Record<string, { color: string; bg: string }> = {
+  navy: { color: '#ffffff', bg: '#394254' },
+  pink: { color: '#394254', bg: '#f88e8a' },
+  lightpink: { color: '#2d3648', bg: '#f9a5a2' },
+};
+export interface ValueCardsData {
+  heading?: string;
+  cards?: ValueCard[];
+}
+
+/** large-image-block: a big image beside a heading + rich body. */
+export interface ImageBlockData {
+  img?: ZigImage;
+  heading?: string;
+  body?: string;
+}
+
+/** team-members: a heading + headshot cards + a button. Headshots are CSS bg. */
+export interface TeamMember {
+  bg?: string; // full CSS background-image value (image-set(...) or url(...))
+  name?: string;
+  role?: string;
+}
+export interface TeamData {
+  heading?: string;
+  members?: TeamMember[];
+  label?: string;
+  href?: string;
+}
+
+/** testimonial cards: quote + author + role. */
+export interface Testimonial {
+  quote?: string;
+  author?: string;
+  role?: string;
+}
+export interface TestimonialsData {
+  items?: Testimonial[];
+}
+
+/** logos strip: a heading + a row of logo images. */
+export interface LogoItem {
+  img?: ZigImage;
+}
+export interface LogosData {
+  heading?: string;
+  logos?: LogoItem[];
+}
+
+/** large-list: a heading + term/description list + a button. */
+export interface ListItem {
+  heading?: string;
+  text?: string;
+}
+export interface LargeListData {
+  heading?: string;
+  items?: ListItem[];
+  label?: string;
+  href?: string;
+}
+
 function db(): D1Database | null {
   const d = (env as unknown as { DB?: D1Database }).DB;
   return d ?? null;
