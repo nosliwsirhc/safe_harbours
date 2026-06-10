@@ -34,7 +34,8 @@
     "@lexical/rich-text": "^0.45.0",
     "@lexical/utils": "^0.45.0",
     "astro": "^6.4.2",
-    "lexical": "^0.45.0"
+    "lexical": "^0.45.0",
+    "xss": "^1.0.15"
   },
   "overrides": {
     "undici": "^7.26.0",

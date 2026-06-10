@@ -277,6 +277,34 @@ const previewSrc = `${page.path}?preview=1`;
     }
     function schedule(fn) { clearTimeout(timer); timer = setTimeout(fn, 700); }
 
+    // Shared image-upload wiring (used by the zig-zag + composer modes). Opens the
+    // file dialog on the "Upload image…" button and POSTs the file to be resized;
+    // the returned manifest is written into `valSel`'s hidden input. `onDone` runs
+    // on success (a save+reload, since the image is a structural change).
+    function wireUpload(list, valSel, onDone) {
+      list.addEventListener('click', (e) => {
+        if (e.target.matches('.zz-upload')) e.target.closest('.zz-image').querySelector('.zz-file').click();
+      });
+      list.addEventListener('change', async (e) => {
+        if (!e.target.matches('.zz-file') || !e.target.files[0]) return;
+        const wrap = e.target.closest('.zz-image');
+        const msg = wrap.querySelector('.zz-upmsg');
+        msg.textContent = 'Resizing…';
+        const fd = new FormData(); fd.append('file', e.target.files[0]);
+        try {
+          const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
+          const d = await res.json();
+          if (d.ok) {
+            wrap.querySelector(valSel).value = JSON.stringify(d.img);
+            const t = wrap.querySelector('.zz-thumb'); t.src = d.img.jpg; t.hidden = false;
+            msg.textContent = '';
+            onDone();
+          } else msg.textContent = d.error || 'Upload failed';
+        } catch { msg.textContent = 'Upload failed'; }
+        e.target.value = '';
+      });
+    }
+
     document.getElementById('retry').addEventListener('click', () => { if (lastSave) lastSave(); });
     publishBtn.addEventListener('click', async () => {
       publishBtn.disabled = true; publishBtn.textContent = 'Publishing…';
@@ -359,30 +387,12 @@ const previewSrc = `${page.path}?preview=1`;
         else { liveText(li); setState('saving'); schedule(save); }
       });
       list.addEventListener('click', (e) => {
-        if (e.target.matches('.zz-upload')) { e.target.closest('.zz-image').querySelector('.zz-file').click(); return; }
         if (e.target.matches('[data-remove]')) {
           const li = e.target.closest('[data-zz-row]');
           confirmRemove(li, () => { li.remove(); renumber(); saveAndReload(); });
         }
       });
-      list.addEventListener('change', async (e) => {
-        if (!e.target.matches('.zz-file') || !e.target.files[0]) return;
-        const wrap = e.target.closest('.zz-image');
-        const msg = wrap.querySelector('.zz-upmsg');
-        msg.textContent = 'Resizing…';
-        const fd = new FormData(); fd.append('file', e.target.files[0]);
-        try {
-          const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
-          const d = await res.json();
-          if (d.ok) {
-            wrap.querySelector('.zz-img').value = JSON.stringify(d.img);
-            const t = wrap.querySelector('.zz-thumb'); t.src = d.img.jpg; t.hidden = false;
-            msg.textContent = '';
-            saveAndReload();
-          } else { msg.textContent = d.error || 'Upload failed'; }
-        } catch { msg.textContent = 'Upload failed — check your connection'; }
-        e.target.value = '';
-      });
+      wireUpload(list, '.zz-img', saveAndReload);
       list.addEventListener('focusin', (e) => { const li = e.target.closest('[data-zz-row]'); if (li) { const i = [...list.querySelectorAll('[data-zz-row]')].indexOf(li); const row = previewRows()[i]; if (row) row.scrollIntoView({ block: 'center', behavior: 'smooth' }); } });
       document.getElementById('zzadd').addEventListener('click', () => {
         const li = document.createElement('li');
@@ -485,20 +495,8 @@ const previewSrc = `${page.path}?preview=1`;
           if (liveText(li, name)) schedule(save); else schedule(saveAndReload);
         } else schedule(saveAndReload);
       });
-      list.addEventListener('change', async (e) => {
-        if (!e.target.matches('.zz-file') || !e.target.files[0]) return;
-        const wrap = e.target.closest('.zz-image'); const msg = wrap.querySelector('.zz-upmsg'); msg.textContent = 'Resizing…';
-        const fd = new FormData(); fd.append('file', e.target.files[0]);
-        try {
-          const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
-          const d = await res.json();
-          if (d.ok) { wrap.querySelector('.zz-imgval').value = JSON.stringify(d.img); const t = wrap.querySelector('.zz-thumb'); t.src = d.img.jpg; t.hidden = false; msg.textContent = ''; saveAndReload(); }
-          else msg.textContent = d.error || 'Upload failed';
-        } catch { msg.textContent = 'Upload failed'; }
-        e.target.value = '';
-      });
+      wireUpload(list, '.zz-imgval', saveAndReload);
       list.addEventListener('click', (e) => {
-        if (e.target.matches('.zz-upload')) { e.target.closest('.zz-image').querySelector('.zz-file').click(); return; }
         if (e.target.matches('[data-remove]')) { const li = e.target.closest('[data-block]'); confirmRemove(li, () => { li.remove(); saveAndReload(); }); }
       });
       list.addEventListener('focusin', (e) => {
