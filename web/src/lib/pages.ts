@@ -100,6 +100,14 @@ export const EDITABLE_PAGES: EditablePage[] = [
     blurb: 'The full terms & conditions text.',
     palette: ALL_KINDS,
   },
+  {
+    key: 'thank-you-fostering',
+    slot: 'main',
+    name: 'Thank You (fostering)',
+    path: '/thank-you-fostering',
+    blurb: 'The confirmation page shown after the foster-parent form.',
+    palette: ALL_KINDS,
+  },
 ];
 
 export function findPage(key: string): EditablePage | undefined {
