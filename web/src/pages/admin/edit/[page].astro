@@ -422,6 +422,12 @@ const config = {
       richSection: { label: 'Custom section', fields: [
         { n: 'body', t: 'rich', l: 'Content' },
       ] },
+      homeHero: { label: 'Home hero', fields: [
+        { n: 'heading', t: 'plain', l: 'Title' },
+        { n: 'intro', t: 'rich', l: 'Intro' },
+        { n: 'featureHeading', t: 'plain', l: 'Feature heading' },
+        { n: 'featureBody', t: 'rich', l: 'Feature text' },
+      ] },
     };
     const DEFAULTS = {
       hero: { lead: '', heading: 'New heading', intro: '<p></p>', bg: '' },
@@ -445,6 +451,7 @@ const config = {
       map: { embed: '' },
       eventSection: { eyebrow: 'Start Here.', heading: 'Book a call', body: '<p></p>', calendlyUrl: '' },
       richSection: { sectionClass: 'editor-content', body: '<p></p>' },
+      homeHero: { heading: 'New heading', intro: '<p></p>', featureHeading: '', featureBody: '<p></p>' },
     };
     // Default value for a freshly-added repeater sub-field.
     const subDefault = (sf) => sf.t === 'image' ? {} : sf.t === 'toggle' ? false : sf.t === 'rich' ? '<p></p>' : sf.t === 'select' ? (sf.opts[0] ? sf.opts[0][0] : '') : '';

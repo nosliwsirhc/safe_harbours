@@ -1,0 +1,50 @@
+---
+// The home hero: an autoplay background video (driven by the per-page theme JS),
+// a mobile fallback image, the headline/intro/links, and a feature row. Markup +
+// decorative circles + the video/images are copied from the mirror; the headline,
+// intro and feature text are editable.
+import type { HomeHeroData } from '../lib/content';
+type Props = HomeHeroData;
+const { heading = '', intro = '', featureHeading = '', featureBody = '' } = Astro.props;
+---
+<div class="hero">
+  <div class="overlay"></div>
+  <div class="background-video show-for-large">
+    <video muted loop playsinline data-autoplay preload="none">
+      <source src="/assets/uploads/2024/10/grandparent-girl-and-teaching-to-read-in-home-wit-2023-12-11-16-15-18-utc.mp4" type="video/mp4" />
+    </video>
+  </div>
+  <div class="background-image" style="background-image: image-set(url('/assets/uploads/2024/10/Hero-Mobile-1-scaled-e1728576191410-524.avif') type('image/avif'), url('/assets/uploads/2024/10/Hero-Mobile-1-scaled-e1728576191410-524.webp') type('image/webp'), url('/assets/uploads/2024/10/Hero-Mobile-1-scaled-e1728576191410.jpg'));"></div>
+  <div class="content">
+    <h1 data-cms-field="heading">{heading}</h1>
+    <div class="introduction" data-cms-field="intro" set:html={intro}></div>
+    <div class="links">
+      <a class="button" href="/become-a-foster-parent/" aria-label="Get Started: Become A Foster Parent">Get Started</a>
+      <a class="button-secondary" href="/about-fostering/">Learn About Fostering</a>
+    </div>
+    <svg class="hero-circle-1 show-for-large" xmlns="http://www.w3.org/2000/svg" width="174" height="174" viewBox="0 0 174 174" fill="none"><circle cx="87" cy="87" r="87" fill="#DAB527" fill-opacity="0.89"></circle></svg>
+    <svg class="hero-circle-2" xmlns="http://www.w3.org/2000/svg" width="109" height="109" viewBox="0 0 109 109" fill="none"><circle cx="54.5" cy="54.5" r="54.5" fill="#F9A5A2"></circle></svg>
+  </div>
+  <div class="feature grid-container">
+    <div class="grid-x grid-padding-x align-middle">
+      <div class="medium-6 medium-order-2">
+        <div class="featured-intro">
+          <h3 data-cms-field="featureHeading">{featureHeading}</h3>
+          <div data-cms-field="featureBody" set:html={featureBody}></div>
+        </div>
+      </div>
+      <div class="medium-6 medium-order-1 image-container">
+        <div class="image">
+          <span class="circle-1"><svg xmlns="http://www.w3.org/2000/svg" width="168" height="168" viewBox="0 0 168 168" fill="none"><circle opacity="0.7" cx="83.7881" cy="84.284" r="83.3794" transform="rotate(21.1165 83.7881 84.284)" fill="#DAB527"></circle></svg></span>
+          <span class="circle-2"><svg xmlns="http://www.w3.org/2000/svg" width="341" height="341" viewBox="0 0 341 341" fill="none"><circle cx="170.5" cy="170.5" r="170.5" fill="#ECD455" fill-opacity="0.89"></circle></svg></span>
+          <span class="circle-3"><svg xmlns="http://www.w3.org/2000/svg" width="261" height="261" viewBox="0 0 261 261" fill="none"><path d="M251.597 177.225C225.787 244.054 150.689 277.307 83.8591 251.498C17.0296 225.688 -16.2237 150.59 9.5858 83.7602C35.3953 16.9308 110.494 -16.3225 177.323 9.48695C244.153 35.2964 277.406 110.395 251.597 177.225Z" fill="#F88E8A" fill-opacity="0.85"></path></svg></span>
+          <picture>
+            <source type="image/avif" srcset="/assets/uploads/2024/10/Family-Home-e1728610237634-640.avif 640w, /assets/uploads/2024/10/Family-Home-e1728610237634-1024.avif 1024w, /assets/uploads/2024/10/Family-Home-e1728610237634-1440.avif 1440w, /assets/uploads/2024/10/Family-Home-e1728610237634-1920.avif 1920w" sizes="100vw" />
+            <source type="image/webp" srcset="/assets/uploads/2024/10/Family-Home-e1728610237634-640.webp 640w, /assets/uploads/2024/10/Family-Home-e1728610237634-1024.webp 1024w, /assets/uploads/2024/10/Family-Home-e1728610237634-1440.webp 1440w, /assets/uploads/2024/10/Family-Home-e1728610237634-1920.webp 1920w" sizes="100vw" />
+            <img alt="" src="/assets/uploads/2024/10/Family-Home-e1728610237634.png" decoding="async" loading="eager" width="2358" height="1874" />
+          </picture>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -99,6 +99,16 @@ export interface MapData {
 export interface RichSectionData {
   sectionClass?: string;
   body?: string;
+  bg?: string; // inline background-image (CSS image-set/url)
+  innerClass?: string; // extra classes on the inner grid-container
+}
+
+/** The home hero: an autoplay background video + content + a feature row. */
+export interface HomeHeroData {
+  heading?: string;
+  intro?: string;
+  featureHeading?: string;
+  featureBody?: string;
 }
 
 /** icon-item-row: a heading + a grid of coloured icon cards. */
