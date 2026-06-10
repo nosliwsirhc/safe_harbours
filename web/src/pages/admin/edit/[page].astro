@@ -114,7 +114,7 @@ const config = {
     .pane--edit .rt:focus-within { outline: 2px solid var(--brand); border-color: var(--brand); }
     .pane--edit .rt-toolbar { display: flex; gap: 0.15rem; padding: 0.25rem; border-bottom: 1px solid var(--line); background: #f7f8fa; }
     .pane--edit .rt-toolbar button { font: inherit; font-size: 0.85rem; min-width: 2.25rem; min-height: 2rem; padding: 0.25rem 0.55rem; border: 1px solid transparent; background: transparent; border-radius: 5px; cursor: pointer; color: var(--ink); }
-    .pane--edit .rt-toolbar button[aria-pressed='true'] { background: #dde0e8; color: var(--brand-deep); }
+    .pane--edit .rt-toolbar button[aria-pressed='true'] { background: var(--control-active); color: var(--brand-deep); }
     .pane--edit .rt-toolbar button:hover { background: #e6e8ee; }
     .pane--edit .rt-editor { min-height: 3.5rem; padding: 0.55rem 0.65rem; font: inherit; outline: none; }
     .pane--edit .rt-editor:empty::before { content: 'Write here…'; color: #aab0bb; }
@@ -125,11 +125,13 @@ const config = {
     .pane--edit .section.confirming { border-color: #d99; background: #fdf3f3; }
     .pane--edit .section__head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
     .pane--edit .head-spacer { flex: 1; }
-    .pane--edit .grip { cursor: grab; background: var(--line); border: 0; color: #5b6270; font-size: 1.05rem; line-height: 1; padding: 0.25rem 0.5rem; border-radius: 6px; }
+    .pane--edit .grip { cursor: grab; background: var(--line); border: 0; color: var(--grip-fg); font-size: 1.05rem; line-height: 1; padding: 0.25rem 0.5rem; border-radius: 6px; }
     .pane--edit .grip:hover { background: #d7dae1; }
     .pane--edit .grip:active { cursor: grabbing; }
-    .pane--edit .moveb { min-width: 1.9rem; min-height: 1.9rem; border: 1px solid var(--line); background: #fff; color: #5b6270; font-size: 0.95rem; line-height: 1; border-radius: 6px; cursor: pointer; }
-    .pane--edit .moveb:hover { background: #f0f1f4; color: var(--brand-deep); }
+    .pane--edit .moveb { min-width: 1.9rem; min-height: 1.9rem; border: 1px solid var(--line); background: #fff; color: var(--grip-fg); font-size: 0.95rem; line-height: 1; border-radius: 6px; cursor: pointer; }
+    .pane--edit .moveb:hover { background: var(--control-active); color: var(--brand-deep); }
+    .pane--edit .moveb:disabled { opacity: 0.3; cursor: default; }
+    .pane--edit .moveb:disabled:hover { background: #fff; color: var(--grip-fg); }
     .pane--edit .zz-num { font-family: Montserrat, sans-serif; font-weight: 700; font-size: 0.85rem; color: var(--brand-deep); }
     .pane--edit .rev { display: flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; color: var(--muted); margin-top: 0.6rem; }
     .pane--edit .rev input { width: auto; }
@@ -148,7 +150,7 @@ const config = {
     .pane--edit .rep-item { border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 8px; padding: 0.6rem 0.7rem; background: #fbfbfc; }
     .pane--edit .rep-item.confirming { border-color: #d99; background: #fdf3f3; }
     .pane--edit .rep-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem; }
-    .pane--edit .rep-grip { cursor: grab; background: var(--line); border: 0; color: #5b6270; font-size: 1rem; line-height: 1; padding: 0.15rem 0.45rem; border-radius: 6px; }
+    .pane--edit .rep-grip { cursor: grab; background: var(--line); border: 0; color: var(--grip-fg); font-size: 1rem; line-height: 1; padding: 0.15rem 0.45rem; border-radius: 6px; }
     .pane--edit .rep-grip:hover { background: #d7dae1; }
     .pane--edit .rep-grip:active { cursor: grabbing; }
     .pane--edit .rep-add { width: 100%; }
@@ -558,31 +560,57 @@ const config = {
     function ensureRepSortable(wrap) {
       if (!window.Sortable || repSortables.has(wrap)) return;
       repSortables.add(wrap);
-      new Sortable(wrap, { handle: '.rep-grip', animation: 150, ghostClass: 'dragging', onEnd: saveAndReload });
+      new Sortable(wrap, { handle: '.rep-grip', animation: 150, ghostClass: 'dragging', onEnd: () => { saveAndReload(); syncMoveButtons(); } });
     }
     const initRepSortables = (scope) => scope.querySelectorAll('[data-rep]').forEach(ensureRepSortable);
 
     // Keyboard-accessible reorder (the drag grip is mouse-only): move a block or
-    // a repeater item past its same-type sibling, keeping focus on the button.
+    // a repeater item past its same-type sibling.
     function moveEl(el, dir, match) {
       const sib = dir === 'up' ? el.previousElementSibling : el.nextElementSibling;
       if (!sib || !sib.matches(match)) return false;
       if (dir === 'up') el.parentNode.insertBefore(el, sib); else el.parentNode.insertBefore(sib, el);
       return true;
     }
+    // Disable the ↑ of the first / ↓ of the last item so the edge buttons aren't
+    // focusable no-ops. Runs after every add/remove/reorder.
+    function syncMoveButtons() {
+      const blocks = cards();
+      blocks.forEach((li, i) => {
+        const up = li.querySelector('.section__head [data-move="up"]');
+        const down = li.querySelector('.section__head [data-move="down"]');
+        if (up) up.disabled = i === 0;
+        if (down) down.disabled = i === blocks.length - 1;
+      });
+      for (const wrap of list.querySelectorAll('[data-rep]')) {
+        const items = [...wrap.querySelectorAll(':scope > [data-rep-item]')];
+        items.forEach((item, i) => {
+          const up = item.querySelector('.rep-head [data-rep-move="up"]');
+          const down = item.querySelector('.rep-head [data-rep-move="down"]');
+          if (up) up.disabled = i === 0;
+          if (down) down.disabled = i === items.length - 1;
+        });
+      }
+    }
+    // After a move, keep focus on a still-enabled move button of the same item.
+    function refocusMove(el, btn) {
+      if (!btn.disabled) { btn.focus(); return; }
+      const alt = el.querySelector((btn.matches('[data-move]') ? '[data-move]' : '[data-rep-move]') + ':not([disabled])');
+      if (alt) alt.focus();
+    }
     list.addEventListener('click', (e) => {
       if (e.target.matches('[data-move]')) {
         const li = e.target.closest('[data-block]');
-        if (moveEl(li, e.target.getAttribute('data-move'), '[data-block]')) { renumber(); saveAndReload(); e.target.focus(); }
+        if (moveEl(li, e.target.getAttribute('data-move'), '[data-block]')) { renumber(); syncMoveButtons(); saveAndReload(); refocusMove(li, e.target); }
         return;
       }
       if (e.target.matches('[data-rep-move]')) {
         const item = e.target.closest('[data-rep-item]');
-        if (moveEl(item, e.target.getAttribute('data-rep-move'), '[data-rep-item]')) { saveAndReload(); e.target.focus(); }
+        if (moveEl(item, e.target.getAttribute('data-rep-move'), '[data-rep-item]')) { syncMoveButtons(); saveAndReload(); refocusMove(item, e.target); }
         return;
       }
-      if (e.target.matches('[data-remove]')) { const li = e.target.closest('[data-block]'); confirmRemove(li, () => { li.remove(); renumber(); saveAndReload(); }); return; }
-      if (e.target.matches('[data-rep-remove]')) { const item = e.target.closest('[data-rep-item]'); confirmRemove(item, () => { item.remove(); saveAndReload(); }); return; }
+      if (e.target.matches('[data-remove]')) { const li = e.target.closest('[data-block]'); confirmRemove(li, () => { li.remove(); renumber(); syncMoveButtons(); saveAndReload(); }); return; }
+      if (e.target.matches('[data-rep-remove]')) { const item = e.target.closest('[data-rep-item]'); confirmRemove(item, () => { item.remove(); syncMoveButtons(); saveAndReload(); }); return; }
       if (e.target.matches('[data-rep-add]')) {
         const li = e.target.closest('[data-block]');
         const f = SPECS[li.dataset.kind].fields.find((x) => x.n === e.target.getAttribute('data-rep-add'));
@@ -590,7 +618,7 @@ const config = {
         const def = {}; for (const sf of f.item) def[sf.n] = subDefault(sf);
         const tmp = document.createElement('div'); tmp.innerHTML = repeaterItemHtml(f, def);
         const node = tmp.firstElementChild; wrap.appendChild(node);
-        ensureRepSortable(wrap);
+        ensureRepSortable(wrap); syncMoveButtons();
         const first = node.querySelector('[data-subfield]'); if (first && first.focus) first.focus();
         saveAndReload();
       }
@@ -601,7 +629,7 @@ const config = {
       const doc = preview.contentDocument; const block = doc && doc.querySelector(`[data-cms-block="${i}"]`);
       if (block) block.scrollIntoView({ block: 'center', behavior: 'smooth' });
     });
-    if (!config.single && window.Sortable) new Sortable(list, { handle: '.grip', animation: 150, ghostClass: 'dragging', onEnd: () => { renumber(); saveAndReload(); } });
+    if (!config.single && window.Sortable) new Sortable(list, { handle: '.grip', animation: 150, ghostClass: 'dragging', onEnd: () => { renumber(); syncMoveButtons(); saveAndReload(); } });
 
     const paletteEl = document.getElementById('palette');
     if (paletteEl) {
@@ -611,7 +639,7 @@ const config = {
         b.textContent = '+ ' + (config.addLabel || SPECS[kind].label);
         b.addEventListener('click', () => {
           const li = makeCard(kind, JSON.parse(JSON.stringify(DEFAULTS[kind])));
-          list.appendChild(li); renumber(); initRepSortables(li);
+          list.appendChild(li); renumber(); initRepSortables(li); syncMoveButtons();
           const first = li.querySelector('[data-field], [data-subfield]'); if (first && first.focus) first.focus();
           saveAndReload();
         });
@@ -628,5 +656,6 @@ const config = {
     }
     renumber();
     initRepSortables(list);
+    syncMoveButtons();
   </script>
 </AdminLayout>
