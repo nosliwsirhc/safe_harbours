@@ -108,6 +108,14 @@ export const EDITABLE_PAGES: EditablePage[] = [
     blurb: 'The confirmation page shown after the foster-parent form.',
     palette: ALL_KINDS,
   },
+  {
+    key: 'about-fostering',
+    slot: 'main',
+    name: 'About Fostering',
+    path: '/about-fostering',
+    blurb: 'The whole About Fostering page — intro, values, FAQs, and more.',
+    palette: ALL_KINDS,
+  },
 ];
 
 export function findPage(key: string): EditablePage | undefined {

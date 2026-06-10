@@ -94,7 +94,16 @@ const faqs = block.kind === 'faqs' ? parse<FaqsData>(block.body) : null;
 
   {banner && <Banner heading={banner.heading} body={banner.body} shorten={banner.shorten ?? true} />}
 
-  {valueCards && <ValueCards heading={valueCards.heading} cards={valueCards.cards} />}
+  {valueCards && (
+    <ValueCards
+      heading={valueCards.heading}
+      cards={valueCards.cards}
+      bg={valueCards.bg}
+      alt={valueCards.alt ?? true}
+      large={valueCards.large ?? false}
+      cols={valueCards.cols ?? 3}
+    />
+  )}
 
   {imageBlock && <ImageBlock img={imageBlock.img} heading={imageBlock.heading} body={imageBlock.body} />}
 

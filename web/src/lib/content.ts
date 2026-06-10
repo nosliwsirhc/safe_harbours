@@ -82,18 +82,24 @@ export interface ValueCard {
   img?: ZigImage;
   title?: string;
   text?: string;
-  style?: 'navy' | 'pink' | 'lightpink'; // preset colour scheme
+  style?: 'navy' | 'darknavy' | 'pink' | 'lightpink'; // preset colour scheme
 }
 
 /** Map a value-card style preset → its text + background colours. */
 export const VALUE_CARD_STYLES: Record<string, { color: string; bg: string }> = {
   navy: { color: '#ffffff', bg: '#394254' },
+  darknavy: { color: '#ffffff', bg: '#2d3648' },
   pink: { color: '#394254', bg: '#f88e8a' },
   lightpink: { color: '#2d3648', bg: '#f9a5a2' },
 };
 export interface ValueCardsData {
   heading?: string;
   cards?: ValueCard[];
+  // Layout variants (set per page, preserved through edits — not editor-exposed).
+  bg?: string; // section background-image (CSS image-set/url)
+  alt?: boolean; // the alt-background tint variant (default true)
+  large?: boolean; // the large card variant
+  cols?: 2 | 3; // cards per row on large screens (default 3)
 }
 
 /** large-image-block: a big image beside a heading + rich body. */
