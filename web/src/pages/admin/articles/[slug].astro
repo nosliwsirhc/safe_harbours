@@ -7,6 +7,7 @@ export const prerender = false;
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import { isAuthed } from '../../../lib/admin';
 import { getArticleForView, listAdminArticles, hasUnpublishedChanges } from '../../../lib/articles';
+import '../../../styles/admin-editor.css';
 
 if (!isAuthed(Astro.request)) return Astro.redirect('/admin/login');
 
@@ -22,7 +23,7 @@ const dateStr = Number.isNaN(article.date.getTime()) ? '' : article.date.toISOSt
 const previewSrc = `/resources/${slug}?preview=1`;
 ---
 <AdminLayout title={`Editing ${article.title}`} active="articles">
-  <div id="errbar" class="errbar" hidden>
+  <div id="errbar" class="errbar" role="alert" hidden>
     ⚠ Couldn’t save your changes — check your connection.
     <button type="button" id="retry">Try again</button>
   </div>
@@ -31,7 +32,7 @@ const previewSrc = `/resources/${slug}?preview=1`;
       <div class="topbar">
         <a class="back" href="/admin/articles">← All articles</a>
         <div class="pub">
-          <span class="save" id="save" data-state="saved">Saved</span>
+          <span class="save" id="save" data-state="saved" role="status" aria-live="polite">Saved</span>
           <button type="button" class="btn btn--primary" id="publish" disabled={!unpublished}>Publish changes</button>
         </div>
       </div>
@@ -54,6 +55,7 @@ const previewSrc = `/resources/${slug}?preview=1`;
           <img class="thumb" src={article.heroImage} alt="" hidden={!article.heroImage} />
           <input type="hidden" id="f-heroImage" data-f data-imgval value={article.heroImage} />
           <button type="button" class="btn btn--ghost up">Upload image…</button>
+          <button type="button" class="btn btn--quiet rm" hidden>Remove</button>
           <span class="upmsg muted"></span>
           <input type="file" class="file" accept="image/jpeg,image/png" hidden />
         </div>
@@ -63,6 +65,7 @@ const previewSrc = `/resources/${slug}?preview=1`;
           <img class="thumb" src={article.thumbnail} alt="" hidden={!article.thumbnail} />
           <input type="hidden" id="f-thumbnail" data-f data-imgval value={article.thumbnail} />
           <button type="button" class="btn btn--ghost up">Upload image…</button>
+          <button type="button" class="btn btn--quiet rm" hidden>Remove</button>
           <span class="upmsg muted"></span>
           <input type="file" class="file" accept="image/jpeg,image/png" hidden />
         </div>
@@ -100,17 +103,17 @@ const previewSrc = `/resources/${slug}?preview=1`;
           ))}
         </select>
 
-        <label>Body</label>
-        <div class="rt">
-          <div class="rt-toolbar">
-            <button type="button" data-rt="h2" title="Heading">H2</button>
-            <button type="button" data-rt="h3" title="Subheading">H3</button>
-            <button type="button" data-rt="p" title="Normal text">¶</button>
-            <button type="button" data-rt="ul" title="Bullet list">•</button>
-            <button type="button" data-rt="ol" title="Numbered list">1.</button>
-            <button type="button" data-rt="bold" title="Bold"><b>B</b></button>
-            <button type="button" data-rt="italic" title="Italic"><i>I</i></button>
-            <button type="button" data-rt="link" title="Link">Link</button>
+        <label id="body-label">Body</label>
+        <div class="rt" data-rt-label="Article body">
+          <div class="rt-toolbar" role="toolbar" aria-label="Text formatting">
+            <button type="button" data-rt="h2" title="Heading" aria-label="Heading">H2</button>
+            <button type="button" data-rt="h3" title="Subheading" aria-label="Subheading">H3</button>
+            <button type="button" data-rt="p" title="Normal text" aria-label="Normal text">¶</button>
+            <button type="button" data-rt="ul" title="Bullet list" aria-label="Bullet list">•</button>
+            <button type="button" data-rt="ol" title="Numbered list" aria-label="Numbered list">1.</button>
+            <button type="button" data-rt="bold" title="Bold" aria-label="Bold" aria-pressed="false"><b>B</b></button>
+            <button type="button" data-rt="italic" title="Italic" aria-label="Italic" aria-pressed="false"><i>I</i></button>
+            <button type="button" data-rt="link" title="Link" aria-label="Add link">Link</button>
           </div>
           <div class="rt-editor"></div>
           <input type="hidden" id="f-body" class="rt-value" data-f value={article.body} />
@@ -128,26 +131,6 @@ const previewSrc = `/resources/${slug}?preview=1`;
   </div>
 
   <style>
-    .errbar { background: #fde8e8; color: #9b1c1c; padding: 0.6rem 1.5rem; font-size: 0.9rem; font-weight: 600; display: none; align-items: center; gap: 0.75rem; }
-    .errbar:not([hidden]) { display: flex; }
-    .errbar button { font: inherit; font-weight: 600; cursor: pointer; border: 1px solid #9b1c1c; background: #fff; color: #9b1c1c; border-radius: 6px; padding: 0.2rem 0.6rem; }
-
-    .editor { display: grid; grid-template-columns: minmax(400px, 520px) 1fr; height: calc(100dvh - 53px); }
-    .pane { min-height: 0; }
-    .pane--edit { overflow-y: auto; padding: 1.25rem 1.5rem 4rem; border-right: 1px solid var(--line); background: var(--bg); }
-    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-    .back { font-weight: 600; text-decoration: none; font-size: 0.9rem; }
-    .pub { display: flex; align-items: center; gap: 0.75rem; }
-    h1 { font-size: 1.5rem; margin: 0 0 0.3rem; }
-    .livenote { margin: 0 0 1.25rem; font-size: 0.9rem; }
-    .livenote[data-pending='true'] { color: #8a5a16; font-weight: 600; }
-    .livenote[data-pending='false'] { color: var(--ok); }
-    .btn--primary:disabled { opacity: 0.45; cursor: default; }
-    .save { font-size: 0.82rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 999px; }
-    .save[data-state='saved'] { color: var(--ok); background: #e8f2ec; }
-    .save[data-state='saving'] { color: var(--muted); background: #ececef; }
-    .save[data-state='error'] { color: #9b1c1c; background: #fde8e8; }
-
     form label { display: block; font-weight: 600; font-size: 0.85rem; margin: 1rem 0 0.35rem; }
     form input, form textarea, form select { width: 100%; font: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 0.55rem 0.65rem; background: #fff; color: var(--ink); }
     form input:focus, form textarea:focus, form select:focus { outline: 2px solid var(--brand); border-color: var(--brand); }
@@ -162,23 +145,14 @@ const previewSrc = `/resources/${slug}?preview=1`;
     .rt { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #fff; margin-top: 0.35rem; }
     .rt:focus-within { outline: 2px solid var(--brand); border-color: var(--brand); }
     .rt-toolbar { display: flex; gap: 0.15rem; padding: 0.25rem; border-bottom: 1px solid var(--line); background: #f7f8fa; flex-wrap: wrap; }
-    .rt-toolbar button { font: inherit; font-size: 0.85rem; min-width: 1.9rem; padding: 0.15rem 0.5rem; border: 1px solid transparent; background: transparent; border-radius: 5px; cursor: pointer; color: var(--ink); }
+    .rt-toolbar button { font: inherit; font-size: 0.85rem; min-width: 2.25rem; min-height: 2rem; padding: 0.25rem 0.55rem; border: 1px solid transparent; background: transparent; border-radius: 5px; cursor: pointer; color: var(--ink); }
     .rt-toolbar button:hover { background: #e6e8ee; }
+    .rt-toolbar button[aria-pressed='true'] { background: #dde0e8; color: var(--brand-deep); }
     .rt-editor { min-height: 16rem; padding: 0.65rem 0.75rem; font: inherit; outline: none; }
     .rt-editor:empty::before { content: 'Write the article…'; color: #aab0bb; }
     .rt-editor h2 { font-size: 1.3rem; margin: 1rem 0 0.5rem; }
     .rt-editor h3 { font-size: 1.1rem; margin: 0.9rem 0 0.4rem; }
     .rt-editor a { color: var(--brand-deep); text-decoration: underline; }
-
-    .pane--preview { display: flex; flex-direction: column; background: #fff; }
-    .preview__bar { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; border-bottom: 1px solid var(--line); font-size: 0.85rem; }
-    .preview__bar a { font-weight: 600; text-decoration: none; }
-    #preview { flex: 1; width: 100%; border: 0; }
-
-    @media (width <= 920px) {
-      .editor { grid-template-columns: 1fr; height: auto; }
-      #preview { height: 70vh; }
-    }
   </style>
 
   <script>
@@ -244,10 +218,25 @@ const previewSrc = `/resources/${slug}?preview=1`;
         setState('error'); showError(); return false;
       } catch { setState('error'); showError(); return false; }
     }
-    const saveAndReload = () => { setState('saving'); clearTimeout(timer); timer = setTimeout(async () => { if (await save()) preview.contentWindow.location.reload(); }, 800); };
+    const schedule = (fn) => { clearTimeout(timer); timer = setTimeout(fn, 800); };
+    const saveAndReload = () => { setState('saving'); schedule(async () => { if (await save()) preview.contentWindow.location.reload(); }); };
 
-    form.addEventListener('input', () => { setState('saving'); saveAndReload(); });
-    form.addEventListener('change', () => { setState('saving'); saveAndReload(); });
+    // Patch the preview in place for the two fields visible on the article page
+    // (title + body); other fields aren't shown there, so just save.
+    function patchPreview(sel, value, html) {
+      let doc; try { doc = preview.contentDocument; } catch { return false; }
+      const el = doc && doc.querySelector(sel);
+      if (!el) return false;
+      if (html) el.innerHTML = value; else el.textContent = value;
+      return true;
+    }
+    form.addEventListener('input', (e) => {
+      setState('saving');
+      if (e.target.id === 'f-title') { patchPreview('[data-cms-field="title"]', e.target.value, false) ? schedule(save) : saveAndReload(); }
+      else if (e.target.id === 'f-body') { patchPreview('[data-cms-article-body]', e.target.value, true) ? schedule(save) : saveAndReload(); }
+      else schedule(save);
+    });
+    form.addEventListener('change', () => { setState('saving'); schedule(save); });
 
     // Image uploads (hero + thumbnail): resize via the Worker, store the URL.
     for (const wrap of document.querySelectorAll('[data-img]')) {
@@ -256,7 +245,11 @@ const previewSrc = `/resources/${slug}?preview=1`;
       const valEl = wrap.querySelector('[data-imgval]');
       const thumb = wrap.querySelector('.thumb');
       const msg = wrap.querySelector('.upmsg');
+      const rm = wrap.querySelector('.rm');
+      const syncRm = () => { rm.hidden = !valEl.value; };
+      syncRm();
       btn.addEventListener('click', () => file.click());
+      rm.addEventListener('click', () => { valEl.value = ''; thumb.src = ''; thumb.hidden = true; syncRm(); saveAndReload(); });
       file.addEventListener('change', async () => {
         if (!file.files[0]) return;
         msg.textContent = 'Resizing…';
@@ -264,7 +257,7 @@ const previewSrc = `/resources/${slug}?preview=1`;
         try {
           const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
           const d = await res.json();
-          if (d.ok) { valEl.value = d.img.jpg; thumb.src = d.img.jpg; thumb.hidden = false; msg.textContent = ''; saveAndReload(); }
+          if (d.ok) { valEl.value = d.img.jpg; thumb.src = d.img.jpg; thumb.hidden = false; msg.textContent = ''; syncRm(); saveAndReload(); }
           else msg.textContent = d.error || 'Upload failed';
         } catch { msg.textContent = 'Upload failed'; }
         file.value = '';

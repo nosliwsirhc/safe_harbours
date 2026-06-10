@@ -12,6 +12,7 @@ import AdminLayout from '../../../layouts/AdminLayout.astro';
 import { isAuthed } from '../../../lib/admin';
 import { getBlocksForView, hasUnpublishedChanges } from '../../../lib/content';
 import { findPage } from '../../../lib/pages';
+import '../../../styles/admin-editor.css';
 
 if (!isAuthed(Astro.request)) return Astro.redirect('/admin/login');
 
@@ -33,7 +34,7 @@ const config = {
 };
 ---
 <AdminLayout title={`Editing ${page.name}`} active="pages">
-  <div id="errbar" class="errbar" hidden>
+  <div id="errbar" class="errbar" role="alert" hidden>
     ⚠ Couldn’t save your changes — check your connection.
     <button type="button" id="retry">Try again</button>
   </div>
@@ -42,7 +43,7 @@ const config = {
       <div class="topbar">
         <a class="back" href="/admin">← All pages</a>
         <div class="pub">
-          <span class="save" id="save" data-state="saved">Saved</span>
+          <span class="save" id="save" data-state="saved" role="status" aria-live="polite">Saved</span>
           <button type="button" class="btn btn--primary" id="publish" disabled={!unpublished}>Publish changes</button>
         </div>
       </div>
@@ -90,29 +91,8 @@ const config = {
   </div>
 
   <style>
-    .errbar { background: #fde8e8; color: #9b1c1c; padding: 0.6rem 1.5rem; font-size: 0.9rem; font-weight: 600; display: none; align-items: center; gap: 0.75rem; }
-    .errbar:not([hidden]) { display: flex; }
-    .errbar button { font: inherit; font-weight: 600; cursor: pointer; border: 1px solid #9b1c1c; background: #fff; color: #9b1c1c; border-radius: 6px; padding: 0.2rem 0.6rem; }
-
-    .editor { display: grid; grid-template-columns: minmax(380px, 480px) 1fr; height: calc(100dvh - 53px); }
-    .pane { min-height: 0; }
-    .pane--edit { overflow-y: auto; padding: 1.25rem 1.5rem 4rem; border-right: 1px solid var(--line); background: var(--bg); }
-    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-    .back { font-weight: 600; text-decoration: none; font-size: 0.9rem; }
-    .back:hover { text-decoration: underline; }
-    .pub { display: flex; align-items: center; gap: 0.75rem; }
-    h1 { font-size: 1.5rem; margin: 0 0 0.3rem; }
-    .livenote { margin: 0 0 1rem; font-size: 0.9rem; }
-    .livenote[data-pending='true'] { color: #8a5a16; font-weight: 600; }
-    .livenote[data-pending='false'] { color: var(--ok); }
     .hint { margin: 0 0 1.5rem; font-size: 0.92rem; }
     .grip-inline { color: var(--muted); }
-    .btn--primary:disabled { opacity: 0.45; cursor: default; }
-
-    .save { font-size: 0.82rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 999px; }
-    .save[data-state='saved'] { color: var(--ok); background: #e8f2ec; }
-    .save[data-state='saving'] { color: var(--muted); background: #ececef; }
-    .save[data-state='error'] { color: #9b1c1c; background: #fde8e8; }
 
     .sections { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: 0.85rem; }
 
@@ -121,17 +101,6 @@ const config = {
     .palette-label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--muted); margin-bottom: 0.6rem; }
     .palette-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
     .palette-btns .btn { flex: 0 0 auto; }
-
-    .pane--preview { display: flex; flex-direction: column; background: #fff; }
-    .preview__bar { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; border-bottom: 1px solid var(--line); font-size: 0.85rem; }
-    .preview__bar a { font-weight: 600; text-decoration: none; }
-    #preview { flex: 1; width: 100%; border: 0; }
-
-    @media (width <= 920px) {
-      .editor { grid-template-columns: 1fr; height: auto; }
-      .pane--edit { border-right: 0; border-bottom: 1px solid var(--line); }
-      #preview { height: 70vh; }
-    }
   </style>
 
   <!-- The block cards are built at runtime (innerHTML), so they never receive
@@ -144,7 +113,8 @@ const config = {
     .pane--edit .rt { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #fff; }
     .pane--edit .rt:focus-within { outline: 2px solid var(--brand); border-color: var(--brand); }
     .pane--edit .rt-toolbar { display: flex; gap: 0.15rem; padding: 0.25rem; border-bottom: 1px solid var(--line); background: #f7f8fa; }
-    .pane--edit .rt-toolbar button { font: inherit; font-size: 0.85rem; min-width: 1.9rem; padding: 0.15rem 0.5rem; border: 1px solid transparent; background: transparent; border-radius: 5px; cursor: pointer; color: var(--ink); }
+    .pane--edit .rt-toolbar button { font: inherit; font-size: 0.85rem; min-width: 2.25rem; min-height: 2rem; padding: 0.25rem 0.55rem; border: 1px solid transparent; background: transparent; border-radius: 5px; cursor: pointer; color: var(--ink); }
+    .pane--edit .rt-toolbar button[aria-pressed='true'] { background: #dde0e8; color: var(--brand-deep); }
     .pane--edit .rt-toolbar button:hover { background: #e6e8ee; }
     .pane--edit .rt-editor { min-height: 3.5rem; padding: 0.55rem 0.65rem; font: inherit; outline: none; }
     .pane--edit .rt-editor:empty::before { content: 'Write here…'; color: #aab0bb; }
@@ -158,6 +128,8 @@ const config = {
     .pane--edit .grip { cursor: grab; background: var(--line); border: 0; color: #5b6270; font-size: 1.05rem; line-height: 1; padding: 0.25rem 0.5rem; border-radius: 6px; }
     .pane--edit .grip:hover { background: #d7dae1; }
     .pane--edit .grip:active { cursor: grabbing; }
+    .pane--edit .moveb { min-width: 1.9rem; min-height: 1.9rem; border: 1px solid var(--line); background: #fff; color: #5b6270; font-size: 0.95rem; line-height: 1; border-radius: 6px; cursor: pointer; }
+    .pane--edit .moveb:hover { background: #f0f1f4; color: var(--brand-deep); }
     .pane--edit .zz-num { font-family: Montserrat, sans-serif; font-weight: 700; font-size: 0.85rem; color: var(--brand-deep); }
     .pane--edit .rev { display: flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; color: var(--muted); margin-top: 0.6rem; }
     .pane--edit .rev input { width: auto; }
@@ -167,9 +139,9 @@ const config = {
     .pane--edit .zz-image { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.35rem; }
     .pane--edit .zz-thumb { width: 96px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); background: #f0f1f4; }
     .pane--edit .zz-upmsg { font-size: 0.8rem; }
-    .pane--edit .confirm { display: flex; gap: 0.5rem; align-items: center; font-size: 0.85rem; color: #9b1c1c; font-weight: 600; }
+    .pane--edit .confirm { display: flex; gap: 0.5rem; align-items: center; font-size: 0.85rem; color: var(--danger); font-weight: 600; }
     .pane--edit .confirm button { font: inherit; font-weight: 600; cursor: pointer; border-radius: 6px; padding: 0.25rem 0.6rem; border: 1px solid var(--line); background: #fff; }
-    .pane--edit .confirm .yes { background: #fde8e8; color: #9b1c1c; border-color: #e3b3b3; }
+    .pane--edit .confirm .yes { background: var(--danger-bg); color: var(--danger); border-color: #e3b3b3; }
 
     /* repeater (a list of sub-item cards inside one block) */
     .pane--edit .rep { display: grid; gap: 0.6rem; margin: 0.35rem 0 0.6rem; }
@@ -182,7 +154,7 @@ const config = {
     .pane--edit .rep-add { width: 100%; }
   </style>
 
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js" is:inline></script>
+  <script src="/assets/sortable.min.js" is:inline></script>
   <script>
     import { initRichText } from '../../../lib/rich-text-client';
     initRichText();
@@ -462,7 +434,7 @@ const config = {
     // nested inside a repeater item (so the two never collide when we collect).
     function fieldHtml(f, v, attr = 'data-field') {
       if (f.t === 'plain') return `<label class="mini">${f.l}</label><input class="field" ${attr}="${f.n}" value="${esc(v)}">`;
-      if (f.t === 'rich') return `<label class="mini">${f.l}</label><div class="rt"><div class="rt-toolbar"><button type="button" data-rt="bold"><b>B</b></button><button type="button" data-rt="italic"><i>I</i></button><button type="button" data-rt="link">Link</button></div><div class="rt-editor"></div><input type="hidden" class="rt-value" ${attr}="${f.n}" value="${esc(v)}"></div>`;
+      if (f.t === 'rich') return `<label class="mini">${f.l}</label><div class="rt" data-rt-label="${esc(f.l)}"><div class="rt-toolbar" role="toolbar" aria-label="Text formatting"><button type="button" data-rt="bold" aria-label="Bold" aria-pressed="false"><b>B</b></button><button type="button" data-rt="italic" aria-label="Italic" aria-pressed="false"><i>I</i></button><button type="button" data-rt="link" aria-label="Add link">Link</button></div><div class="rt-editor"></div><input type="hidden" class="rt-value" ${attr}="${f.n}" value="${esc(v)}"></div>`;
       if (f.t === 'toggle') return `<label class="rev"><input type="checkbox" ${attr}="${f.n}" ${v ? 'checked' : ''}> ${f.l}</label>`;
       if (f.t === 'select') return `<label class="mini">${f.l}</label><select class="kind" ${attr}="${f.n}">${f.opts.map((o) => `<option value="${o[0]}" ${v === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select>`;
       if (f.t === 'image') { const thumb = (v && (v.src || v.jpg)) || ''; return `<label class="mini">${f.l}</label><div class="zz-image"><img class="zz-thumb" src="${esc(thumb)}" alt="" ${thumb ? '' : 'hidden'}><input type="hidden" class="zz-imgval" ${attr}="${f.n}" value="${esc(JSON.stringify(v || {}))}"><button type="button" class="btn btn--ghost zz-upload">Upload image…</button><span class="zz-upmsg muted"></span><input type="file" class="zz-file" accept="image/jpeg,image/png" hidden></div>`; }
@@ -477,7 +449,7 @@ const config = {
     // data-subfield so a block's own collect() never picks them up).
     function repeaterItemHtml(f, data) {
       const sub = f.item.map((sf) => fieldHtml(sf, data ? data[sf.n] : undefined, 'data-subfield')).join('');
-      return `<div class="rep-item" data-rep-item><div class="rep-head"><button type="button" class="rep-grip" title="Drag to reorder">⠿</button><span class="head-spacer"></span><button type="button" class="btn btn--quiet" data-rep-remove>Remove</button></div>${sub}</div>`;
+      return `<div class="rep-item" data-rep-item><div class="rep-head"><button type="button" class="rep-grip" title="Drag to reorder" aria-hidden="true" tabindex="-1">⠿</button><button type="button" class="moveb" data-rep-move="up" aria-label="Move up">↑</button><button type="button" class="moveb" data-rep-move="down" aria-label="Move down">↓</button><span class="head-spacer"></span><button type="button" class="btn btn--quiet" data-rep-remove>Remove</button></div>${sub}</div>`;
     }
     function makeCard(kind, data) {
       const li = document.createElement('li');
@@ -488,7 +460,7 @@ const config = {
         li.innerHTML = fields; // single fixed block (e.g. hero): no header / drag / remove
       } else {
         const label = config.numbered ? 'Step' : SPECS[kind].label;
-        li.innerHTML = `<div class="section__head"><button type="button" class="grip" title="Drag to reorder">⠿</button><span class="zz-num">${label}</span><span class="head-spacer"></span><button type="button" class="btn btn--quiet" data-remove>Remove</button></div>${fields}`;
+        li.innerHTML = `<div class="section__head"><button type="button" class="grip" title="Drag to reorder" aria-hidden="true" tabindex="-1">⠿</button><button type="button" class="moveb" data-move="up" aria-label="Move up">↑</button><button type="button" class="moveb" data-move="down" aria-label="Move down">↓</button><span class="zz-num">${label}</span><span class="head-spacer"></span><button type="button" class="btn btn--quiet" data-remove>Remove</button></div>${fields}`;
       }
       return li;
     }
@@ -590,7 +562,25 @@ const config = {
     }
     const initRepSortables = (scope) => scope.querySelectorAll('[data-rep]').forEach(ensureRepSortable);
 
+    // Keyboard-accessible reorder (the drag grip is mouse-only): move a block or
+    // a repeater item past its same-type sibling, keeping focus on the button.
+    function moveEl(el, dir, match) {
+      const sib = dir === 'up' ? el.previousElementSibling : el.nextElementSibling;
+      if (!sib || !sib.matches(match)) return false;
+      if (dir === 'up') el.parentNode.insertBefore(el, sib); else el.parentNode.insertBefore(sib, el);
+      return true;
+    }
     list.addEventListener('click', (e) => {
+      if (e.target.matches('[data-move]')) {
+        const li = e.target.closest('[data-block]');
+        if (moveEl(li, e.target.getAttribute('data-move'), '[data-block]')) { renumber(); saveAndReload(); e.target.focus(); }
+        return;
+      }
+      if (e.target.matches('[data-rep-move]')) {
+        const item = e.target.closest('[data-rep-item]');
+        if (moveEl(item, e.target.getAttribute('data-rep-move'), '[data-rep-item]')) { saveAndReload(); e.target.focus(); }
+        return;
+      }
       if (e.target.matches('[data-remove]')) { const li = e.target.closest('[data-block]'); confirmRemove(li, () => { li.remove(); renumber(); saveAndReload(); }); return; }
       if (e.target.matches('[data-rep-remove]')) { const item = e.target.closest('[data-rep-item]'); confirmRemove(item, () => { item.remove(); saveAndReload(); }); return; }
       if (e.target.matches('[data-rep-add]')) {

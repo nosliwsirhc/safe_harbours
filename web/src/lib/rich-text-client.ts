@@ -30,7 +30,25 @@ function attach(rt: Element) {
   editor.setRootElement(surface);
   editor.setEditable(true);
   surface.setAttribute('contenteditable', 'true');
+  // Accessible name for the editing surface (a <label> can't target a contenteditable).
+  surface.setAttribute('role', 'textbox');
+  surface.setAttribute('aria-multiline', 'true');
+  surface.setAttribute('aria-label', el.dataset.rtLabel ?? 'Formatted text');
   mergeRegister(registerRichText(editor), registerList(editor));
+
+  // Reflect the current selection's bold/italic state on the toolbar toggles.
+  const boldBtn = toolbar?.querySelector<HTMLElement>('[data-rt="bold"]');
+  const italicBtn = toolbar?.querySelector<HTMLElement>('[data-rt="italic"]');
+  if (boldBtn || italicBtn) {
+    editor.registerUpdateListener(() => {
+      editor.read(() => {
+        const sel = $getSelection();
+        const range = $isRangeSelection(sel);
+        boldBtn?.setAttribute('aria-pressed', String(range && sel.hasFormat('bold')));
+        italicBtn?.setAttribute('aria-pressed', String(range && sel.hasFormat('italic')));
+      });
+    });
+  }
 
   // Mirror edits to the hidden input + fire `input` so the page autosaves/previews.
   const startTracking = () => {

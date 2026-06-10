@@ -21,6 +21,13 @@ const fmt = (d: Date) => (Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(
     </div>
     <p class="muted intro">Create and edit the articles on the Resources page. Changes save as a private draft; publish to put them live.</p>
 
+    <div class="newform" id="newform" hidden>
+      <label class="sr-only" for="new-title">New article title</label>
+      <input id="new-title" type="text" placeholder="Article title…" autocomplete="off" />
+      <button type="button" class="btn btn--primary" id="new-create">Create</button>
+      <button type="button" class="btn btn--ghost" id="new-cancel">Cancel</button>
+    </div>
+
     {articles.length === 0 && <p class="empty muted">No articles yet. Click “New article” to write your first one.</p>}
 
     <ul class="list" role="list">
@@ -50,33 +57,63 @@ const fmt = (d: Date) => (Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(
     .row__title { font-weight: 600; }
     .row__meta { font-size: 0.85rem; }
     .badge { font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.03em; }
-    .badge--live { color: var(--ok); background: #e8f2ec; }
-    .badge--draft { color: #8a5a16; background: #f6ecdb; }
+    .badge--live { color: var(--ok); background: var(--ok-bg); }
+    .badge--draft { color: var(--warn); background: var(--warn-bg); }
     .row__edit { padding: 0.35rem 0.8rem; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+    .newform { display: flex; gap: 0.5rem; align-items: center; margin: 0 0 1.5rem; }
+    .newform input { flex: 1; font: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 0.55rem 0.7rem; background: #fff; }
+    .newform input:focus { outline: 2px solid var(--brand); border-color: var(--brand); }
+    .confirm { display: inline-flex; gap: 0.4rem; align-items: center; font-size: 0.85rem; color: var(--danger); font-weight: 600; }
+    .confirm .yes { color: var(--danger); }
   </style>
 
   <script is:inline>
     {
-      document.getElementById('new').addEventListener('click', async () => {
-        const title = prompt('Article title');
-        if (!title || !title.trim()) return;
-        const res = await fetch('/api/admin/articles', {
-          method: 'POST', headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ action: 'create', title: title.trim() }),
-        });
-        const data = await res.json();
-        if (data.ok && data.slug) location.href = `/admin/articles/${data.slug}`;
-        else alert('Could not create the article.');
-      });
+      const newBtn = document.getElementById('new');
+      const newForm = document.getElementById('newform');
+      const newTitle = document.getElementById('new-title');
+      const createBtn = document.getElementById('new-create');
+      const openNew = () => { newForm.hidden = false; newBtn.hidden = true; newTitle.focus(); };
+      const closeNew = () => { newForm.hidden = true; newBtn.hidden = false; newTitle.value = ''; createBtn.disabled = false; };
+      newBtn.addEventListener('click', openNew);
+      document.getElementById('new-cancel').addEventListener('click', closeNew);
+      const create = async () => {
+        const title = newTitle.value.trim();
+        if (!title) { newTitle.focus(); return; }
+        createBtn.disabled = true; createBtn.textContent = 'Creating…';
+        try {
+          const res = await fetch('/api/admin/articles', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action: 'create', title }) });
+          const data = await res.json();
+          if (data.ok && data.slug) { location.href = `/admin/articles/${data.slug}`; return; }
+        } catch {}
+        createBtn.disabled = false; createBtn.textContent = 'Create';
+        newTitle.setCustomValidity('Could not create — try again.'); newTitle.reportValidity();
+      };
+      createBtn.addEventListener('click', create);
+      newTitle.addEventListener('input', () => newTitle.setCustomValidity(''));
+      newTitle.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); create(); } if (e.key === 'Escape') closeNew(); });
+
+      // Inline delete confirm (no native dialog).
       for (const btn of document.querySelectorAll('.row__del')) {
-        btn.addEventListener('click', async () => {
-          if (!confirm(`Delete “${btn.dataset.title}”? This removes it from the site.`)) return;
-          const res = await fetch('/api/admin/articles', {
-            method: 'POST', headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ action: 'delete', slug: btn.dataset.slug }),
+        btn.addEventListener('click', () => {
+          const row = btn.closest('.row');
+          if (row.querySelector('.confirm')) return;
+          btn.style.display = 'none';
+          const c = document.createElement('span');
+          c.className = 'confirm';
+          c.innerHTML = 'Delete? <button type="button" class="btn btn--quiet yes">Delete</button><button type="button" class="btn btn--quiet no">Keep</button>';
+          btn.after(c);
+          const cancel = () => { c.remove(); btn.style.display = ''; };
+          c.querySelector('.no').addEventListener('click', cancel);
+          c.querySelector('.yes').addEventListener('click', async () => {
+            try {
+              const res = await fetch('/api/admin/articles', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action: 'delete', slug: btn.dataset.slug }) });
+              if ((await res.json()).ok) { row.remove(); return; }
+            } catch {}
+            cancel();
           });
-          if ((await res.json()).ok) btn.closest('.row').remove();
-          else alert('Could not delete.');
+          c.querySelector('.yes').focus();
         });
       }
     }

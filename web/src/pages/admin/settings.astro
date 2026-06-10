@@ -13,7 +13,7 @@ const settings = await getSettings();
 ---
 <AdminLayout title="Settings" active="settings">
   <main class="wrap">
-    <div class="crumbs"><a href="/admin">← All pages</a><span class="save" id="save" data-state="saved">All changes saved</span></div>
+    <div class="crumbs"><a href="/admin">← All pages</a><span class="save" id="save" data-state="saved" role="status" aria-live="polite">All changes saved</span></div>
     <h1>Tracking & analytics</h1>
     <p class="muted lede">Paste the IDs from Google. They’re added to every page automatically. Leave a box empty to turn that one off.</p>
 
@@ -37,9 +37,9 @@ const settings = await getSettings();
     input:focus { outline: 2px solid var(--brand); border-color: var(--brand); }
     .small { font-size: 0.84rem; margin: 0.35rem 0 0; }
     .save { font-size: 0.82rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 999px; }
-    .save[data-state='saved'] { color: var(--ok); background: #e8f2ec; }
-    .save[data-state='saving'] { color: var(--muted); background: #ececef; }
-    .save[data-state='dirty'] { color: #8a5a16; background: #fbf0dd; }
+    .save[data-state='saved'] { color: var(--ok); background: var(--ok-bg); }
+    .save[data-state='saving'] { color: var(--muted); background: var(--saving-bg); }
+    .save[data-state='dirty'] { color: var(--warn); background: var(--warn-bg); }
   </style>
 
   <script is:inline>
