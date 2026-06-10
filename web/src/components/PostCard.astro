@@ -1,30 +1,31 @@
 ---
-// A resource post card, rendered from the resources content collection (single
-// source of truth). `variant` controls the title heading: related-posts use
-// <h4>, the /resources index's first card uses <h3 class="m-h4">.
-import { getEntry } from 'astro:content';
+// A resource post card. Reads the article from D1 (single source of truth). Pass
+// `article` to avoid a refetch (the index already has them); else it loads by
+// slug (related-posts pass slugs). `variant` controls the title heading: related
+// posts use <h4>, the /resources index's first card uses <h3 class="m-h4">.
 import { cardMeta } from '../lib/format';
 import { bgImageSet } from '../lib/img';
+import { getArticle, type Article } from '../lib/articles';
 
 interface Props {
   slug: string;
   variant?: 'related' | 'index';
+  article?: Article;
 }
-const { slug, variant = 'related' } = Astro.props;
-const entry = await getEntry('resources', slug);
-if (!entry) throw new Error(`PostCard: unknown article slug "${slug}"`);
-const a = entry.data;
-const meta = cardMeta(a.date, a.author);
+const { slug, variant = 'related', article } = Astro.props;
+const a = article ?? (await getArticle(slug));
 ---
-<a class="post-card" href={`/resources/${slug}/`}>
-  <div class="thumbnail-wrap">
-    <div class="post-card__thumbnail" style={`background-image: ${bgImageSet(a.thumbnail ?? a.heroImage, 800)};`}></div>
-  </div>
-  <div class="content">
-    <div class="title">
-      {variant === 'index' ? <h3 class="m-h4">{a.title}</h3> : <h4>{a.title}</h4>}
+{a && (
+  <a class="post-card" href={`/resources/${a.slug}/`}>
+    <div class="thumbnail-wrap">
+      <div class="post-card__thumbnail" style={`background-image: ${bgImageSet(a.thumbnail || a.heroImage, 800)};`}></div>
     </div>
-    <div class="excerpt">{a.excerpt}</div>
-    <div class="meta"><p>{meta}</p></div>
-  </div>
-</a>
+    <div class="content">
+      <div class="title">
+        {variant === 'index' ? <h3 class="m-h4">{a.title}</h3> : <h4>{a.title}</h4>}
+      </div>
+      <div class="excerpt">{a.excerpt}</div>
+      <div class="meta"><p>{cardMeta(a.date, a.author)}</p></div>
+    </div>
+  </a>
+)}

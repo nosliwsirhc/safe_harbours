@@ -53,9 +53,9 @@ export default tseslint.config(
     },
   },
 
-  // Node-side config + build scripts.
+  // Node-side config + build/migration scripts.
   {
-    files: ['*.config.mjs', 'scripts/**'],
+    files: ['*.config.mjs', 'scripts/**', 'db/**/*.mjs'],
     languageOptions: { globals: globals.node },
   },
 );

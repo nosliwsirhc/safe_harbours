@@ -5,29 +5,27 @@
 // filter over the rendered cards. The featured post is data-driven (the article
 // flagged `featured`, else the newest). The hero, newsletter form, etc. mirror
 // the captured theme.
-import { getCollection } from 'astro:content';
 import PostCard from './PostCard.astro';
 import { cardMeta } from '../lib/format';
 import { bgImageSet } from '../lib/img';
+import { listArticles } from '../lib/articles';
 
-const all = await getCollection('resources');
+const all = await listArticles('published');
 
 // Featured: the flagged article, else the most recent by date.
-const featured =
-  all.find((p) => p.data.featured) ??
-  [...all].sort((a, b) => b.data.date.getTime() - a.data.date.getTime())[0];
+const featured = all.find((a) => a.featured) ?? [...all].sort((a, b) => b.date.getTime() - a.date.getTime())[0];
 
 // The grid: every article with an `indexOrder`, in that order, minus the
 // featured one (it has its own slot above the grid).
 const gridPosts = all
-  .filter((p) => p.data.indexOrder !== undefined && p.id !== featured?.id)
-  .sort((a, b) => (a.data.indexOrder ?? 0) - (b.data.indexOrder ?? 0));
+  .filter((a) => a.indexOrder !== null && a.slug !== featured?.slug)
+  .sort((a, b) => (a.indexOrder ?? 0) - (b.indexOrder ?? 0));
 
 // Category options: every distinct category across the listed articles.
 const listed = featured ? [featured, ...gridPosts] : gridPosts;
-const categories = [...new Set(listed.map((p) => p.data.category))].sort();
+const categories = [...new Set(listed.map((a) => a.category))].sort();
 
-const featuredHref = featured ? `/resources/${featured.id}/` : '#';
+const featuredHref = featured ? `/resources/${featured.slug}/` : '#';
 ---
 <div class="page-hero blog">
   <div class="grid-container">
@@ -60,16 +58,16 @@ const featuredHref = featured ? `/resources/${featured.id}/` : '#';
     <div class="feature-post">
       <div class="feature-post__border grid-x">
         <div class="cell medium-6 large-7">
-          <a class="feature-post__thumbnail-wrap" href={featuredHref} title={featured.data.title}>
+          <a class="feature-post__thumbnail-wrap" href={featuredHref} title={featured.title}>
             <p class="badge">Featured Post</p>
-            <div class="feature-post__thumbnail" style={`background-image: ${bgImageSet(featured.data.thumbnail ?? featured.data.heroImage, 800)};`}></div>
+            <div class="feature-post__thumbnail" style={`background-image: ${bgImageSet(featured.thumbnail || featured.heroImage, 800)};`}></div>
           </a>
         </div>
         <div class="cell medium-6 large-5 align-center-middle">
-          <a class="content" href={featuredHref} title={featured.data.title}>
-            <div class="title"><h2 class="m-h3">{featured.data.title}</h2></div>
-            {featured.data.excerpt && <div class="excerpt">{featured.data.excerpt}</div>}
-            <div class="meta"><p>{cardMeta(featured.data.date, featured.data.author)}</p></div>
+          <a class="content" href={featuredHref} title={featured.title}>
+            <div class="title"><h2 class="m-h3">{featured.title}</h2></div>
+            {featured.excerpt && <div class="excerpt">{featured.excerpt}</div>}
+            <div class="meta"><p>{cardMeta(featured.date, featured.author)}</p></div>
           </a>
         </div>
       </div>
@@ -90,8 +88,8 @@ const featuredHref = featured ? `/resources/${featured.id}/` : '#';
     </div>
     <div class="grid-x grid-padding-x grid-padding-y" id="res-grid">
       {gridPosts.map((p, i) => (
-        <div class="cell medium-6 large-4" data-res-card data-category={p.data.category} data-search={`${p.data.title} ${p.data.excerpt ?? ''} ${p.data.category}`.toLowerCase()}>
-          <PostCard slug={p.id} variant={i === 0 ? 'index' : 'related'} />
+        <div class="cell medium-6 large-4" data-res-card data-category={p.category} data-search={`${p.title} ${p.excerpt} ${p.category}`.toLowerCase()}>
+          <PostCard slug={p.slug} article={p} variant={i === 0 ? 'index' : 'related'} />
         </div>
       ))}
     </div>

@@ -1,21 +1,21 @@
 ---
-// One dynamic route for every resource article, generated from the resources
-// content collection. Add an article = add src/content/resources/<slug>.md.
-import { getCollection, render } from 'astro:content';
+// One dynamic route for every resource article, served live from D1 (SSR). New
+// articles authored in /admin appear immediately, no rebuild. Draft is shown
+// only inside the authed admin preview (?preview=1).
+export const prerender = false;
+
 import ThemeLayout from '../../layouts/ThemeLayout.astro';
 import ResourceArticle from '../../components/ResourceArticle.astro';
+import { getArticleForView } from '../../lib/articles';
+import { isAuthed } from '../../lib/admin';
 
-export async function getStaticPaths() {
-  const posts = await getCollection('resources');
-  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
-}
-
-const { post } = Astro.props;
-const { Content } = await render(post);
-const { title, heroImage, related } = post.data;
+const { slug } = Astro.params;
+const preview = Astro.url.searchParams.get('preview') === '1' && isAuthed(Astro.request);
+const article = slug ? await getArticleForView(slug, preview) : null;
+if (!article) return new Response('Article not found', { status: 404 });
 ---
-<ThemeLayout name={post.id} title={`${title} | Safe Harbours`}>
-  <ResourceArticle slug={post.id} title={title} heroImage={heroImage} related={related}>
-    <Content />
+<ThemeLayout name="resources" title={`${article.title} | Safe Harbours`} description={article.excerpt}>
+  <ResourceArticle slug={article.slug} title={article.title} heroImage={article.heroImage} related={article.related}>
+    <Fragment set:html={article.body} />
   </ResourceArticle>
 </ThemeLayout>

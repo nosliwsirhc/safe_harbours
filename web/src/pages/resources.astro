@@ -1,4 +1,7 @@
 ---
+// The /resources index. SSR so the article grid reads live from D1 (new articles
+// appear without a rebuild).
+export const prerender = false;
 import ThemeLayout from '../layouts/ThemeLayout.astro';
 import ResourcesIndex from '../components/ResourcesIndex.astro';
 ---
