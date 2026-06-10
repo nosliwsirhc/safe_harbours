@@ -1,0 +1,58 @@
+---
+// Renders one composer block by its `kind`. A page is a list of these. The
+// data-cms-block index + each component's data-cms-field hooks let the editor
+// update the live preview in place.
+import Hero from './Hero.astro';
+import ZigZag from './ZigZag.astro';
+import Cta from './Cta.astro';
+import type { Hero as HeroData, ZigRow, CtaData } from '../lib/content';
+
+interface Props {
+  block: { kind: string; body: string };
+  index: number;
+}
+const { block, index } = Astro.props;
+
+function parse<T>(s: string): T | null {
+  try {
+    return JSON.parse(s) as T;
+  } catch {
+    return null;
+  }
+}
+
+const hero = block.kind === 'hero' ? parse<HeroData>(block.body) : null;
+const row = block.kind === 'imageText' ? parse<ZigRow>(block.body) : null;
+const cta = block.kind === 'cta' ? parse<CtaData>(block.body) : null;
+const heading = block.kind === 'heading' ? parse<{ text?: string }>(block.body) : null;
+const text = block.kind === 'text' ? parse<{ html?: string }>(block.body) : null;
+---
+<div class="cms-block-wrap" data-cms-block={index}>
+  {hero && <Hero lead={hero.lead} heading={hero.heading} intro={hero.intro} bg={hero.bg} />}
+
+  {row && (
+    <section class="zig-zag ">
+      <div class="grid-container">
+        <ZigZag reverse={row.reverse} heading={row.heading} body={row.body} img={row.img} />
+      </div>
+    </section>
+  )}
+
+  {cta && <Cta heading={cta.heading} body={cta.body} label={cta.label} href={cta.href} variant={cta.variant} />}
+
+  {heading && (
+    <div class="grid-container">
+      <div class="section-title"><h2 data-cms-field="text">{heading.text}</h2></div>
+    </div>
+  )}
+
+  {text && (
+    <div class="grid-container">
+      <div class="composed-text" data-cms-field="html" set:html={text.html}></div>
+    </div>
+  )}
+</div>
+
+<style is:global>
+  .composed-text { max-width: 70ch; margin-inline: auto; padding: 1rem 0; }
+</style>

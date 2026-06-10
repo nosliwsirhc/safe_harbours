@@ -26,11 +26,11 @@ export const site = {
   sisterAgency: { name: "Annie's Havens", url: 'https://www.annieshavens.ca' },
 } as const;
 
-export type NavItem = {
+export interface NavItem {
   label: string;
   href?: string;
   children?: { label: string; href: string }[];
-};
+}
 
 export const nav: NavItem[] = [
   { label: 'About Fostering', href: '/about-fostering' },

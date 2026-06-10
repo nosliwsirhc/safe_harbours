@@ -1,0 +1,67 @@
+---
+// Settings: the Google tag ids. Rare setup task, kept off the main editing flow.
+// Autosaves on change, in plain language.
+export const prerender = false;
+
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { isAuthed } from '../../lib/admin';
+import { getSettings } from '../../lib/content';
+
+if (!isAuthed(Astro.request)) return Astro.redirect('/admin/login');
+
+const settings = await getSettings();
+---
+<AdminLayout title="Settings" active="settings">
+  <main class="wrap">
+    <div class="crumbs"><a href="/admin">← All pages</a><span class="save" id="save" data-state="saved">All changes saved</span></div>
+    <h1>Tracking & analytics</h1>
+    <p class="muted lede">Paste the IDs from Google. They’re added to every page automatically. Leave a box empty to turn that one off.</p>
+
+    <label for="ga4">Google Analytics measurement ID</label>
+    <input id="ga4" data-key="ga4_id" value={settings.ga4_id ?? ''} placeholder="G-XXXXXXXXXX" autocomplete="off" />
+    <p class="muted small">Find it in Google Analytics → Admin → Data streams. Starts with “G-”.</p>
+
+    <label for="gtm">Google Tag Manager container ID</label>
+    <input id="gtm" data-key="gtm_id" value={settings.gtm_id ?? ''} placeholder="GTM-XXXXXXX" autocomplete="off" />
+    <p class="muted small">Only if you use Tag Manager. Starts with “GTM-”.</p>
+  </main>
+
+  <style>
+    .wrap { max-width: 560px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .crumbs { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+    .crumbs a { font-weight: 600; text-decoration: none; font-size: 0.9rem; }
+    h1 { font-size: 1.5rem; margin: 0 0 0.3rem; }
+    .lede { margin: 0 0 2rem; font-size: 1.02rem; }
+    label { display: block; font-weight: 600; font-size: 0.9rem; margin: 1.25rem 0 0.4rem; }
+    input { width: 100%; font: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.7rem; background: #fff; }
+    input:focus { outline: 2px solid var(--brand); border-color: var(--brand); }
+    .small { font-size: 0.84rem; margin: 0.35rem 0 0; }
+    .save { font-size: 0.82rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 999px; }
+    .save[data-state='saved'] { color: var(--ok); background: #e8f2ec; }
+    .save[data-state='saving'] { color: var(--muted); background: #ececef; }
+    .save[data-state='dirty'] { color: #8a5a16; background: #fbf0dd; }
+  </style>
+
+  <script is:inline>
+    const saveEl = document.getElementById('save');
+    let timer;
+    function setState(s) {
+      saveEl.dataset.state = s;
+      saveEl.textContent = s === 'saving' ? 'Saving…' : s === 'dirty' ? 'Unsaved changes' : 'All changes saved';
+    }
+    async function save() {
+      setState('saving');
+      const payload = {};
+      document.querySelectorAll('input[data-key]').forEach((el) => { payload[el.dataset.key] = el.value; });
+      try {
+        const res = await fetch('/api/admin/settings', {
+          method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload),
+        });
+        setState((await res.json()).ok ? 'saved' : 'dirty');
+      } catch { setState('dirty'); }
+    }
+    document.querySelectorAll('input[data-key]').forEach((el) => {
+      el.addEventListener('input', () => { setState('dirty'); clearTimeout(timer); timer = setTimeout(save, 700); });
+    });
+  </script>
+</AdminLayout>

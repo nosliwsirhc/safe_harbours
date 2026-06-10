@@ -18,7 +18,7 @@ const meta = cardMeta(a.date, a.author);
 ---
 <a class="post-card" href={`/resources/${slug}/`}>
   <div class="thumbnail-wrap">
-    <div class="post-card__thumbnail" style={`background-image: ${bgImageSet(a.thumbnail!, 800)};`}></div>
+    <div class="post-card__thumbnail" style={`background-image: ${bgImageSet(a.thumbnail ?? a.heroImage, 800)};`}></div>
   </div>
   <div class="content">
     <div class="title">

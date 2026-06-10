@@ -1,0 +1,17 @@
+---
+// A fully composed page: its content is an ordered list of blocks from D1,
+// rendered by BlockRenderer. Borrows Our Story's theme chrome (header/footer/CSS)
+// via ThemeLayout name="our-story". Draft shown only in the authed admin preview.
+export const prerender = false;
+
+import ThemeLayout from '../layouts/ThemeLayout.astro';
+import BlockRenderer from '../components/BlockRenderer.astro';
+import { getBlocksForView } from '../lib/content';
+import { isAuthed } from '../lib/admin';
+
+const preview = Astro.url.searchParams.get('preview') === '1' && isAuthed(Astro.request);
+const blocks = await getBlocksForView('our-impact', 'main', preview);
+---
+<ThemeLayout name="our-story" title="Our Impact | Safe Harbours">
+  {blocks.map((b, i) => <BlockRenderer block={b} index={i} />)}
+</ThemeLayout>

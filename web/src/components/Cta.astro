@@ -1,0 +1,24 @@
+---
+// Call-to-action band, using the theme's .global-cta styling. `variant` tints it
+// light or dark. data-cms-field hooks let the composer update the preview live.
+import type { CtaData } from '../lib/content';
+type Props = CtaData;
+const { heading = '', body = '', label = '', href = '', variant = 'light' } = Astro.props;
+---
+<section class={`global-cta cta--${variant}`}>
+  <div class="grid-container">
+    <div class="content">
+      <h3 data-cms-field="heading">{heading}</h3>
+      <div class="cta-body" data-cms-field="body" set:html={body}></div>
+      {label && (
+        <p><a href={href || '#'} class="cta-link">{label}</a></p>
+      )}
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .cta--dark { background: #2a2f3a; color: #fff; }
+  .cta--dark a { color: #f4c542; }
+  .global-cta .cta-link { display: inline-block; margin-top: 0.5rem; font-weight: 700; }
+</style>

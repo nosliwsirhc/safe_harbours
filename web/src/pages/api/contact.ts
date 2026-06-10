@@ -19,9 +19,9 @@ const json = (body: unknown, status = 200) =>
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   const env = workerEnv as unknown as Record<string, string | undefined>;
 
-  let data: Record<string, string> = {};
+  let data: Record<string, string | undefined>;
   try {
-    data = (await request.json()) as Record<string, string>;
+    data = (await request.json());
   } catch {
     return json({ ok: false, error: 'Invalid request.' }, 400);
   }
@@ -46,9 +46,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     const body = new URLSearchParams({ secret, response: token });
     if (clientAddress) body.set('remoteip', clientAddress);
     const r = await fetch(TURNSTILE_VERIFY, { method: 'POST', body });
-    verified = ((await r.json()) as { success?: boolean }).success === true;
+    const result: unknown = await r.json();
+    verified = typeof result === 'object' && result !== null && 'success' in result && result.success === true;
   } catch {
-    verified = false;
+    // Verification request failed → leave `verified` false.
   }
   if (!verified) {
     return json({ ok: false, error: 'Verification failed. Please complete the check and try again.' }, 400);

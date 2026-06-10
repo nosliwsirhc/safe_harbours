@@ -1,0 +1,35 @@
+---
+// Alternating image/text row, rebuilt from the mirror markup so the self-hosted
+// theme CSS styles it identically. `reverse` flips the image side. Text + image
+// are data. data-zigzag / data-zz hooks let the admin update the preview live.
+import ResponsiveImage from './ResponsiveImage.astro';
+import type { ZigImage } from '../lib/content';
+interface Props {
+  reverse?: boolean;
+  count?: string;
+  heading?: string;
+  body?: string;
+  img?: ZigImage;
+}
+const { reverse = false, count = '', heading = '', body = '', img = {} } = Astro.props;
+---
+<div class={`zig-zag-row${reverse ? ' reverse' : ''}`} data-zigzag>
+  <div class="grid-x grid-padding-x align-middle">
+    <div class="zig-zag-image cell medium-6">
+      {img.webpset ? (
+        <ResponsiveImage jpg={img.jpg ?? ''} webpset={img.webpset} jpgset={img.jpgset} w={img.w} h={img.h} />
+      ) : img.jpg ? (
+        <picture>
+          {img.avif && <source type="image/avif" srcset={img.avif} sizes="100vw" />}
+          {img.webp && <source type="image/webp" srcset={img.webp} sizes="100vw" />}
+          <img alt="" src={img.jpg} decoding="async" loading="lazy" width={img.w} height={img.h} />
+        </picture>
+      ) : null}
+    </div>
+    <div class="zig-zag-content cell medium-6">
+      {count && <span class="row-count" data-zz="count">{count}</span>}
+      <h4 data-zz="heading" data-cms-field="heading">{heading}</h4>
+      <div class="zz-body-rich" data-zz="body" data-cms-field="body" set:html={body}></div>
+    </div>
+  </div>
+</div>

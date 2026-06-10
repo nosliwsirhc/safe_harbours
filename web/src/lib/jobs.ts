@@ -60,7 +60,7 @@ export async function listJobs(): Promise<JobPosting[]> {
       .prepare('SELECT data FROM postings WHERE closing_date >= ? ORDER BY closing_date ASC')
       .bind(todayOrg())
       .all<{ data: string }>();
-    return (results ?? []).map((r) => JSON.parse(r.data) as JobPosting);
+    return results.map((r) => JSON.parse(r.data) as JobPosting);
   } catch (err) {
     console.error('[jobs] listJobs failed', err);
     return [];

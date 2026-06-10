@@ -15,3 +15,7 @@ RESEND_TOKEN=
 # Where inquiries are sent / sent from (the "from" domain must be verified in Resend).
 CONTACT_TO=info@safeharbours.ca
 CONTACT_FROM=Safe Harbours <noreply@safeharbours.ca>
+
+# CMS spike — the /admin password (single shared secret). In production:
+#   wrangler secret put ADMIN_TOKEN
+ADMIN_TOKEN=change-me-to-a-long-random-string

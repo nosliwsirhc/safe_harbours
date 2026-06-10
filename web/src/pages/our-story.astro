@@ -1,4 +1,24 @@
 ---
+// SSR. The hero is now a real, data-driven component (editable from /admin); the
+// rest of the page is still the mirrored markup (those sections become their own
+// components next). If the hero has no data yet, we render the original mirror
+// hero unchanged — so this can never regress to a blank page.
+export const prerender = false;
+
 import ThemeLayout from '../layouts/ThemeLayout.astro';
+import Hero from '../components/Hero.astro';
+import { getHeroForView } from '../lib/content';
+import { isAuthed } from '../lib/admin';
+import blob from '../../_mirror/our-story.main.html?raw';
+
+// Show the draft only inside the admin preview (authed + ?preview=1); the public
+// always sees published.
+const preview = Astro.url.searchParams.get('preview') === '1' && isAuthed(Astro.request);
+const hero = await getHeroForView('our-story', preview);
+const seam = blob.indexOf('<div id="" class="banner-bar');
+const afterHero = seam !== -1 ? blob.slice(seam) : blob;
 ---
-<ThemeLayout name="our-story" title="Our Story | Safe Harbours" />
+<ThemeLayout name="our-story" title="Our Story | Safe Harbours">
+  {hero && <Hero lead={hero.lead} heading={hero.heading} intro={hero.intro} bg={hero.bg} />}
+  <Fragment set:html={hero ? afterHero : blob} />
+</ThemeLayout>

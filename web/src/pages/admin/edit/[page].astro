@@ -1,0 +1,529 @@
+---
+// The live-preview editor. Type-aware (hero fields / zig-zag step list / freeform
+// blocks). Edits autosave to a DRAFT; nothing is public until "Publish". Preview
+// iframe shows the draft (?preview=1). Designed to be safe for non-technical
+// editors: auto-numbered steps, confirm-before-delete, loud save-failure.
+export const prerender = false;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { isAuthed } from '../../../lib/admin';
+import { getBlocksForView, getHeroForView, hasUnpublishedChanges, type Hero, type ZigRow } from '../../../lib/content';
+import { findPage } from '../../../lib/pages';
+
+if (!isAuthed(Astro.request)) return Astro.redirect('/admin/login');
+
+const key = Astro.params.page;
+const page = key ? findPage(key) : undefined;
+if (!page) return Astro.redirect('/admin');
+
+const isHero = page.component === 'hero';
+const isZigzag = page.component === 'zigzag';
+const isComposer = page.component === 'composer';
+const EMPTY_HERO: Hero = { lead: '', heading: '', intro: '', bg: '' };
+const hero: Hero = isHero ? ((await getHeroForView(page.key, true)) ?? EMPTY_HERO) : EMPTY_HERO;
+const blocks = isHero ? [] : await getBlocksForView(page.key, page.slot, true);
+const rows: ZigRow[] = isZigzag
+  ? blocks
+      .filter((b) => b.kind === 'zigzag')
+      .map((b): ZigRow | null => {
+        try {
+          return JSON.parse(b.body) as ZigRow;
+        } catch {
+          return null;
+        }
+      })
+      .filter((r): r is ZigRow => r !== null)
+  : [];
+const composerBlocks = isComposer ? blocks.map((b) => ({ kind: b.kind, body: b.body })) : [];
+const unpublished = await hasUnpublishedChanges(page.key, page.slot);
+const previewSrc = `${page.path}?preview=1`;
+---
+<AdminLayout title={`Editing ${page.name}`} active="pages">
+  <div id="errbar" class="errbar" hidden>
+    ⚠ Couldn’t save your changes — check your connection.
+    <button type="button" id="retry">Try again</button>
+  </div>
+  <div class="editor">
+    <section class="pane pane--edit">
+      <div class="topbar">
+        <a class="back" href="/admin">← All pages</a>
+        <div class="pub">
+          <span class="save" id="save" data-state="saved">Saved</span>
+          <button type="button" class="btn btn--primary" id="publish" disabled={!unpublished}>Publish changes</button>
+        </div>
+      </div>
+      <h1>{page.name}</h1>
+      <p class="livenote" id="livenote" data-pending={String(unpublished)}>
+        {unpublished
+          ? 'You have unpublished changes. Click “Publish changes” to put them on the live site.'
+          : 'This page is up to date with the live site.'}
+      </p>
+
+      {isHero ? (
+        <div id="herofields">
+          <label for="f-lead">Small line above the title</label>
+          <input id="f-lead" data-hero="lead" value={hero.lead} />
+          <label for="f-heading">Title</label>
+          <input id="f-heading" class="field--heading" data-hero="heading" value={hero.heading} />
+          <label>Intro text</label>
+          <div class="rt">
+            <div class="rt-toolbar">
+              <button type="button" data-rt="bold" title="Bold"><b>B</b></button>
+              <button type="button" data-rt="italic" title="Italic"><i>I</i></button>
+              <button type="button" data-rt="link" title="Add a link">Link</button>
+            </div>
+            <div class="rt-editor"></div>
+            <input type="hidden" id="f-intro" class="rt-value" data-hero="intro" value={hero.intro} />
+          </div>
+        </div>
+      ) : isZigzag ? (
+        <>
+          <p class="muted hint">Edit each step. Drag the <span class="grip-inline">⠿</span> handle to reorder — steps are numbered automatically.</p>
+          <ol class="sections" id="zzlist" role="list">
+            {rows.map((r) => (
+              <li class="section" data-zz-row data-img={JSON.stringify(r.img ?? {})}>
+                <div class="section__head">
+                  <button type="button" class="grip" aria-label="Drag to reorder" title="Drag to reorder">⠿</button>
+                  <span class="zz-num">Step</span>
+                  <label class="rev"><input type="checkbox" data-zz="reverse" checked={!!r.reverse} /> Image on right</label>
+                  <span class="head-spacer"></span>
+                  <button type="button" class="btn btn--quiet remove" data-remove>Remove</button>
+                </div>
+                <label class="mini">Step title</label>
+                <input class="field--heading" data-zz="heading" value={r.heading ?? ''} placeholder="Step title" />
+                <label class="mini">Step description</label>
+                <div class="rt">
+                  <div class="rt-toolbar">
+                    <button type="button" data-rt="bold" title="Bold"><b>B</b></button>
+                    <button type="button" data-rt="italic" title="Italic"><i>I</i></button>
+                    <button type="button" data-rt="link" title="Add a link">Link</button>
+                  </div>
+                  <div class="rt-editor"></div>
+                  <input type="hidden" class="rt-value" data-zz="body" value={r.body ?? ''} />
+                </div>
+                <label class="mini">Image</label>
+                <div class="zz-image">
+                  <img class="zz-thumb" src={(r.img && r.img.jpg) ?? ''} alt="" hidden={!(r.img && r.img.jpg)} />
+                  <input type="hidden" class="zz-img" data-zz="img" value={JSON.stringify(r.img ?? {})} />
+                  <button type="button" class="btn btn--ghost zz-upload">Upload image…</button>
+                  <span class="zz-upmsg muted"></span>
+                  <input type="file" class="zz-file" accept="image/jpeg,image/png" hidden />
+                </div>
+              </li>
+            ))}
+          </ol>
+          <button type="button" class="btn btn--ghost add" id="zzadd">+ Add step</button>
+        </>
+      ) : isComposer ? (
+        <>
+          <p class="muted hint">Build the page from sections. Add one below, edit it, and drag <span class="grip-inline">⠿</span> to reorder. It saves automatically.</p>
+          <ol class="sections" id="composer" role="list"></ol>
+          <div class="palette">
+            <span class="palette-label">Add a section</span>
+            <div id="palette" class="palette-btns"></div>
+          </div>
+        </>
+      ) : null}
+    </section>
+
+    <section class="pane pane--preview">
+      <div class="preview__bar">
+        <span class="muted">Live preview <span class="muted">(draft — not public until you publish)</span></span>
+        <a href={page.path} target="_blank" rel="noopener">Open live page ↗</a>
+      </div>
+      <iframe id="preview" src={previewSrc} title={`Preview of ${page.name}`}></iframe>
+    </section>
+  </div>
+
+  <style>
+    .errbar { background: #fde8e8; color: #9b1c1c; padding: 0.6rem 1.5rem; font-size: 0.9rem; font-weight: 600; display: none; align-items: center; gap: 0.75rem; }
+    .errbar:not([hidden]) { display: flex; }
+    .errbar button { font: inherit; font-weight: 600; cursor: pointer; border: 1px solid #9b1c1c; background: #fff; color: #9b1c1c; border-radius: 6px; padding: 0.2rem 0.6rem; }
+
+    .editor { display: grid; grid-template-columns: minmax(380px, 480px) 1fr; height: calc(100dvh - 53px); }
+    .pane { min-height: 0; }
+    .pane--edit { overflow-y: auto; padding: 1.25rem 1.5rem 4rem; border-right: 1px solid var(--line); background: var(--bg); }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+    .back { font-weight: 600; text-decoration: none; font-size: 0.9rem; }
+    .back:hover { text-decoration: underline; }
+    .pub { display: flex; align-items: center; gap: 0.75rem; }
+    h1 { font-size: 1.5rem; margin: 0 0 0.3rem; }
+    .livenote { margin: 0 0 1.5rem; font-size: 0.9rem; }
+    .livenote[data-pending='true'] { color: #8a5a16; font-weight: 600; }
+    .livenote[data-pending='false'] { color: var(--ok); }
+    .hint { margin: 0 0 1.5rem; font-size: 0.92rem; }
+    .grip-inline { color: var(--muted); }
+    .btn--primary:disabled { opacity: 0.45; cursor: default; }
+
+    .save { font-size: 0.82rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 999px; }
+    .save[data-state='saved'] { color: var(--ok); background: #e8f2ec; }
+    .save[data-state='saving'] { color: var(--muted); background: #ececef; }
+    .save[data-state='error'] { color: #9b1c1c; background: #fde8e8; }
+
+    label { display: block; }
+    #herofields label { font-weight: 600; font-size: 0.85rem; margin: 1rem 0 0.35rem; }
+    #herofields input, #herofields textarea { width: 100%; font: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 0.55rem 0.65rem; background: #fff; }
+    #herofields input:focus, #herofields textarea:focus { outline: 2px solid var(--brand); border-color: var(--brand); }
+    #herofields .field--heading { font-family: Montserrat, sans-serif; font-weight: 600; font-size: 1.05rem; }
+    #herofields textarea { min-height: 5rem; resize: vertical; }
+    .mini { font-weight: 600; font-size: 0.78rem; color: var(--muted); margin: 0.6rem 0 0.25rem; }
+
+    /* rich-text control (bold / italic / link) */
+    .rt { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #fff; }
+    .rt:focus-within { outline: 2px solid var(--brand); border-color: var(--brand); }
+    .rt-toolbar { display: flex; gap: 0.15rem; padding: 0.25rem; border-bottom: 1px solid var(--line); background: #f7f8fa; }
+    .rt-toolbar button { font: inherit; font-size: 0.85rem; min-width: 1.9rem; padding: 0.15rem 0.5rem; border: 1px solid transparent; background: transparent; border-radius: 5px; cursor: pointer; color: var(--ink); }
+    .rt-toolbar button:hover { background: #e6e8ee; }
+    .rt-editor { min-height: 3.5rem; padding: 0.55rem 0.65rem; font: inherit; outline: none; }
+    .rt-editor:empty::before { content: 'Write here…'; color: #aab0bb; }
+    .rt-editor a { color: var(--brand-deep); text-decoration: underline; }
+
+    .sections { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: 0.85rem; }
+    .section { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--brand); border-radius: var(--radius); padding: 0.85rem 0.95rem; box-shadow: var(--shadow); }
+    .section.dragging { opacity: 0.5; }
+    .section.confirming { border-color: #d99; background: #fdf3f3; }
+    .section__head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+    .head-spacer { flex: 1; }
+    .grip { cursor: grab; background: var(--line); border: 0; color: #5b6270; font-size: 1.05rem; line-height: 1; padding: 0.25rem 0.5rem; border-radius: 6px; }
+    .grip:hover { background: #d7dae1; }
+    .grip:active { cursor: grabbing; }
+    .zz-num { font-family: Montserrat, sans-serif; font-weight: 700; font-size: 0.85rem; color: var(--brand-deep); }
+    .rev { display: flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; color: var(--muted); }
+    .rev input { width: auto; }
+    .kind { font: inherit; font-size: 0.85rem; padding: 0.25rem 0.4rem; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+    .field, .zz-body, .zz-img, [data-zz='heading'] { width: 100%; font: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 0.55rem 0.65rem; background: #fff; }
+    .field:focus, .zz-body:focus, .zz-img:focus, [data-zz='heading']:focus { outline: 2px solid var(--brand); border-color: var(--brand); }
+    .field--heading { font-family: Montserrat, sans-serif; font-weight: 600; font-size: 1.05rem; }
+    .field--text { min-height: 3.5rem; resize: none; overflow: hidden; }
+    .zz-body { min-height: 4rem; resize: vertical; }
+    .zz-image { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+    .zz-thumb { width: 96px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); background: #f0f1f4; }
+    .zz-upmsg { font-size: 0.8rem; }
+    .confirm { display: flex; gap: 0.5rem; align-items: center; font-size: 0.85rem; color: #9b1c1c; font-weight: 600; }
+    .confirm button { font: inherit; font-weight: 600; cursor: pointer; border-radius: 6px; padding: 0.25rem 0.6rem; border: 1px solid var(--line); background: #fff; }
+    .confirm .yes { background: #fde8e8; color: #9b1c1c; border-color: #e3b3b3; }
+    .add { width: 100%; }
+    .empty { text-align: center; padding: 1.5rem; border: 1px dashed var(--line); border-radius: var(--radius); margin: 0 0 1rem; }
+
+    /* composer palette */
+    .palette { border: 1px dashed var(--line); border-radius: var(--radius); padding: 1rem; text-align: center; }
+    .palette-label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--muted); margin-bottom: 0.6rem; }
+    .palette-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+    .palette-btns .btn { flex: 0 0 auto; }
+    #composer .section { border-left-color: var(--accent); }
+    #composer .zz-num { color: var(--accent); }
+
+    .pane--preview { display: flex; flex-direction: column; background: #fff; }
+    .preview__bar { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; border-bottom: 1px solid var(--line); font-size: 0.85rem; }
+    .preview__bar a { font-weight: 600; text-decoration: none; }
+    #preview { flex: 1; width: 100%; border: 0; }
+
+    @media (width <= 920px) {
+      .editor { grid-template-columns: 1fr; height: auto; }
+      .pane--edit { border-right: 0; border-bottom: 1px solid var(--line); }
+      #preview { height: 70vh; }
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js" is:inline></script>
+  <script>
+    import { initRichText } from '../../../lib/rich-text-client';
+    initRichText();
+  </script>
+  <script is:inline define:vars={{ pageKey: page.key, slot: page.slot, isHero, isZigzag, isComposer, composerBlocks, bg: hero?.bg ?? '' }}>
+    const saveEl = document.getElementById('save');
+    const errbar = document.getElementById('errbar');
+    const preview = document.getElementById('preview');
+    const publishBtn = document.getElementById('publish');
+    const livenote = document.getElementById('livenote');
+    let timer, lastSave = null, flushSave = null;
+
+    // Keep the preview clean: hide the cookie banner + Astro dev toolbar inside it.
+    preview.addEventListener('load', () => {
+      try {
+        const doc = preview.contentDocument;
+        const s = doc.createElement('style');
+        s.textContent = '#consent, astro-dev-toolbar { display: none !important; }';
+        doc.head.appendChild(s);
+      } catch {}
+    });
+
+    function setState(s) {
+      saveEl.dataset.state = s;
+      saveEl.textContent = s === 'saving' ? 'Saving…' : s === 'error' ? 'Not saved' : 'Saved';
+    }
+    function showError() { errbar.hidden = false; }
+    function hideError() { errbar.hidden = true; }
+    function markPending(p) {
+      publishBtn.disabled = !p;
+      livenote.dataset.pending = String(p);
+      livenote.textContent = p
+        ? 'You have unpublished changes. Click “Publish changes” to put them on the live site.'
+        : 'This page is up to date with the live site.';
+    }
+
+    async function postBlocks(blocks) {
+      setState('saving');
+      lastSave = () => postBlocks(blocks);
+      try {
+        const res = await fetch('/api/admin/blocks', {
+          method: 'POST', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ page: pageKey, slot, blocks }),
+        });
+        const ok = (await res.json()).ok;
+        if (ok) { setState('saved'); hideError(); markPending(true); return true; }
+        setState('error'); showError(); return false;
+      } catch { setState('error'); showError(); return false; }
+    }
+    function schedule(fn) { clearTimeout(timer); timer = setTimeout(fn, 700); }
+
+    document.getElementById('retry').addEventListener('click', () => { if (lastSave) lastSave(); });
+    publishBtn.addEventListener('click', async () => {
+      publishBtn.disabled = true; publishBtn.textContent = 'Publishing…';
+      try {
+        clearTimeout(timer);            // cancel any pending autosave so it can't re-flag pending…
+        if (flushSave) await flushSave(); // …and flush the latest edit into the draft first
+        const res = await fetch('/api/admin/publish', {
+          method: 'POST', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ page: pageKey, slot }),
+        });
+        publishBtn.textContent = 'Publish changes';
+        const ok = (await res.json()).ok;
+        markPending(!ok);
+        if (ok) hideError(); else showError();
+      } catch { publishBtn.textContent = 'Publish changes'; markPending(true); showError(); }
+    });
+
+    // (Rich text is handled by Lexical — see lib/rich-text-client. It writes
+    // serialized HTML into the hidden .rt-value inputs and fires `input` events.)
+
+    // Inline "Remove → are you sure?" so a misclick can't delete content.
+    function confirmRemove(li, onYes) {
+      const head = li.querySelector('.section__head');
+      const btn = head.querySelector('[data-remove]');
+      btn.style.display = 'none';
+      li.classList.add('confirming');
+      const wrap = document.createElement('span');
+      wrap.className = 'confirm';
+      wrap.innerHTML = 'Delete this? <button type="button" class="yes">Delete</button><button type="button" class="no">Keep</button>';
+      head.appendChild(wrap);
+      wrap.querySelector('.no').addEventListener('click', () => { wrap.remove(); btn.style.display = ''; li.classList.remove('confirming'); });
+      wrap.querySelector('.yes').addEventListener('click', () => { onYes(); });
+    }
+
+    if (isHero) {
+      const val = (id) => document.getElementById(id).value;
+      const fields = () => ({ lead: val('f-lead'), heading: val('f-heading'), intro: val('f-intro'), bg });
+      const target = (sel) => { const doc = preview.contentDocument; const h = doc && doc.querySelector('[data-cms-hero]'); return h && h.querySelector(sel); };
+      function renderPreview() {
+        const f = fields();
+        const l = target('[data-hero="lead"]'); if (l) l.textContent = f.lead;
+        const hd = target('[data-hero="heading"]'); if (hd) hd.textContent = f.heading;
+        const it = target('[data-hero="intro"]'); if (it) it.innerHTML = f.intro;
+      }
+      const save = () => postBlocks([{ kind: 'hero', body: JSON.stringify(fields()) }]);
+      flushSave = save;
+      document.querySelectorAll('#herofields [data-hero]').forEach((el) => {
+        el.addEventListener('input', () => { renderPreview(); setState('saving'); schedule(save); });
+        el.addEventListener('focus', () => { const doc = preview.contentDocument; const h = doc && doc.querySelector('[data-cms-hero]'); if (h) h.scrollIntoView({ block: 'start', behavior: 'smooth' }); });
+      });
+    } else if (isZigzag) {
+      const list = document.getElementById('zzlist');
+      const previewRows = () => { const doc = preview.contentDocument; const h = doc && doc.querySelector('[data-cms-zigzag]'); return h ? [...h.querySelectorAll('.zig-zag-row')] : []; };
+      const renumber = () => [...list.querySelectorAll('[data-zz-row]')].forEach((li, i) => { li.querySelector('.zz-num').textContent = 'Step ' + (i + 1); });
+      const cardImg = (li) => {
+        try { return JSON.parse(li.querySelector('[data-zz="img"]').value || '{}'); } catch { return {}; }
+      };
+      const collect = () => [...list.querySelectorAll('[data-zz-row]')].map((li) => ({
+        kind: 'zigzag',
+        body: JSON.stringify({
+          reverse: li.querySelector('[data-zz="reverse"]').checked,
+          heading: li.querySelector('[data-zz="heading"]').value,
+          body: li.querySelector('[data-zz="body"]').value,
+          img: cardImg(li),
+        }),
+      }));
+      const save = () => postBlocks(collect());
+      flushSave = save;
+      const saveAndReload = () => { setState('saving'); clearTimeout(timer); timer = setTimeout(async () => { if (await save()) preview.contentWindow.location.reload(); }, 350); };
+      function liveText(li) {
+        const i = [...list.querySelectorAll('[data-zz-row]')].indexOf(li);
+        const row = previewRows()[i]; if (!row) return;
+        const h = row.querySelector('[data-zz="heading"]'); if (h) h.textContent = li.querySelector('[data-zz="heading"]').value;
+        const b = row.querySelector('[data-zz="body"]'); if (b) b.innerHTML = li.querySelector('[data-zz="body"]').value;
+        row.classList.toggle('reverse', li.querySelector('[data-zz="reverse"]').checked);
+      }
+      list.addEventListener('input', (e) => {
+        const li = e.target.closest('[data-zz-row]'); if (!li) return;
+        if (e.target.matches('[data-zz="reverse"]')) { liveText(li); setState('saving'); schedule(() => saveAndReload()); }
+        else { liveText(li); setState('saving'); schedule(save); }
+      });
+      list.addEventListener('click', (e) => {
+        if (e.target.matches('.zz-upload')) { e.target.closest('.zz-image').querySelector('.zz-file').click(); return; }
+        if (e.target.matches('[data-remove]')) {
+          const li = e.target.closest('[data-zz-row]');
+          confirmRemove(li, () => { li.remove(); renumber(); saveAndReload(); });
+        }
+      });
+      list.addEventListener('change', async (e) => {
+        if (!e.target.matches('.zz-file') || !e.target.files[0]) return;
+        const wrap = e.target.closest('.zz-image');
+        const msg = wrap.querySelector('.zz-upmsg');
+        msg.textContent = 'Resizing…';
+        const fd = new FormData(); fd.append('file', e.target.files[0]);
+        try {
+          const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
+          const d = await res.json();
+          if (d.ok) {
+            wrap.querySelector('.zz-img').value = JSON.stringify(d.img);
+            const t = wrap.querySelector('.zz-thumb'); t.src = d.img.jpg; t.hidden = false;
+            msg.textContent = '';
+            saveAndReload();
+          } else { msg.textContent = d.error || 'Upload failed'; }
+        } catch { msg.textContent = 'Upload failed — check your connection'; }
+        e.target.value = '';
+      });
+      list.addEventListener('focusin', (e) => { const li = e.target.closest('[data-zz-row]'); if (li) { const i = [...list.querySelectorAll('[data-zz-row]')].indexOf(li); const row = previewRows()[i]; if (row) row.scrollIntoView({ block: 'center', behavior: 'smooth' }); } });
+      document.getElementById('zzadd').addEventListener('click', () => {
+        const li = document.createElement('li');
+        li.className = 'section'; li.setAttribute('data-zz-row', ''); li.dataset.img = '{}';
+        li.innerHTML = '<div class="section__head"><button type="button" class="grip" aria-label="Drag to reorder" title="Drag to reorder">⠿</button><span class="zz-num">Step</span><label class="rev"><input type="checkbox" data-zz="reverse"> Image on right</label><span class="head-spacer"></span><button type="button" class="btn btn--quiet remove" data-remove>Remove</button></div><label class="mini">Step title</label><input class="field--heading" data-zz="heading" placeholder="Step title"><label class="mini">Step description</label><div class="rt"><div class="rt-toolbar"><button type="button" data-rt="bold" title="Bold"><b>B</b></button><button type="button" data-rt="italic" title="Italic"><i>I</i></button><button type="button" data-rt="link" title="Add a link">Link</button></div><div class="rt-editor"></div><input type="hidden" class="rt-value" data-zz="body"></div><label class="mini">Image</label><div class="zz-image"><img class="zz-thumb" alt="" hidden><input type="hidden" class="zz-img" data-zz="img"><button type="button" class="btn btn--ghost zz-upload">Upload image…</button><span class="zz-upmsg muted"></span><input type="file" class="zz-file" accept="image/jpeg,image/png" hidden></div>';
+        list.appendChild(li); renumber();
+        li.querySelector('[data-zz="heading"]').focus();
+        saveAndReload();
+      });
+      if (window.Sortable) new Sortable(list, { handle: '.grip', animation: 150, ghostClass: 'dragging', onEnd: () => { renumber(); saveAndReload(); } });
+      renumber();
+    } else if (isComposer) {
+      // ---- Page composer: a page is a list of typed component blocks ----
+      const list = document.getElementById('composer');
+      const SPECS = {
+        hero: { label: 'Hero', fields: [
+          { n: 'lead', t: 'plain', l: 'Small line above the title' },
+          { n: 'heading', t: 'plain', l: 'Title' },
+          { n: 'intro', t: 'rich', l: 'Intro text' },
+        ] },
+        heading: { label: 'Heading', fields: [{ n: 'text', t: 'plain', l: 'Heading' }] },
+        text: { label: 'Text', fields: [{ n: 'html', t: 'rich', l: 'Text' }] },
+        imageText: { label: 'Image + text', fields: [
+          { n: 'reverse', t: 'toggle', l: 'Image on right' },
+          { n: 'heading', t: 'plain', l: 'Heading' },
+          { n: 'body', t: 'rich', l: 'Text' },
+          { n: 'img', t: 'image', l: 'Image' },
+        ] },
+        cta: { label: 'Call to action', fields: [
+          { n: 'heading', t: 'plain', l: 'Heading' },
+          { n: 'body', t: 'rich', l: 'Text' },
+          { n: 'label', t: 'plain', l: 'Button label' },
+          { n: 'href', t: 'plain', l: 'Button link' },
+          { n: 'variant', t: 'select', l: 'Style', opts: [['light', 'Light'], ['dark', 'Dark']] },
+        ] },
+      };
+      const ORDER = ['hero', 'heading', 'text', 'imageText', 'cta'];
+      const DEFAULTS = {
+        hero: { lead: '', heading: 'New heading', intro: '<p></p>', bg: '' },
+        heading: { text: 'Section title' },
+        text: { html: '<p>Write something…</p>' },
+        imageText: { reverse: false, heading: 'New section', body: '<p></p>', img: {} },
+        cta: { heading: 'Ready to get started?', body: '<p></p>', label: 'Get started', href: '/contact-us', variant: 'light' },
+      };
+      const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      function fieldHtml(f, v) {
+        if (f.t === 'plain') return `<label class="mini">${f.l}</label><input class="field" data-field="${f.n}" value="${esc(v)}">`;
+        if (f.t === 'rich') return `<label class="mini">${f.l}</label><div class="rt"><div class="rt-toolbar"><button type="button" data-rt="bold"><b>B</b></button><button type="button" data-rt="italic"><i>I</i></button><button type="button" data-rt="link">Link</button></div><div class="rt-editor"></div><input type="hidden" class="rt-value" data-field="${f.n}" value="${esc(v)}"></div>`;
+        if (f.t === 'toggle') return `<label class="rev"><input type="checkbox" data-field="${f.n}" ${v ? 'checked' : ''}> ${f.l}</label>`;
+        if (f.t === 'select') return `<label class="mini">${f.l}</label><select class="kind" data-field="${f.n}">${f.opts.map((o) => `<option value="${o[0]}" ${v === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select>`;
+        if (f.t === 'image') { const thumb = (v && (v.src || v.jpg)) || ''; return `<label class="mini">${f.l}</label><div class="zz-image"><img class="zz-thumb" src="${esc(thumb)}" alt="" ${thumb ? '' : 'hidden'}><input type="hidden" class="zz-imgval" data-field="${f.n}" value="${esc(JSON.stringify(v || {}))}"><button type="button" class="btn btn--ghost zz-upload">Upload image…</button><span class="zz-upmsg muted"></span><input type="file" class="zz-file" accept="image/jpeg,image/png" hidden></div>`; }
+        return '';
+      }
+      function makeCard(kind, data) {
+        const li = document.createElement('li');
+        li.className = 'section'; li.setAttribute('data-block', ''); li.dataset.kind = kind;
+        li.dataset.extra = JSON.stringify(data);
+        const fields = SPECS[kind].fields.map((f) => fieldHtml(f, data[f.n])).join('');
+        li.innerHTML = `<div class="section__head"><button type="button" class="grip" title="Drag to reorder">⠿</button><span class="zz-num">${SPECS[kind].label}</span><span class="head-spacer"></span><button type="button" class="btn btn--quiet" data-remove>Remove</button></div>${fields}`;
+        return li;
+      }
+      const cards = () => [...list.querySelectorAll('[data-block]')];
+      function collect() {
+        return cards().map((li) => {
+          const kind = li.dataset.kind;
+          let body = {};
+          try { body = JSON.parse(li.dataset.extra || '{}'); } catch {}
+          for (const f of SPECS[kind].fields) {
+            const el = li.querySelector(`[data-field="${f.n}"]`);
+            if (!el) continue;
+            if (f.t === 'toggle') body[f.n] = el.checked;
+            else if (f.t === 'image') { try { body[f.n] = JSON.parse(el.value || '{}'); } catch { body[f.n] = {}; } }
+            else body[f.n] = el.value;
+          }
+          return { kind, body: JSON.stringify(body) };
+        });
+      }
+      const save = () => postBlocks(collect());
+      flushSave = save;
+      const saveAndReload = () => { setState('saving'); clearTimeout(timer); timer = setTimeout(async () => { if (await save()) preview.contentWindow.location.reload(); }, 350); };
+      function liveText(li, name) {
+        const i = cards().indexOf(li);
+        const doc = preview.contentDocument;
+        const block = doc && doc.querySelector(`[data-cms-block="${i}"]`);
+        const target = block && block.querySelector(`[data-cms-field="${name}"]`);
+        const src = li.querySelector(`[data-field="${name}"]`);
+        if (!target || !src) return false; // no live target (e.g. an empty/optional field)
+        const f = SPECS[li.dataset.kind].fields.find((x) => x.n === name);
+        if (f && f.t === 'rich') target.innerHTML = src.value; else target.textContent = src.value;
+        return true;
+      }
+      list.addEventListener('input', (e) => {
+        const li = e.target.closest('[data-block]'); if (!li) return;
+        const fieldEl = e.target.closest('[data-field]'); if (!fieldEl) return;
+        const name = fieldEl.getAttribute('data-field');
+        const f = SPECS[li.dataset.kind].fields.find((x) => x.n === name);
+        setState('saving');
+        if (f && (f.t === 'plain' || f.t === 'rich')) {
+          // If the field has no live preview node (optional/empty), reload to show it.
+          if (liveText(li, name)) schedule(save); else schedule(saveAndReload);
+        } else schedule(saveAndReload);
+      });
+      list.addEventListener('change', async (e) => {
+        if (!e.target.matches('.zz-file') || !e.target.files[0]) return;
+        const wrap = e.target.closest('.zz-image'); const msg = wrap.querySelector('.zz-upmsg'); msg.textContent = 'Resizing…';
+        const fd = new FormData(); fd.append('file', e.target.files[0]);
+        try {
+          const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
+          const d = await res.json();
+          if (d.ok) { wrap.querySelector('.zz-imgval').value = JSON.stringify(d.img); const t = wrap.querySelector('.zz-thumb'); t.src = d.img.jpg; t.hidden = false; msg.textContent = ''; saveAndReload(); }
+          else msg.textContent = d.error || 'Upload failed';
+        } catch { msg.textContent = 'Upload failed'; }
+        e.target.value = '';
+      });
+      list.addEventListener('click', (e) => {
+        if (e.target.matches('.zz-upload')) { e.target.closest('.zz-image').querySelector('.zz-file').click(); return; }
+        if (e.target.matches('[data-remove]')) { const li = e.target.closest('[data-block]'); confirmRemove(li, () => { li.remove(); saveAndReload(); }); }
+      });
+      list.addEventListener('focusin', (e) => {
+        const li = e.target.closest('[data-block]'); if (!li) return;
+        const i = cards().indexOf(li);
+        const doc = preview.contentDocument; const block = doc && doc.querySelector(`[data-cms-block="${i}"]`);
+        if (block) block.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      });
+      if (window.Sortable) new Sortable(list, { handle: '.grip', animation: 150, ghostClass: 'dragging', onEnd: saveAndReload });
+      const palette = document.getElementById('palette');
+      for (const kind of ORDER) {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'btn btn--ghost'; b.textContent = '+ ' + SPECS[kind].label;
+        b.addEventListener('click', () => {
+          const li = makeCard(kind, JSON.parse(JSON.stringify(DEFAULTS[kind])));
+          list.appendChild(li);
+          const first = li.querySelector('[data-field]'); if (first && first.focus) first.focus();
+          saveAndReload();
+        });
+        palette.appendChild(b);
+      }
+      for (const blk of composerBlocks) {
+        let data = {}; try { data = JSON.parse(blk.body); } catch {}
+        list.appendChild(makeCard(blk.kind, data));
+      }
+    }
+  </script>
+</AdminLayout>

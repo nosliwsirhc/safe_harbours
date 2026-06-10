@@ -30,8 +30,9 @@ const canReorder = marketing !== '' && iconStart !== -1 && widgetAt > jobsStart;
 
 let hero = '';
 let banner = '';
-let openBefore = '';
-let openAfter = '';
+// Assigned in both branches below, so no initializer (avoids a dead default).
+let openBefore: string;
+let openAfter: string;
 
 if (canReorder) {
   hero = blob.slice(0, bannerStart);

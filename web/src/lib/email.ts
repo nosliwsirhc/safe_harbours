@@ -5,7 +5,7 @@
 // pull-quote. Table-based + inline styles for broad client support
 // (Outlook/Gmail/Apple Mail); all interpolated values are HTML-escaped.
 
-const esc = (s: unknown) =>
+const esc = (s: string | number | null | undefined) =>
   String(s ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -13,7 +13,7 @@ const esc = (s: unknown) =>
     .replace(/"/g, '&quot;');
 
 const telHref = (phone: string) => {
-  const d = String(phone || '').replace(/\D/g, '');
+  const d = phone.replace(/\D/g, '');
   return d.length === 10 ? `+1${d}` : d;
 };
 
@@ -36,7 +36,7 @@ export interface EmailModel {
   email?: string;
   phone?: string;
   /** extra detail rows (e.g. Source) */
-  rows?: Array<{ label: string; value: string }>;
+  rows?: { label: string; value: string }[];
   /** free-text message, rendered as a pull-quote */
   message?: string;
 }
@@ -54,7 +54,7 @@ export function renderEmail(m: EmailModel): string {
     (m.phone
       ? `<tr>${labelCell('Phone')}<td style="padding:10px 0 0;font-family:${BODY};font-size:17px;line-height:1.4;"><a href="tel:${esc(telHref(m.phone))}" style="color:${SLATE};text-decoration:none;font-weight:600;">${esc(m.phone)}</a></td></tr>`
       : '') +
-    (m.rows || [])
+    (m.rows ?? [])
       .map(
         (r) =>
           `<tr>${labelCell(r.label)}<td style="padding:10px 0 0;font-family:${BODY};font-size:16px;line-height:1.5;color:${SLATE};">${esc(r.value)}</td></tr>`

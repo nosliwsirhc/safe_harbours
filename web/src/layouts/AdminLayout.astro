@@ -1,0 +1,94 @@
+---
+// Shared chrome for the editor. Calm, warm, tied to the site's own fonts and
+// theme colour so it reads as part of Safe Harbours, not a generic dashboard.
+// Auth is checked per-page (a layout can't redirect), not here.
+interface Props {
+  title: string;
+  active?: 'pages' | 'settings';
+}
+const { title, active } = Astro.props;
+---
+<!doctype html>
+<html lang="en-CA">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} · Safe Harbours</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap"
+    />
+    <style is:global>
+      :root {
+        --ink: #2a2f3a;
+        --muted: #6b7180;
+        --bg: #f4f5f7;
+        --panel: #fdfdfc;
+        --line: #e4e6ec;
+        --brand: #484e5e;
+        --brand-deep: #3a3f4d;
+        --accent: #b9543f; /* warm clay — for the one primary action */
+        --ok: #2f7d4f;
+        --radius: 10px;
+        --shadow: 0 1px 2px rgb(42 47 58 / 6%);
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; }
+
+      body {
+        font-family: 'Source Sans 3', system-ui, sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.55;
+      }
+      h1, h2, h3 { font-family: Montserrat, system-ui, sans-serif; letter-spacing: -0.01em; }
+      a { color: var(--brand-deep); }
+
+      .admin-bar {
+        background: var(--brand);
+        color: #fff;
+        display: flex;
+        align-items: baseline;
+        gap: 1.5rem;
+        padding: 0.85rem 1.5rem;
+      }
+      .admin-bar__brand { font-family: Montserrat, sans-serif; font-weight: 700; font-size: 1rem; }
+      .admin-bar nav { display: flex; gap: 1.25rem; }
+
+      .admin-bar nav a {
+        color: #c9ccd6; text-decoration: none; font-weight: 600; font-size: 0.9rem;
+        padding-bottom: 0.15rem; border-bottom: 2px solid transparent;
+      }
+      .admin-bar nav a[aria-current='true'] { color: #fff; border-bottom-color: var(--accent); }
+      .admin-bar nav a:hover { color: #fff; }
+      .admin-bar__out { margin-left: auto; color: #c9ccd6; text-decoration: none; font-weight: 600; font-size: 0.85rem; }
+      .admin-bar__out:hover { color: #fff; }
+
+      .btn {
+        font: inherit; font-weight: 600; cursor: pointer; border-radius: 8px;
+        padding: 0.5rem 0.9rem; border: 1px solid transparent; background: transparent; color: var(--brand-deep);
+      }
+      .btn--primary { background: var(--accent); color: #fff; }
+      .btn--primary:hover { filter: brightness(0.95); }
+      .btn--ghost { border-color: var(--line); background: #fff; }
+      .btn--ghost:hover { border-color: var(--muted); }
+      .btn--quiet { color: var(--muted); padding: 0.35rem 0.5rem; }
+      .btn--quiet:hover { color: var(--accent); }
+
+      .muted { color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <header class="admin-bar">
+      <span class="admin-bar__brand">Safe Harbours</span>
+      <nav>
+        <a href="/admin" aria-current={active === 'pages' ? 'true' : undefined}>Pages</a>
+        <a href="/admin/settings" aria-current={active === 'settings' ? 'true' : undefined}>Settings</a>
+      </nav>
+      <a class="admin-bar__out" href="/api/admin/logout">Log out</a>
+    </header>
+    <slot />
+  </body>
+</html>
