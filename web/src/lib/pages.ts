@@ -20,9 +20,13 @@ export type BlockKind =
   | 'imageBlock'
   | 'team'
   | 'testimonials'
-  | 'logos';
+  | 'logos'
+  | 'heroForm'
+  | 'steps'
+  | 'largeList'
+  | 'safety';
 
-/** Every block kind the composer can add — the default palette for a rich page. */
+/** Every general-purpose block kind the composer can add (the default palette). */
 export const ALL_KINDS: BlockKind[] = [
   'hero',
   'heading',
@@ -33,6 +37,8 @@ export const ALL_KINDS: BlockKind[] = [
   'valueCards',
   'team',
   'testimonials',
+  'steps',
+  'largeList',
   'cta',
   'logos',
 ];
@@ -60,13 +66,11 @@ export const EDITABLE_PAGES: EditablePage[] = [
   },
   {
     key: 'become-a-foster-parent',
-    slot: 'process',
+    slot: 'main',
     name: 'Become a Foster Parent',
     path: '/become-a-foster-parent',
-    blurb: 'The “How it Works” steps — edit, reorder, add or remove.',
-    palette: ['imageText'],
-    numbered: true,
-    addLabel: 'Add step',
+    blurb: 'The whole Become a Foster Parent page — edit every section, reorder, add or remove.',
+    palette: ['heroForm', ...ALL_KINDS, 'safety'],
   },
   {
     key: 'our-impact',

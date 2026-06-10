@@ -3,9 +3,10 @@
 // theme CSS styles it identically. `reverse` flips the image side. Text + image
 // are data. `data-cms-field` hooks let the admin update the preview live.
 //
-// `block` is the editor block index. When set we put `data-cms-block` directly
-// ON the row (not a wrapper) so the row stays a direct child of `.zig-zag` —
-// the theme's :nth-child rules drive the alternating layout + number colours.
+// `item` is the index of this row within a Steps block's repeater. When set we
+// put `data-cms-item` directly ON the row (not a wrapper) so the row stays a
+// direct child of `.zig-zag` — the theme's :nth-child rules drive the alternating
+// layout + number colours, and the editor can patch it live by item index.
 import ResponsiveImage from './ResponsiveImage.astro';
 import type { ZigImage } from '../lib/content';
 interface Props {
@@ -14,11 +15,11 @@ interface Props {
   heading?: string;
   body?: string;
   img?: ZigImage;
-  block?: number;
+  item?: number;
 }
-const { reverse = false, count = '', heading = '', body = '', img = {}, block } = Astro.props;
+const { reverse = false, count = '', heading = '', body = '', img = {}, item } = Astro.props;
 ---
-<div class={`zig-zag-row${reverse ? ' reverse' : ''}`} data-cms-block={block}>
+<div class={`zig-zag-row${reverse ? ' reverse' : ''}`} data-cms-item={item}>
   <div class="grid-x grid-padding-x align-middle">
     <div class="zig-zag-image cell medium-6">
       {img.webpset ? (

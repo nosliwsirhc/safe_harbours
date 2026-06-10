@@ -130,6 +130,29 @@ export interface LargeListData {
   href?: string;
 }
 
+/** "How it Works": a heading + a list of zig-zag step rows (auto-numbered). */
+export interface StepsData {
+  heading?: string;
+  steps?: ZigRow[];
+}
+
+/** page-hero with the recruitment form beside it. */
+export interface HeroFormData {
+  heading?: string;
+  intro?: string;
+  bg?: string;
+}
+
+/** safety section: intro + support cards + an "important" callout. */
+export interface SafetyCard {
+  text?: string;
+}
+export interface SafetyData {
+  content?: string;
+  cards?: SafetyCard[];
+  important?: string;
+}
+
 function db(): D1Database | null {
   const d = (env as unknown as { DB?: D1Database }).DB;
   return d ?? null;

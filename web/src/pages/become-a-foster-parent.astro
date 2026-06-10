@@ -1,48 +1,17 @@
 ---
-// SSR. The "How it Works" zig-zag section is now data-driven (editable +
-// reorderable from /admin); the rest of the page is still mirrored markup. Falls
-// back to the original mirror section if there's no data yet.
+// Fully composed from D1 blocks (editable from /admin), rendered by BlockRenderer
+// — the hero+form, "How it Works" steps, trauma list, support & safety, CTA and
+// logos are all data now. Draft shown only inside the authed admin preview.
 export const prerender = false;
 
 import ThemeLayout from '../layouts/ThemeLayout.astro';
-import ZigZag from '../components/ZigZag.astro';
+import BlockRenderer from '../components/BlockRenderer.astro';
 import { getBlocksForView } from '../lib/content';
 import { isAuthed } from '../lib/admin';
-import blob from '../../_mirror/become-a-foster-parent.main.html?raw';
 
 const preview = Astro.url.searchParams.get('preview') === '1' && isAuthed(Astro.request);
-const blocks = await getBlocksForView('become-a-foster-parent', 'process', preview);
-const rows = blocks
-  .filter((b) => b.kind === 'imageText')
-  .map((b) => {
-    try {
-      return JSON.parse(b.body);
-    } catch {
-      return null;
-    }
-  })
-  .filter(Boolean);
-
-const start = blob.indexOf('<section class="zig-zag');
-const lastRow = blob.lastIndexOf('zig-zag-row');
-const endRel = lastRow !== -1 ? blob.indexOf('</section>', lastRow) : -1;
-const end = endRel !== -1 ? endRel + '</section>'.length : -1;
-const canSplit = start !== -1 && end !== -1 && rows.length > 0;
-
-const before = canSplit ? blob.slice(0, start) : blob;
-const after = canSplit ? blob.slice(end) : '';
+const blocks = await getBlocksForView('become-a-foster-parent', 'main', preview);
 ---
 <ThemeLayout name="become-a-foster-parent" title="Become a Foster Parent | Safe Harbours">
-  <Fragment set:html={before} />
-  {canSplit && (
-    <section class="zig-zag ">
-      <div class="grid-container">
-        <div class="section-title"><h3 style="color: #2D3648;">How it Works</h3></div>
-        {rows.map((r, i) => (
-          <ZigZag reverse={r.reverse} count={`${i + 1}.`} heading={r.heading} body={r.body} img={r.img} block={i} />
-        ))}
-      </div>
-    </section>
-  )}
-  <Fragment set:html={after} />
+  {blocks.map((b, i) => <BlockRenderer block={b} index={i} />)}
 </ThemeLayout>

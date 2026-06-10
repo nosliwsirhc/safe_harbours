@@ -11,6 +11,10 @@ import ImageBlock from './ImageBlock.astro';
 import Team from './Team.astro';
 import Testimonials from './Testimonials.astro';
 import Logos from './Logos.astro';
+import HeroForm from './HeroForm.astro';
+import Steps from './Steps.astro';
+import LargeList from './LargeList.astro';
+import Safety from './Safety.astro';
 import type {
   Hero as HeroData,
   ZigRow,
@@ -21,6 +25,10 @@ import type {
   TeamData,
   TestimonialsData,
   LogosData,
+  HeroFormData,
+  StepsData,
+  LargeListData,
+  SafetyData,
 } from '../lib/content';
 
 interface Props {
@@ -48,6 +56,10 @@ const imageBlock = block.kind === 'imageBlock' ? parse<ImageBlockData>(block.bod
 const team = block.kind === 'team' ? parse<TeamData>(block.body) : null;
 const testimonials = block.kind === 'testimonials' ? parse<TestimonialsData>(block.body) : null;
 const logos = block.kind === 'logos' ? parse<LogosData>(block.body) : null;
+const heroForm = block.kind === 'heroForm' ? parse<HeroFormData>(block.body) : null;
+const steps = block.kind === 'steps' ? parse<StepsData>(block.body) : null;
+const largeList = block.kind === 'largeList' ? parse<LargeListData>(block.body) : null;
+const safety = block.kind === 'safety' ? parse<SafetyData>(block.body) : null;
 ---
 <div class="cms-block-wrap" data-cms-block={index}>
   {hero && <Hero lead={hero.lead} heading={hero.heading} intro={hero.intro} bg={hero.bg} />}
@@ -85,6 +97,14 @@ const logos = block.kind === 'logos' ? parse<LogosData>(block.body) : null;
   {testimonials && <Testimonials items={testimonials.items} />}
 
   {logos && <Logos heading={logos.heading} logos={logos.logos} />}
+
+  {heroForm && <HeroForm heading={heroForm.heading} intro={heroForm.intro} bg={heroForm.bg} />}
+
+  {steps && <Steps heading={steps.heading} steps={steps.steps} />}
+
+  {largeList && <LargeList heading={largeList.heading} items={largeList.items} label={largeList.label} href={largeList.href} />}
+
+  {safety && <Safety content={safety.content} cards={safety.cards} important={safety.important} />}
 </div>
 
 <style is:global>

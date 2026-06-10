@@ -1,0 +1,54 @@
+---
+// page-hero with the recruitment form beside it (the Become a Foster Parent top).
+// Heading + intro are editable; the form is fixed functional furniture — its
+// markup matches the mirror so the site-wide forms.js wires it up (validation,
+// Turnstile, POST to /api/contact).
+import type { HeroFormData } from '../lib/content';
+type Props = HeroFormData;
+const { heading = '', intro = '', bg = '' } = Astro.props;
+---
+<div class="page-hero ">
+  <div class="grid-container">
+    <div class="overlay"></div>
+    {bg && <div class="background-image" style={`background-image: ${bg};`}></div>}
+    <div class="grid-x">
+      <div class="cell medium-9 large-7">
+        <div class="content">
+          <h1 data-cms-field="heading">{heading}</h1>
+          <div class="hero-intro" data-cms-field="intro" set:html={intro}></div>
+        </div>
+      </div>
+      <div class="cell medium-12 large-5">
+        <div class="gform_wrapper gravity-theme gform-theme--no-framework" id="gform_wrapper_4">
+          <div id="gf_4" class="gform_anchor" tabindex="-1"></div>
+          <div class="gform_heading">
+            <h2 class="gform_title">Interested In Becoming a Foster Parent?</h2>
+            <p class="gform_required_legend">"<span class="gfield_required gfield_required_asterisk">*</span>" indicates required fields</p>
+          </div>
+          <form class="sh-form" data-endpoint="/api/contact" data-role="Recruitment: Foster Parents" data-success="Thanks for your interest! A member of our team will reach out within one business day." novalidate>
+            <div class="sh-form-row">
+              <div class="sh-field"><label for="fp-first">First Name <span class="sh-req" aria-hidden="true">*</span></label><input id="fp-first" name="first" type="text" required aria-required="true" autocomplete="given-name" /><span class="sh-err" role="alert"></span></div>
+              <div class="sh-field"><label for="fp-last">Last Name <span class="sh-req" aria-hidden="true">*</span></label><input id="fp-last" name="last" type="text" required aria-required="true" autocomplete="family-name" /><span class="sh-err" role="alert"></span></div>
+            </div>
+            <div class="sh-form-row">
+              <div class="sh-field"><label for="fp-email">Email <span class="sh-req" aria-hidden="true">*</span></label><input id="fp-email" name="email" type="email" required aria-required="true" autocomplete="email" /><span class="sh-err" role="alert"></span></div>
+              <div class="sh-field"><label for="fp-phone">Phone <span class="sh-req" aria-hidden="true">*</span></label><input id="fp-phone" name="phone" type="tel" required aria-required="true" autocomplete="tel" /><span class="sh-err" role="alert"></span></div>
+            </div>
+            <div class="sh-field"><label for="fp-city">Closest Major City or Region <span class="sh-req" aria-hidden="true">*</span></label><input id="fp-city" name="city" type="text" required aria-required="true" /><span class="sh-err" role="alert"></span></div>
+            <div class="sh-field"><label for="fp-msg">Message</label><textarea id="fp-msg" name="msg"></textarea></div>
+            <div class="cf-turnstile" data-size="flexible"></div>
+            <p class="sh-hp" aria-hidden="true"><label>Leave this field empty<input type="text" name="hp" tabindex="-1" autocomplete="off" /></label></p>
+            <button type="submit" class="button">Submit</button>
+            <p class="sh-form-error" role="alert"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+    <svg class="circle-1 show-for-large" xmlns="http://www.w3.org/2000/svg" width="179" height="179" viewBox="0 0 179 179" fill="none">
+      <circle cx="89.2938" cy="89.5107" r="87" transform="rotate(-91.5314 89.2938 89.5107)" fill="#DAB527" fill-opacity="0.89"></circle>
+    </svg>
+    <svg class="circle-2 show-for-large" xmlns="http://www.w3.org/2000/svg" width="112" height="112" viewBox="0 0 112 112" fill="none">
+      <circle cx="55.9621" cy="55.937" r="54.5" transform="rotate(-91.5314 55.9621 55.937)" fill="#F9A5A2"></circle>
+    </svg>
+  </div>
+</div>

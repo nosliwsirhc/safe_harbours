@@ -1,0 +1,33 @@
+---
+// large-list: a heading + a term/description list + a button (on the dark band).
+// Each list entry is a repeater item. Markup/classes copied from the mirror.
+import type { LargeListData } from '../lib/content';
+type Props = LargeListData;
+const { heading = '', items = [], label = '', href = '' } = Astro.props;
+---
+<section class="large-list">
+  <div class="grid-container">
+    <div class="grid-x grid-padding-x">
+      <div class="cell small-12">
+        <div class="section-title text-center">
+          <h2 data-cms-field="heading">{heading}</h2>
+        </div>
+      </div>
+      <div class="cell">
+        <ul class="large-list-items">
+          {items.map((it, i) => (
+            <li data-cms-item={i}>
+              <p class="heading" data-cms-field="heading">{it.heading}</p>
+              <p class="text" data-cms-field="text">{it.text}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+      {label && (
+        <div class="cell text-center">
+          <a class="button-secondary" href={href || '#'} target="_self" data-cms-field="label">{label}</a>
+        </div>
+      )}
+    </div>
+  </div>
+</section>

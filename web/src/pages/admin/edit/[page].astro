@@ -362,6 +362,35 @@ const config = {
           { n: 'img', t: 'image', l: 'Logo' },
         ] },
       ] },
+      heroForm: { label: 'Hero with form', fields: [
+        { n: 'heading', t: 'plain', l: 'Title' },
+        { n: 'intro', t: 'rich', l: 'Intro text' },
+      ] },
+      steps: { label: 'How it works (steps)', fields: [
+        { n: 'heading', t: 'plain', l: 'Section heading' },
+        { n: 'steps', t: 'repeater', l: 'Steps', addLabel: 'step', item: [
+          { n: 'reverse', t: 'toggle', l: 'Image on right' },
+          { n: 'heading', t: 'plain', l: 'Step title' },
+          { n: 'body', t: 'rich', l: 'Step description' },
+          { n: 'img', t: 'image', l: 'Image' },
+        ] },
+      ] },
+      largeList: { label: 'Large list', fields: [
+        { n: 'heading', t: 'plain', l: 'Section heading' },
+        { n: 'items', t: 'repeater', l: 'List items', addLabel: 'item', item: [
+          { n: 'heading', t: 'plain', l: 'Term' },
+          { n: 'text', t: 'plain', l: 'Description' },
+        ] },
+        { n: 'label', t: 'plain', l: 'Button label' },
+        { n: 'href', t: 'plain', l: 'Button link' },
+      ] },
+      safety: { label: 'Support & safety', fields: [
+        { n: 'content', t: 'rich', l: 'Intro' },
+        { n: 'cards', t: 'repeater', l: 'Support cards', addLabel: 'card', item: [
+          { n: 'text', t: 'rich', l: 'Text' },
+        ] },
+        { n: 'important', t: 'rich', l: 'Callout' },
+      ] },
     };
     const DEFAULTS = {
       hero: { lead: '', heading: 'New heading', intro: '<p></p>', bg: '' },
@@ -375,6 +404,10 @@ const config = {
       team: { heading: 'Our Team', members: [{ bg: '', name: 'Name', role: 'Role' }], label: '', href: '' },
       testimonials: { items: [{ quote: '', author: 'Name', role: 'Role' }] },
       logos: { heading: 'Referral Partners', logos: [{ img: {} }] },
+      heroForm: { heading: 'New heading', intro: '<p></p>', bg: '' },
+      steps: { heading: 'How it Works', steps: [{ reverse: false, heading: 'Step', body: '<p></p>', img: {} }] },
+      largeList: { heading: 'Section heading', items: [{ heading: 'Term', text: 'Description' }], label: '', href: '' },
+      safety: { content: '<p></p>', cards: [{ text: '<p></p>' }], important: '<p></p>' },
     };
     // Default value for a freshly-added repeater sub-field.
     const subDefault = (sf) => sf.t === 'image' ? {} : sf.t === 'toggle' ? false : sf.t === 'rich' ? '<p></p>' : sf.t === 'select' ? (sf.opts[0] ? sf.opts[0][0] : '') : '';
