@@ -3,7 +3,7 @@
 // verbatim from the mirror so the self-hosted theme CSS styles it identically —
 // only the text + background are now data (props), not frozen HTML. This single
 // component backs the hero on every page that has one (7 of them). The
-// data-hero / data-cms-hero hooks let the admin update the preview in place.
+// data-cms-field hooks let the admin update the preview in place.
 interface Props {
   lead?: string;
   heading?: string;
@@ -12,16 +12,16 @@ interface Props {
 }
 const { lead = '', heading = '', intro = '', bg = '' } = Astro.props;
 ---
-<div class="page-hero " data-cms-hero>
+<div class="page-hero ">
   <div class="grid-container">
     <div class="overlay"></div>
     {bg && <div class="background-image" style={`background-image: ${bg};`}></div>}
     <div class="grid-x">
       <div class="cell medium-9 large-7">
         <div class="content">
-          <p class="lead" data-hero="lead" data-cms-field="lead">{lead}</p>
-          <h1 data-hero="heading" data-cms-field="heading">{heading}</h1>
-          <div class="hero-intro" data-hero="intro" data-cms-field="intro" set:html={intro}></div>
+          <p class="lead" data-cms-field="lead">{lead}</p>
+          <h1 data-cms-field="heading">{heading}</h1>
+          <div class="hero-intro" data-cms-field="intro" set:html={intro}></div>
         </div>
       </div>
     </div>

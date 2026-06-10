@@ -13,7 +13,7 @@ import blob from '../../_mirror/become-a-foster-parent.main.html?raw';
 const preview = Astro.url.searchParams.get('preview') === '1' && isAuthed(Astro.request);
 const blocks = await getBlocksForView('become-a-foster-parent', 'process', preview);
 const rows = blocks
-  .filter((b) => b.kind === 'zigzag')
+  .filter((b) => b.kind === 'imageText')
   .map((b) => {
     try {
       return JSON.parse(b.body);
@@ -35,11 +35,11 @@ const after = canSplit ? blob.slice(end) : '';
 <ThemeLayout name="become-a-foster-parent" title="Become a Foster Parent | Safe Harbours">
   <Fragment set:html={before} />
   {canSplit && (
-    <section class="zig-zag " data-cms-zigzag>
+    <section class="zig-zag ">
       <div class="grid-container">
         <div class="section-title"><h3 style="color: #2D3648;">How it Works</h3></div>
         {rows.map((r, i) => (
-          <ZigZag reverse={r.reverse} count={`${i + 1}.`} heading={r.heading} body={r.body} img={r.img} />
+          <ZigZag reverse={r.reverse} count={`${i + 1}.`} heading={r.heading} body={r.body} img={r.img} block={i} />
         ))}
       </div>
     </section>

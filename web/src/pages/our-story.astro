@@ -19,6 +19,10 @@ const seam = blob.indexOf('<div id="" class="banner-bar');
 const afterHero = seam !== -1 ? blob.slice(seam) : blob;
 ---
 <ThemeLayout name="our-story" title="Our Story | Safe Harbours">
-  {hero && <Hero lead={hero.lead} heading={hero.heading} intro={hero.intro} bg={hero.bg} />}
+  {hero && (
+    <div class="cms-block-wrap" data-cms-block="0">
+      <Hero lead={hero.lead} heading={hero.heading} intro={hero.intro} bg={hero.bg} />
+    </div>
+  )}
   <Fragment set:html={hero ? afterHero : blob} />
 </ThemeLayout>

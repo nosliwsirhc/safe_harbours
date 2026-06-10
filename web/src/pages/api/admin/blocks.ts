@@ -14,7 +14,7 @@ function cleanBlock(kind: string, body: string): string {
       const d = JSON.parse(body) as Partial<Hero>;
       return JSON.stringify({ ...d, lead: toPlainText(d.lead), heading: toPlainText(d.heading), intro: sanitizeRich(d.intro) });
     }
-    if (kind === 'zigzag' || kind === 'imageText') {
+    if (kind === 'imageText') {
       const d = JSON.parse(body) as Partial<ZigRow>;
       return JSON.stringify({ ...d, heading: toPlainText(d.heading), body: sanitizeRich(d.body) });
     }
