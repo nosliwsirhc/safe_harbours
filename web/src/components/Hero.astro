@@ -9,10 +9,11 @@ interface Props {
   heading?: string;
   intro?: string;
   bg?: string; // full CSS image-set(...) value
+  variant?: string; // extra class on .page-hero (e.g. a landing variant)
 }
-const { lead = '', heading = '', intro = '', bg = '' } = Astro.props;
+const { lead = '', heading = '', intro = '', bg = '', variant = '' } = Astro.props;
 ---
-<div class="page-hero ">
+<div class:list={['page-hero', variant]}>
   <div class="grid-container">
     <div class="overlay"></div>
     {bg && <div class="background-image" style={`background-image: ${bg};`}></div>}

@@ -19,6 +19,7 @@ import TextBlock from './TextBlock.astro';
 import Faqs from './Faqs.astro';
 import ContactHero from './ContactHero.astro';
 import Map from './Map.astro';
+import EventSection from './EventSection.astro';
 import type {
   Hero as HeroData,
   ZigRow,
@@ -37,6 +38,7 @@ import type {
   FaqsData,
   ContactHeroData,
   MapData,
+  EventSectionData,
 } from '../lib/content';
 
 interface Props {
@@ -72,9 +74,10 @@ const textBlock = block.kind === 'textBlock' ? parse<TextBlockData>(block.body) 
 const faqs = block.kind === 'faqs' ? parse<FaqsData>(block.body) : null;
 const contactHero = block.kind === 'contactHero' ? parse<ContactHeroData>(block.body) : null;
 const map = block.kind === 'map' ? parse<MapData>(block.body) : null;
+const eventSection = block.kind === 'eventSection' ? parse<EventSectionData>(block.body) : null;
 ---
 <div class="cms-block-wrap" data-cms-block={index}>
-  {hero && <Hero lead={hero.lead} heading={hero.heading} intro={hero.intro} bg={hero.bg} />}
+  {hero && <Hero lead={hero.lead} heading={hero.heading} intro={hero.intro} bg={hero.bg} variant={hero.variant} />}
 
   {row && (
     <section class="zig-zag ">
@@ -121,7 +124,7 @@ const map = block.kind === 'map' ? parse<MapData>(block.body) : null;
 
   {heroForm && <HeroForm heading={heroForm.heading} intro={heroForm.intro} bg={heroForm.bg} />}
 
-  {steps && <Steps heading={steps.heading} steps={steps.steps} />}
+  {steps && <Steps heading={steps.heading} steps={steps.steps} sectionClass={steps.sectionClass} />}
 
   {largeList && <LargeList heading={largeList.heading} items={largeList.items} label={largeList.label} href={largeList.href} />}
 
@@ -131,9 +134,22 @@ const map = block.kind === 'map' ? parse<MapData>(block.body) : null;
 
   {faqs && <Faqs heading={faqs.heading} items={faqs.items} />}
 
-  {contactHero && <ContactHero heading={contactHero.heading} phone={contactHero.phone} email={contactHero.email} address={contactHero.address} bg={contactHero.bg} />}
+  {contactHero && (
+    <ContactHero
+      heading={contactHero.heading}
+      phone={contactHero.phone}
+      email={contactHero.email}
+      address={contactHero.address}
+      bg={contactHero.bg}
+      variant={contactHero.variant}
+      description={contactHero.description}
+      showImage={contactHero.showImage ?? true}
+    />
+  )}
 
   {map && <Map embed={map.embed} />}
+
+  {eventSection && <EventSection eyebrow={eventSection.eyebrow} heading={eventSection.heading} body={eventSection.body} calendlyUrl={eventSection.calendlyUrl} bg={eventSection.bg} />}
 </div>
 
 <style is:global>

@@ -405,12 +405,19 @@ const config = {
       ] },
       contactHero: { label: 'Contact hero', fields: [
         { n: 'heading', t: 'plain', l: 'Title' },
+        { n: 'description', t: 'rich', l: 'Intro (optional)' },
         { n: 'phone', t: 'plain', l: 'Phone' },
         { n: 'email', t: 'plain', l: 'Email' },
         { n: 'address', t: 'rich', l: 'Address' },
       ] },
       map: { label: 'Map', fields: [
         { n: 'embed', t: 'plain', l: 'Google Maps embed URL' },
+      ] },
+      eventSection: { label: 'Booking (Calendly)', fields: [
+        { n: 'eyebrow', t: 'plain', l: 'Eyebrow' },
+        { n: 'heading', t: 'plain', l: 'Heading' },
+        { n: 'body', t: 'rich', l: 'Text' },
+        { n: 'calendlyUrl', t: 'plain', l: 'Calendly URL' },
       ] },
     };
     const DEFAULTS = {
@@ -431,8 +438,9 @@ const config = {
       safety: { content: '<p></p>', cards: [{ text: '<p></p>' }], important: '<p></p>' },
       textBlock: { heading: 'New heading', body: '<p></p>' },
       faqs: { heading: 'Frequently Asked Questions', items: [{ q: 'Question?', a: '<p></p>' }] },
-      contactHero: { heading: 'Contact Us', phone: '', email: '', address: '<p></p>', bg: '' },
+      contactHero: { heading: 'Contact Us', description: '', phone: '', email: '', address: '<p></p>', bg: '' },
       map: { embed: '' },
+      eventSection: { eyebrow: 'Start Here.', heading: 'Book a call', body: '<p></p>', calendlyUrl: '' },
     };
     // Default value for a freshly-added repeater sub-field.
     const subDefault = (sf) => sf.t === 'image' ? {} : sf.t === 'toggle' ? false : sf.t === 'rich' ? '<p></p>' : sf.t === 'select' ? (sf.opts[0] ? sf.opts[0][0] : '') : '';

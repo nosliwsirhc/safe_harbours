@@ -23,6 +23,7 @@ export interface Hero {
   heading: string;
   intro: string;
   bg: string;
+  variant?: string; // extra class on .page-hero (e.g. a landing variant)
 }
 
 export interface ZigImage {
@@ -84,6 +85,9 @@ export interface ContactHeroData {
   email?: string;
   address?: string;
   bg?: string;
+  variant?: string; // extra class on .hero (e.g. contact-hero)
+  description?: string; // rich intro shown instead of the phone/email/address list
+  showImage?: boolean; // render the decorative photo + circles (default true)
 }
 
 /** A full-width Google Maps embed. */
@@ -171,6 +175,16 @@ export interface LargeListData {
 export interface StepsData {
   heading?: string;
   steps?: ZigRow[];
+  sectionClass?: string; // extra classes on the .zig-zag section (e.g. lp-section)
+}
+
+/** event-section: an intro beside an embedded Calendly booking widget. */
+export interface EventSectionData {
+  eyebrow?: string;
+  heading?: string;
+  body?: string;
+  calendlyUrl?: string;
+  bg?: string;
 }
 
 /** page-hero with the recruitment form beside it. */

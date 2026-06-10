@@ -4,21 +4,26 @@
 // and the decorative image/circles are fixed furniture. Markup copied from mirror.
 import type { ContactHeroData } from '../lib/content';
 type Props = ContactHeroData;
-const { heading = '', phone = '', email = '', address = '', bg = '' } = Astro.props;
+const { heading = '', phone = '', email = '', address = '', bg = '', variant = '', description = '', showImage = true } = Astro.props;
 ---
-<div class="hero">
+<div class:list={['hero', variant]}>
   <div class="grid-container">
     <div class="overlay"></div>
     {bg && <div class="background-image" style={`background-image: ${bg};`}></div>}
-    <div class="grid-x">
+    <div class="grid-x align-middle">
       <div class="cell medium-6 large-5">
         <div class="content">
           <h1 data-cms-field="heading">{heading}</h1>
-          <ul class="hero-contact-info">
-            <li><span class="label">Phone:</span><p data-cms-field="phone">{phone}</p></li>
-            <li><span class="label">Email:</span><p data-cms-field="email">{email}</p></li>
-            <li><span class="label">Address:</span><p data-cms-field="address" set:html={address}></p></li>
-          </ul>
+          {description ? (
+            <div class="description" data-cms-field="description" set:html={description}></div>
+          ) : (
+            <ul class="hero-contact-info">
+              <li><span class="label">Phone:</span><p data-cms-field="phone">{phone}</p></li>
+              <li><span class="label">Email:</span><p data-cms-field="email">{email}</p></li>
+              <li><span class="label">Address:</span><p data-cms-field="address" set:html={address}></p></li>
+            </ul>
+          )}
+          {showImage && (
           <div class="image show-for-medium">
             <span class="circle-2">
               <svg xmlns="http://www.w3.org/2000/svg" width="341" height="341" viewBox="0 0 341 341" fill="none"><circle cx="170.5" cy="170.5" r="170.5" fill="#ECD455" fill-opacity="0.89"></circle></svg>
@@ -32,6 +37,7 @@ const { heading = '', phone = '', email = '', address = '', bg = '' } = Astro.pr
               <img alt="" src="/assets/uploads/2024/10/Interview-ContactUs.png" decoding="async" loading="eager" width="1707" height="1259" />
             </picture>
           </div>
+          )}
         </div>
       </div>
       <div class="cell medium-6 large-7">
@@ -61,6 +67,7 @@ const { heading = '', phone = '', email = '', address = '', bg = '' } = Astro.pr
         <svg class="hero-circle-1 show-for-large" xmlns="http://www.w3.org/2000/svg" width="174" height="174" viewBox="0 0 174 174" fill="none"><circle cx="87" cy="87" r="87" fill="#DAB527" fill-opacity="0.89"></circle></svg>
         <svg class="hero-circle-2" xmlns="http://www.w3.org/2000/svg" width="109" height="109" viewBox="0 0 109 109" fill="none"><circle cx="54.5" cy="54.5" r="54.5" fill="#F9A5A2"></circle></svg>
       </div>
+      {showImage && (
       <div class="image hide-for-medium">
         <span class="circle-2">
           <svg xmlns="http://www.w3.org/2000/svg" width="341" height="341" viewBox="0 0 341 341" fill="none"><circle cx="170.5" cy="170.5" r="170.5" fill="#ECD455" fill-opacity="0.89"></circle></svg>
@@ -74,6 +81,7 @@ const { heading = '', phone = '', email = '', address = '', bg = '' } = Astro.pr
           <img alt="" src="/assets/uploads/2024/10/Interview-ContactUs.png" decoding="async" loading="lazy" width="1707" height="1259" />
         </picture>
       </div>
+      )}
     </div>
   </div>
 </div>

@@ -1,4 +1,16 @@
 ---
+// Composed from D1 blocks (editable from /admin). Draft shown only inside the
+// authed admin preview (?preview=1).
+export const prerender = false;
+
 import ThemeLayout from '../layouts/ThemeLayout.astro';
+import BlockRenderer from '../components/BlockRenderer.astro';
+import { getBlocksForView } from '../lib/content';
+import { isAuthed } from '../lib/admin';
+
+const preview = Astro.url.searchParams.get('preview') === '1' && isAuthed(Astro.request);
+const blocks = await getBlocksForView('book-an-appointment', 'main', preview);
 ---
-<ThemeLayout name="book-an-appointment" title="Book an Appointment | Safe Harbours" />
+<ThemeLayout name="book-an-appointment" title="Book an Appointment | Safe Harbours">
+  {blocks.map((b, i) => <BlockRenderer block={b} index={i} />)}
+</ThemeLayout>

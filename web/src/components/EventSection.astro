@@ -1,0 +1,29 @@
+---
+// event-section: a short intro beside an embedded Calendly booking widget.
+// Markup/classes + the decorative circles copied from the mirror; the Calendly
+// script renders the inline widget from data-url. Intro text is editable.
+import type { EventSectionData } from '../lib/content';
+type Props = EventSectionData;
+const { eyebrow = '', heading = '', body = '', calendlyUrl = '', bg = '' } = Astro.props;
+---
+<section class="event-section" id="book" style={bg ? `background-image: ${bg};` : undefined}>
+  <svg class="main-svg" xmlns="http://www.w3.org/2000/svg" width="231" height="248" viewBox="0 0 231 248" fill="none">
+    <circle cx="128.073" cy="102.008" r="87" transform="rotate(78.9952 128.073 102.008)" fill="#DAB527" fill-opacity="0.65"></circle>
+    <circle cx="63.9014" cy="183.251" r="54.5" transform="rotate(78.9952 63.9014 183.251)" fill="#F9A5A2"></circle>
+  </svg>
+  <div class="grid-container">
+    <div class="grid-x grid-margin-x align-middle">
+      <div class="large-4 medium-12 small-12 cell">
+        <span class="eyebrow" data-cms-field="eyebrow">{eyebrow}</span>
+        <h2 class="small" data-cms-field="heading">{heading}</h2>
+        <div class="event-section--content" data-cms-field="body" set:html={body}></div>
+      </div>
+      <div class="large-8 medium-12 small-12 cell">
+        <div class="event-section--book">
+          <div class="calendly-inline-widget" data-url={calendlyUrl} style="min-width:320px;height:700px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script src="https://assets.calendly.com/assets/external/widget.js" async is:inline></script>
