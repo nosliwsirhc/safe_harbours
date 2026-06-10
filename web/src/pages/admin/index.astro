@@ -9,8 +9,12 @@ import { EDITABLE_PAGES } from '../../lib/pages';
 
 if (!isAuthed(Astro.request)) return Astro.redirect('/admin/login');
 
-// Pages not yet wired for editing (shown greyed so the list feels complete).
-const COMING_SOON = ['Home', 'About Fostering', 'Careers', 'Program Description', 'Resources', 'Contact Us', 'Book an Appointment'];
+// Pages managed by other systems (shown greyed so the list feels complete):
+// Careers comes from the jobs board, Resources from the articles collection.
+const MANAGED_ELSEWHERE = [
+  { name: 'Careers', where: 'Managed from the jobs board.' },
+  { name: 'Resources', where: 'Managed from the articles collection.' },
+];
 ---
 <AdminLayout title="Pages" active="pages">
   <main class="wrap">
@@ -35,14 +39,13 @@ const COMING_SOON = ['Home', 'About Fostering', 'Careers', 'Program Description'
       ))}
     </ul>
 
-    <h2 class="grouphead">Coming soon</h2>
+    <h2 class="grouphead">Managed elsewhere</h2>
     <ul class="pages" role="list">
-      {COMING_SOON.map((name) => (
+      {MANAGED_ELSEWHERE.map((p) => (
         <li>
           <div class="page page--soon" aria-disabled="true">
-            <span class="page__name">{name}</span>
-            <span class="page__blurb muted">Not editable yet.</span>
-            <span class="page__go muted" aria-hidden="true">Soon</span>
+            <span class="page__name">{p.name}</span>
+            <span class="page__blurb muted">{p.where}</span>
           </div>
         </li>
       ))}
