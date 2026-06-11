@@ -60,24 +60,43 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // entry (these pages have no per-request variation).
   const cacheKey = new Request(`${url.origin}${url.pathname}${url.search}`, { method: 'GET' });
 
-  const hit = await cache.match(cacheKey);
-  if (hit) return hit;
+  // Serve a cached copy if present. Cache API responses have IMMUTABLE headers,
+  // and the runtime enforces that strictly (Miniflare/dev does not — which is
+  // why this only surfaced in production): handing one back to Astro's pipeline,
+  // which sets headers downstream, throws "Can't modify immutable headers" → 500.
+  // So we copy it into a fresh, mutable response. All cache work is wrapped so a
+  // cache failure can never break the page — it just falls through to a render.
+  try {
+    const hit = await cache.match(cacheKey);
+    if (hit) {
+      const headers = new Headers(hit.headers);
+      headers.set('x-edge-cache', 'HIT');
+      return new Response(hit.body, { status: hit.status, statusText: hit.statusText, headers });
+    }
+  } catch {
+    // fall through to a fresh render
+  }
 
   const res = await next();
 
-  const cacheable =
-    res.status === 200 &&
-    (res.headers.get('content-type') ?? '').includes('text/html') &&
-    !res.headers.has('set-cookie');
+  try {
+    const cacheable =
+      res.status === 200 &&
+      (res.headers.get('content-type') ?? '').includes('text/html') &&
+      !res.headers.has('set-cookie');
 
-  if (cacheable) {
-    // max-age=0 → browsers always revalidate (so a published change is never
-    // pinned in someone's browser); s-maxage → the edge caches for EDGE_TTL.
-    res.headers.set('Cache-Control', `public, max-age=0, s-maxage=${EDGE_TTL}`);
-    const ctx = (locals as { cfContext?: { waitUntil(p: Promise<unknown>): void } }).cfContext;
-    const stored = res.clone();
-    if (ctx?.waitUntil) ctx.waitUntil(cache.put(cacheKey, stored));
-    else await cache.put(cacheKey, stored);
+    if (cacheable) {
+      // max-age=0 → browsers always revalidate (so a published change is never
+      // pinned in someone's browser); s-maxage → the edge caches for EDGE_TTL.
+      res.headers.set('Cache-Control', `public, max-age=0, s-maxage=${EDGE_TTL}`);
+      res.headers.set('x-edge-cache', 'MISS');
+      const ctx = (locals as { cfContext?: { waitUntil(p: Promise<unknown>): void } }).cfContext;
+      const stored = res.clone();
+      if (ctx?.waitUntil) ctx.waitUntil(cache.put(cacheKey, stored));
+      else await cache.put(cacheKey, stored);
+    }
+  } catch {
+    // caching is best-effort — never let it break the response
   }
   return res;
 });
