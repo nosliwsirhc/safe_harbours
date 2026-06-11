@@ -18,8 +18,9 @@ import { defineMiddleware } from 'astro:middleware';
 //     down for fresher publishes, or add a cache purge on publish for instant.
 const EDGE_TTL = 60; // seconds a rendered page stays cached in a data centre
 
-const isPrivate = (pathname: string): boolean =>
-  pathname.startsWith('/admin') || pathname.startsWith('/api');
+// Match the /admin and /api route trees on segment boundaries, so an unrelated
+// public path like /apiary isn't accidentally forced private.
+const isPrivate = (pathname: string): boolean => /^\/(admin|api)(\/|$)/.test(pathname);
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { request, locals } = context;
@@ -70,7 +71,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
     !res.headers.has('set-cookie');
 
   if (cacheable) {
-    res.headers.set('Cache-Control', `public, s-maxage=${EDGE_TTL}, stale-while-revalidate=600`);
+    // max-age=0 → browsers always revalidate (so a published change is never
+    // pinned in someone's browser); s-maxage → the edge caches for EDGE_TTL.
+    res.headers.set('Cache-Control', `public, max-age=0, s-maxage=${EDGE_TTL}`);
     const ctx = (locals as { cfContext?: { waitUntil(p: Promise<unknown>): void } }).cfContext;
     const stored = res.clone();
     if (ctx?.waitUntil) ctx.waitUntil(cache.put(cacheKey, stored));
