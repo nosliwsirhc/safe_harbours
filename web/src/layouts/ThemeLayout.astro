@@ -106,14 +106,14 @@ const orgSchema = {
 <html lang="en-CA">
   <head>
     <meta charset="UTF-8" />
+    {/* Analytics. Consent Mode v2 defaults to denied BEFORE any tag loads, so no
+        GTM/GA tag writes cookies until the visitor accepts — the consent banner
+        flips it to granted. GTM loads on every page once its container ID is set
+        in /admin/settings; GA4 loads through the consent banner (one place, no
+        double-counting). gtag() is defined once here and shared by both. */}
+    <script is:inline set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});`} />
     {gtmId && (
       <script is:inline set:html={`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${gtmId}');`} />
-    )}
-    {ga4Id && (
-      <Fragment>
-        <script async src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`} is:inline></script>
-        <script is:inline set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${ga4Id}');`} />
-      </Fragment>
     )}
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{pageTitle}</title>
@@ -154,7 +154,29 @@ const orgSchema = {
         <SiteFooter path={cleanPath} />
       </div>
     </div>
-    <ConsentBanner />
+    <ConsentBanner ga4Id={ga4Id} gtmId={gtmId} />
+    {/* Conversion events → dataLayer (for GTM/GA4). Phone-call + email clicks are
+        tracked everywhere; CTA clicks fire for elements marked data-cta or links
+        to the key conversion pages. Form submits push generate_lead (forms.js). */}
+    <script is:inline set:html={`
+      (function () {
+        window.dataLayer = window.dataLayer || [];
+        var KEY_CTA = /\\/(become-a-foster-parent|book-an-appointment)(\\/|$|\\?)/;
+        document.addEventListener('click', function (e) {
+          var a = e.target && e.target.closest && e.target.closest('a, [data-cta]');
+          if (!a) return;
+          var href = a.getAttribute('href') || '';
+          var text = (a.textContent || '').trim().slice(0, 100);
+          if (href.indexOf('tel:') === 0) {
+            window.dataLayer.push({ event: 'phone_call', link_url: href, link_text: text });
+          } else if (href.indexOf('mailto:') === 0) {
+            window.dataLayer.push({ event: 'email_click', link_url: href, link_text: text });
+          } else if (a.hasAttribute('data-cta') || KEY_CTA.test(href)) {
+            window.dataLayer.push({ event: 'cta_click', cta_label: a.getAttribute('data-cta') || text, cta_url: href });
+          }
+        }, true);
+      })();
+    `} />
     <script is:inline define:vars={{ turnstileKey }}>window.__TS_KEY = turnstileKey;</script>
     <script src={meta.script} defer is:inline></script>
     <script src={ver('/assets/forms.js')} defer is:inline></script>

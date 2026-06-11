@@ -15,7 +15,7 @@ const { heading = '', body = '', label = '', href = '' } = Astro.props;
           <h3 data-cms-field="heading">{heading}</h3>
           <div data-cms-field="body" set:html={body}></div>
           {label && (
-            <p><a href={href || '#'} data-cms-field="label">{label}</a></p>
+            <p><a href={href || '#'} data-cms-field="label" data-cta={label || 'cta'}>{label}</a></p>
           )}
         </div>
       </div>

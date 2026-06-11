@@ -165,7 +165,12 @@
         var data = await res.json().catch(function () { return {}; });
         if (res.ok && data.ok) {
           showSuccess(form, okMsg);
-          if (window.gtag) window.gtag('event', 'generate_lead', { form_location: location.pathname });
+          // Conversion event for GTM/GA4. dataLayer.push catches AJAX submits
+          // (GTM can't see a fetch() form submit on its own); gtag is a fallback.
+          var formSource = form.getAttribute('data-source') || '';
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({ event: 'generate_lead', form_location: location.pathname, form_source: formSource });
+          if (window.gtag) window.gtag('event', 'generate_lead', { form_location: location.pathname, form_source: formSource });
         } else {
           formError(form, (data && data.error) || 'Something went wrong. Please try again, or call us.');
           if (window.turnstile) try { window.turnstile.reset(); } catch (x) {}
