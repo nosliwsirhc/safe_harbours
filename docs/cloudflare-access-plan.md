@@ -8,11 +8,15 @@
 > cookie elsewhere e.g. draft preview). Secrets `CF_ACCESS_TEAM_DOMAIN` +
 > `CF_ACCESS_AUD` (both apps' AUDs) are set.
 >
+> Login + logout + draft preview confirmed working. The shared password is
+> **retired** (`ADMIN_TOKEN` deleted) and the `*.workers.dev` subdomain is
+> **disabled** (`workers_dev: false`) — `/admin` is Access-only, on the
+> `www.safeharbours.ca` Custom Domain only.
+>
 > **Manage users:** edit the shared policy in Zero Trust → Access → Policies
-> ("Safe Harbours editors"). **Revert to password:** delete the two Access apps —
-> `/admin` falls back to the still-present `ADMIN_TOKEN` immediately.
-> **Remaining:** retire `ADMIN_TOKEN` + disable the `*.workers.dev` preview URL
-> once an OTP login is confirmed.
+> ("Safe Harbours editors"). **Break-glass / revert:** delete the two Access apps
+> AND re-add the `ADMIN_TOKEN` secret (`wrangler secret put ADMIN_TOKEN`) to fall
+> back to the password gate.
 
 ## Goal
 
