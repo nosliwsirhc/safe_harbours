@@ -8,7 +8,7 @@ import BlockRenderer from '../components/BlockRenderer.astro';
 import { getBlocksForView } from '../lib/content';
 import { isAuthed } from '../lib/admin';
 
-const preview = Astro.url.searchParams.get('preview') === '1' && isAuthed(Astro.request);
+const preview = Astro.url.searchParams.get('preview') === '1' && await isAuthed(Astro.request);
 const blocks = await getBlocksForView('contact-us', 'main', preview);
 ---
 <ThemeLayout name="contact-us" title="Contact Us | Safe Harbours">

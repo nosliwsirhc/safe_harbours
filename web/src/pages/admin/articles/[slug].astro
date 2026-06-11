@@ -9,7 +9,7 @@ import { isAuthed } from '../../../lib/admin';
 import { getArticleForView, listAdminArticles, hasUnpublishedChanges } from '../../../lib/articles';
 import '../../../styles/admin-editor.css';
 
-if (!isAuthed(Astro.request)) return Astro.redirect('/admin/login');
+if (!(await isAuthed(Astro.request))) return Astro.redirect('/admin/login');
 
 const slug = Astro.params.slug ?? '';
 const article = await getArticleForView(slug, true);

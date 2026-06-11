@@ -10,7 +10,7 @@ const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 
 export const POST: APIRoute = async ({ request }) => {
-  if (!isAuthed(request)) return json({ ok: false, error: 'Unauthorized' }, 401);
+  if (!(await isAuthed(request))) return json({ ok: false, error: 'Unauthorized' }, 401);
   let raw: unknown;
   try {
     raw = await request.json();

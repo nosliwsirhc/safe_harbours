@@ -10,7 +10,7 @@ import { getArticleForView } from '../../lib/articles';
 import { isAuthed } from '../../lib/admin';
 
 const { slug } = Astro.params;
-const preview = Astro.url.searchParams.get('preview') === '1' && isAuthed(Astro.request);
+const preview = Astro.url.searchParams.get('preview') === '1' && await isAuthed(Astro.request);
 const article = slug ? await getArticleForView(slug, preview) : null;
 if (!article) return new Response('Article not found', { status: 404 });
 ---

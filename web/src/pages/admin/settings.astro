@@ -7,7 +7,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 import { isAuthed } from '../../lib/admin';
 import { getSettings } from '../../lib/content';
 
-if (!isAuthed(Astro.request)) return Astro.redirect('/admin/login');
+if (!(await isAuthed(Astro.request))) return Astro.redirect('/admin/login');
 
 const settings = await getSettings();
 ---

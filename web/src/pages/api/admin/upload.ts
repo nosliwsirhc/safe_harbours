@@ -14,7 +14,7 @@ const MAX_BYTES = 8 * 1024 * 1024; // cap input so the Worker resize stays withi
 const WIDTHS = [480, 768, 1024, 1536];
 
 export const POST: APIRoute = async ({ request }) => {
-  if (!isAuthed(request)) return json({ ok: false, error: 'Unauthorized' }, 401);
+  if (!(await isAuthed(request))) return json({ ok: false, error: 'Unauthorized' }, 401);
 
   const media = (env as unknown as { MEDIA?: R2Bucket }).MEDIA;
   if (!media) return json({ ok: false, error: 'Image storage is not set up yet.' }, 500);

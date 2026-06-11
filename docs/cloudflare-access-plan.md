@@ -43,33 +43,55 @@ Editor ──> Cloudflare Access (verify identity + policy) ──> Worker /admi
    - the nvision editors' emails (or `@nvision.ca`)
    - Safe Harbours staff emails
    - Login method: One-time PIN (no IdP setup needed) or Google/Microsoft SSO.
-4. **(Recommended) Verify the Access JWT in the Worker** for defense-in-depth, so
-   the app trusts the identity only when the request genuinely came through
-   Access:
-   - Read `Cf-Access-Jwt-Assertion`, validate it against the team's public keys
-     (`https://<team>.cloudflareaccess.com/cdn-cgi/access/certs`), and read the
-     verified email. Update `isAuthed()` in `src/lib/admin.ts` to accept this.
-   - Keep the existing `ADMIN_TOKEN` password as a **transitional fallback**, then
-     remove it once Access is confirmed working.
-5. **Use the email for attribution** — pass the Access email into publish/save so
-   the revision-history "by" field records who made each change.
-6. **Test**: confirm an allowed email gets in, a non-listed email is blocked, and
-   the password path can be retired.
+4. **Set two Worker secrets** so the app trusts Access (see below). Until both are
+   set, the app ignores Access and uses the shared password — so steps 1–3 can be
+   done and tested first without affecting the live login.
 
-## Code touch-points (small)
+## The app code is already done ✅
 
-- `src/lib/admin.ts` — add an `accessEmail(request)` helper (verify JWT → email)
-  and let `isAuthed()` accept a valid Access identity.
-- Publish/save handlers (`api/admin/*`) — record the editor email on writes.
-- No UI changes required; the Cloudflare login screen replaces our `/admin/login`.
+JWT verification is implemented and shipped (inert until configured):
+
+- `src/lib/admin.ts` verifies the `Cf-Access-Jwt-Assertion` header against the
+  team's public keys (`https://<team>/cdn-cgi/access/certs`), checks the issuer
+  and audience, and returns the signed-in email (`accessEmail()`).
+- `isAuthed()` is now async and returns true for **either** a valid Access
+  identity **or** the existing `ADMIN_TOKEN` password (transitional fallback).
+- Verifying the JWT in-Worker is defense-in-depth: even if the Worker were reached
+  off the Access-protected hostname (e.g. a `*.workers.dev` URL), a forged
+  `Cf-Access-Authenticated-User-Email` header is rejected because the signature
+  won't validate.
+
+### Turn it on (two Worker secrets)
+
+```sh
+# The Audience (AUD) tag from the Access application's "Overview" tab:
+wrangler secret put CF_ACCESS_AUD
+# Your Zero Trust team domain, e.g. safeharbours.cloudflareaccess.com:
+wrangler secret put CF_ACCESS_TEAM_DOMAIN
+```
+
+The moment both are present, a verified Access login is accepted. Leave
+`ADMIN_TOKEN` set during the transition; once Access is confirmed working,
+**remove it** (`wrangler secret delete ADMIN_TOKEN`) to retire the shared
+password entirely.
+
+## Test
+
+- An **allowed** email signs in via Cloudflare → lands in `/admin`, no password.
+- A **non-listed** email is blocked at Cloudflare's login (never reaches the app).
+- With both secrets set, the old `/admin/login` password is no longer needed.
+
+## Follow-ups (small, optional)
+
+- **Attribution:** `accessEmail(request)` is ready to stamp a "by" field on
+  publishes once revision history exists (see the roadmap).
+- **Logout:** point the admin "Log out" link at `/cdn-cgi/access/logout` when
+  Access is active (the cookie logout still works in the meantime).
 
 ## Risks / notes
 
-- The Access policy is enforced on the **hostname path**, and the Worker serves
-  that same hostname, so Access sits in front of it at the edge — there's no
-  public bypass route. Verifying the JWT in-Worker closes the gap where a
-  misconfiguration could forward unauthenticated traffic.
-- The `.workers.dev` preview URL is **not** behind the Custom Domain's Access app;
-  ensure the admin isn't reachable there (or add a policy / disable the preview).
-- Effort: **Low–Medium** — mostly Cloudflare configuration plus the optional
-  JWT-verification helper.
+- The `.workers.dev` preview URL is **not** behind the Custom Domain's Access app.
+  The in-Worker JWT check already blocks forged identities there, but you can also
+  disable the preview URL or add a route-level Access policy for belt-and-braces.
+- Effort: **Low** now — the code is done; this is Cloudflare configuration plus
+  two `wrangler secret put` commands.

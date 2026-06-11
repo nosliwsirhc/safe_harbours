@@ -8,7 +8,7 @@ import BlockRenderer from '../components/BlockRenderer.astro';
 import { getBlocksForView } from '../lib/content';
 import { isAuthed } from '../lib/admin';
 
-const preview = Astro.url.searchParams.get('preview') === '1' && isAuthed(Astro.request);
+const preview = Astro.url.searchParams.get('preview') === '1' && await isAuthed(Astro.request);
 const blocks = await getBlocksForView('thank-you-fostering', 'main', preview);
 ---
 <ThemeLayout name="thank-you-fostering" title="Thank You | Safe Harbours">
