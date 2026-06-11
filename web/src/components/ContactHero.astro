@@ -1,0 +1,87 @@
+---
+// The Contact Us hero: contact details beside the website contact form. Heading
+// + phone/email/address are editable; the form (wired by the site-wide forms.js)
+// and the decorative image/circles are fixed furniture. Markup copied from mirror.
+import type { ContactHeroData } from '../lib/content';
+type Props = ContactHeroData;
+const { heading = '', phone = '', email = '', address = '', bg = '', variant = '', description = '', showImage = true } = Astro.props;
+---
+<div class:list={['hero', variant]}>
+  <div class="grid-container">
+    <div class="overlay"></div>
+    {bg && <div class="background-image" style={`background-image: ${bg};`}></div>}
+    <div class="grid-x align-middle">
+      <div class="cell medium-6 large-5">
+        <div class="content">
+          <h1 data-cms-field="heading">{heading}</h1>
+          {description ? (
+            <div class="description" data-cms-field="description" set:html={description}></div>
+          ) : (
+            <ul class="hero-contact-info">
+              <li><span class="label">Phone:</span><p data-cms-field="phone">{phone}</p></li>
+              <li><span class="label">Email:</span><p data-cms-field="email">{email}</p></li>
+              <li><span class="label">Address:</span><p data-cms-field="address" set:html={address}></p></li>
+            </ul>
+          )}
+          {showImage && (
+          <div class="image show-for-medium">
+            <span class="circle-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="341" height="341" viewBox="0 0 341 341" fill="none"><circle cx="170.5" cy="170.5" r="170.5" fill="#ECD455" fill-opacity="0.89"></circle></svg>
+            </span>
+            <span class="circle-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="261" height="261" viewBox="0 0 261 261" fill="none"><path d="M251.597 177.225C225.787 244.054 150.689 277.307 83.8591 251.498C17.0296 225.688 -16.2237 150.59 9.5858 83.7602C35.3953 16.9308 110.494 -16.3225 177.323 9.48695C244.153 35.2964 277.406 110.395 251.597 177.225Z" fill="#F88E8A" fill-opacity="0.85"></path></svg>
+            </span>
+            <picture>
+              <source type="image/avif" srcset="/assets/uploads/2024/10/Interview-ContactUs-640.avif 640w, /assets/uploads/2024/10/Interview-ContactUs-1024.avif 1024w, /assets/uploads/2024/10/Interview-ContactUs-1440.avif 1440w" sizes="100vw" />
+              <source type="image/webp" srcset="/assets/uploads/2024/10/Interview-ContactUs-640.webp 640w, /assets/uploads/2024/10/Interview-ContactUs-1024.webp 1024w, /assets/uploads/2024/10/Interview-ContactUs-1440.webp 1440w" sizes="100vw" />
+              <img alt="" src="/assets/uploads/2024/10/Interview-ContactUs.png" decoding="async" loading="eager" width="1707" height="1259" />
+            </picture>
+          </div>
+          )}
+        </div>
+      </div>
+      <div class="cell medium-6 large-7">
+        <div class="hero-form">
+          <div class="gform_wrapper gravity-theme gform-theme--no-framework" id="gform_wrapper_2">
+            <div id="gf_2" class="gform_anchor" tabindex="-1"></div>
+            <div class="gform_heading">
+              <p class="gform_required_legend">"<span class="gfield_required gfield_required_asterisk">*</span>" indicates required fields</p>
+            </div>
+            <form class="sh-form" data-endpoint="/api/contact" data-role="Website contact" data-success="Thanks for reaching out. A member of our team will get back to you within one business day." novalidate>
+              <div class="sh-form-row">
+                <div class="sh-field"><label for="c-first">First Name</label><input id="c-first" name="first" type="text" autocomplete="given-name" /></div>
+                <div class="sh-field"><label for="c-last">Last Name</label><input id="c-last" name="last" type="text" autocomplete="family-name" /></div>
+              </div>
+              <div class="sh-form-row">
+                <div class="sh-field"><label for="c-phone">Phone <span class="sh-req" aria-hidden="true">*</span></label><input id="c-phone" name="phone" type="tel" required aria-required="true" autocomplete="tel" /><span class="sh-err" role="alert"></span></div>
+                <div class="sh-field"><label for="c-email">Email <span class="sh-req" aria-hidden="true">*</span></label><input id="c-email" name="email" type="email" required aria-required="true" autocomplete="email" /><span class="sh-err" role="alert"></span></div>
+              </div>
+              <div class="sh-field"><label for="c-msg">Message</label><textarea id="c-msg" name="msg"></textarea></div>
+              <div class="cf-turnstile" data-size="flexible"></div>
+              <p class="sh-hp" aria-hidden="true"><label>Leave this field empty<input type="text" name="hp" tabindex="-1" autocomplete="off" /></label></p>
+              <button type="submit" class="button">Submit</button>
+              <p class="sh-form-error" role="alert"></p>
+            </form>
+          </div>
+        </div>
+        <svg class="hero-circle-1 show-for-large" xmlns="http://www.w3.org/2000/svg" width="174" height="174" viewBox="0 0 174 174" fill="none"><circle cx="87" cy="87" r="87" fill="#DAB527" fill-opacity="0.89"></circle></svg>
+        <svg class="hero-circle-2" xmlns="http://www.w3.org/2000/svg" width="109" height="109" viewBox="0 0 109 109" fill="none"><circle cx="54.5" cy="54.5" r="54.5" fill="#F9A5A2"></circle></svg>
+      </div>
+      {showImage && (
+      <div class="image hide-for-medium">
+        <span class="circle-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="341" height="341" viewBox="0 0 341 341" fill="none"><circle cx="170.5" cy="170.5" r="170.5" fill="#ECD455" fill-opacity="0.89"></circle></svg>
+        </span>
+        <span class="circle-3">
+          <svg xmlns="http://www.w3.org/2000/svg" width="261" height="261" viewBox="0 0 261 261" fill="none"><path d="M251.597 177.225C225.787 244.054 150.689 277.307 83.8591 251.498C17.0296 225.688 -16.2237 150.59 9.5858 83.7602C35.3953 16.9308 110.494 -16.3225 177.323 9.48695C244.153 35.2964 277.406 110.395 251.597 177.225Z" fill="#F88E8A" fill-opacity="0.85"></path></svg>
+        </span>
+        <picture>
+          <source type="image/avif" srcset="/assets/uploads/2024/10/Interview-ContactUs-640.avif 640w, /assets/uploads/2024/10/Interview-ContactUs-1024.avif 1024w, /assets/uploads/2024/10/Interview-ContactUs-1440.avif 1440w" sizes="100vw" />
+          <source type="image/webp" srcset="/assets/uploads/2024/10/Interview-ContactUs-640.webp 640w, /assets/uploads/2024/10/Interview-ContactUs-1024.webp 1024w, /assets/uploads/2024/10/Interview-ContactUs-1440.webp 1440w" sizes="100vw" />
+          <img alt="" src="/assets/uploads/2024/10/Interview-ContactUs.png" decoding="async" loading="lazy" width="1707" height="1259" />
+        </picture>
+      </div>
+      )}
+    </div>
+  </div>
+</div>

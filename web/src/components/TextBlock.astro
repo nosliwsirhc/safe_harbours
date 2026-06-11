@@ -1,0 +1,21 @@
+---
+// page-text-block: a single wide column of long-form content (privacy, terms).
+// Markup/classes + the decorative circle copied from the mirror so the theme CSS
+// styles it identically. Heading + body are editable.
+import type { TextBlockData } from '../lib/content';
+type Props = TextBlockData;
+const { heading = '', body = '' } = Astro.props;
+---
+<div class="page-text-block">
+  <svg class="hero-circle show-for-large" xmlns="http://www.w3.org/2000/svg" width="101" height="179" viewBox="0 0 101 179" fill="none">
+    <circle opacity="0.63" cx="11.6478" cy="89.6481" r="77.7467" transform="rotate(180 11.6478 89.6481)" stroke="#ECD455" stroke-width="23"></circle>
+  </svg>
+  <div class="grid-container">
+    <div class="grid-x">
+      <div class="cell large-10">
+        <h1 data-cms-field="heading">{heading}</h1>
+        <div data-cms-field="body" set:html={body}></div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,21 +1,31 @@
 ---
-// The /resources index body. The card grid is driven by the article registry
-// (PostCard, shared with related-posts). The rest mirrors the captured theme
-// verbatim: the hero, the featured post (its own longer excerpt), the FacetWP
-// facet placeholders (empty divs filled by facetwp JS at runtime), and the
-// newsletter signup form. Only change from the capture: the meaningless
-// gf_browser_* server-sniff class is dropped.
-import { getCollection } from 'astro:content';
+// The /resources index body. The card grid is driven by the resources content
+// collection. Replaces the (now-dead) FacetWP search/category/load-more — which
+// needed the WordPress backend — with a real client-side search + category
+// filter over the rendered cards. The featured post is data-driven (the article
+// flagged `featured`, else the newest). The hero, newsletter form, etc. mirror
+// the captured theme.
 import PostCard from './PostCard.astro';
+import { cardMeta } from '../lib/format';
 import { bgImageSet } from '../lib/img';
+import { listArticles } from '../lib/articles';
 
-// The index grid: articles with an `indexOrder`, in that order.
-const indexPosts = (await getCollection('resources'))
-  .filter((p) => p.data.indexOrder !== undefined)
-  .sort((a, b) => (a.data.indexOrder ?? 0) - (b.data.indexOrder ?? 0));
+const all = await listArticles('published');
 
-const featuredHref = '/resources/eligibility-and-requirements-for-becoming-a-foster-parent-in-ontario/';
-const featuredTitle = 'Eligibility and Requirements for Becoming a Foster Parent in Ontario';
+// Featured: the flagged article, else the most recent by date.
+const featured = all.find((a) => a.featured) ?? [...all].sort((a, b) => b.date.getTime() - a.date.getTime())[0];
+
+// The grid: every article with an `indexOrder`, in that order, minus the
+// featured one (it has its own slot above the grid).
+const gridPosts = all
+  .filter((a) => a.indexOrder !== null && a.slug !== featured?.slug)
+  .sort((a, b) => (a.indexOrder ?? 0) - (b.indexOrder ?? 0));
+
+// Category options: every distinct category across the listed articles.
+const listed = featured ? [featured, ...gridPosts] : gridPosts;
+const categories = [...new Set(listed.map((a) => a.category))].sort();
+
+const featuredHref = featured ? `/resources/${featured.slug}/` : '#';
 ---
 <div class="page-hero blog">
   <div class="grid-container">
@@ -28,7 +38,8 @@ const featuredTitle = 'Eligibility and Requirements for Becoming a Foster Parent
           <h1>Resources</h1>
           <p>From essential training materials to expert advice on trauma-informed care, our resources are designed to help you provide the best possible care for the children in your home.</p>
           <div class="filter">
-            <div class="facetwp-facet facetwp-facet-search facetwp-type-search" data-name="search" data-type="search"></div>
+            <label class="sr-only" for="res-search">Search resources</label>
+            <input id="res-search" class="res-search" type="search" placeholder="Search resources…" autocomplete="off" />
           </div>
         </div>
       </div>
@@ -43,42 +54,46 @@ const featuredTitle = 'Eligibility and Requirements for Becoming a Foster Parent
    auto-closes it at #content's end, nesting the grid + newsletter inside it).
    We reproduce that exactly: emit the open tag raw and never close it. */}
 <Fragment set:html={'<div class="feature-post__container">'} />
-  <div class="feature-post">
-    <div class="feature-post__border grid-x">
-      <div class="cell medium-6 large-7">
-        <a class="feature-post__thumbnail-wrap" href={featuredHref} title={featuredTitle}>
-          <p class="badge">Featured Post - (Most Recent)</p>
-          <div class="feature-post__thumbnail" style={`background-image: ${bgImageSet('/assets/uploads/2026/02/foster6.jpg', 800)};`}></div>
-        </a>
-      </div>
-      <div class="cell medium-6 large-5 align-center-middle">
-        <a class="content" href={featuredHref} title={featuredTitle}>
-          <div class="title"><h2 class="m-h3">Eligibility and Requirements for Becoming a Foster Parent in Ontario</h2></div>
-          <div class="excerpt">What Does It Mean to Be a Foster Parent Becoming a foster parent in Ontario means opening your home to a child or youth who cannot safely live with their family, often during a period...</div>
-          <div class="meta"><p>Mar 3rd 2026 By Safe Harbours</p></div>
-        </a>
+  {featured && (
+    <div class="feature-post">
+      <div class="feature-post__border grid-x">
+        <div class="cell medium-6 large-7">
+          <a class="feature-post__thumbnail-wrap" href={featuredHref} title={featured.title}>
+            <p class="badge">Featured Post</p>
+            <div class="feature-post__thumbnail" style={`background-image: ${bgImageSet(featured.thumbnail || featured.heroImage, 800)};`}></div>
+          </a>
+        </div>
+        <div class="cell medium-6 large-5 align-center-middle">
+          <a class="content" href={featuredHref} title={featured.title}>
+            <div class="title"><h2 class="m-h3">{featured.title}</h2></div>
+            {featured.excerpt && <div class="excerpt">{featured.excerpt}</div>}
+            <div class="meta"><p>{cardMeta(featured.date, featured.author)}</p></div>
+          </a>
+        </div>
       </div>
     </div>
-  </div>
+  )}
 
 <div class="grid-container">
   <div class="grid-x">
     <div class="cell">
       <div class="filter-drop">
-        <p>Sort by Category</p>
-        <div class="facetwp-facet facetwp-facet-categories facetwp-type-dropdown" data-name="categories" data-type="dropdown"></div>
+        <label for="res-cat">Sort by Category</label>
+        <select id="res-cat">
+          <option value="">All categories</option>
+          {categories.map((c) => <option value={c}>{c}</option>)}
+        </select>
+        <span class="res-count" id="res-count" aria-live="polite"></span>
       </div>
     </div>
-    <div class="grid-x grid-padding-x grid-padding-y">
-      {indexPosts.map((p, i) => (
-        <div class="cell medium-6 large-4">
-          <PostCard slug={p.id} variant={i === 0 ? 'index' : 'related'} />
+    <div class="grid-x grid-padding-x grid-padding-y" id="res-grid">
+      {gridPosts.map((p, i) => (
+        <div class="cell medium-6 large-4" data-res-card data-category={p.category} data-search={`${p.title} ${p.excerpt} ${p.category}`.toLowerCase()}>
+          <PostCard slug={p.slug} article={p} variant={i === 0 ? 'index' : 'related'} />
         </div>
       ))}
     </div>
-    <div class="cell filter-loadmore text-center">
-      <div class="facetwp-facet facetwp-facet-view_more facetwp-type-pager" data-name="view_more" data-type="pager"></div>
-    </div>
+    <p class="res-empty" id="res-empty" hidden>No resources match your search. <button type="button" id="res-clear">Clear filters</button></p>
   </div>
 </div>
 
@@ -122,3 +137,42 @@ const featuredTitle = 'Eligibility and Requirements for Becoming a Foster Parent
     </div>
   </div>
 </section>
+
+<style>
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+  .res-search { width: 100%; max-width: 30rem; border-radius: 1rem; border: 1px solid #fff; padding: 0.6rem 1.25rem; font-family: Montserrat, sans-serif; font-size: 1rem; color: #2a2f39; background: #fff; }
+  .res-search::placeholder { color: #565d68; opacity: 1; }
+  .res-search:focus { outline: 2px solid #ffc700; }
+  .filter-drop { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+  .filter-drop label { font-size: 16px; font-family: Montserrat, sans-serif; margin: 0; }
+  .filter-drop select { padding: 0.4rem 1rem; font-family: Montserrat, sans-serif; }
+  .res-count { font-size: 0.9rem; color: #6b7280; margin-left: auto; }
+  .res-empty { text-align: center; padding: 2rem 0 3rem; font-size: 1.05rem; color: #394254; }
+  .res-empty button { font: inherit; color: #1779ba; background: none; border: 0; text-decoration: underline; cursor: pointer; padding: 0; }
+</style>
+
+<script is:inline>
+  {
+    const search = document.getElementById('res-search');
+    const cat = document.getElementById('res-cat');
+    const cells = [...document.querySelectorAll('[data-res-card]')];
+    const empty = document.getElementById('res-empty');
+    const count = document.getElementById('res-count');
+    const apply = () => {
+      const q = (search.value || '').trim().toLowerCase();
+      const c = cat.value;
+      let shown = 0;
+      for (const cell of cells) {
+        const show = (!q || cell.getAttribute('data-search').includes(q)) && (!c || cell.getAttribute('data-category') === c);
+        cell.hidden = !show;
+        if (show) shown++;
+      }
+      empty.hidden = shown !== 0;
+      count.textContent = shown + (shown === 1 ? ' resource' : ' resources');
+    };
+    search.addEventListener('input', apply);
+    cat.addEventListener('change', apply);
+    document.getElementById('res-clear').addEventListener('click', () => { search.value = ''; cat.value = ''; apply(); });
+    apply();
+  }
+</script>

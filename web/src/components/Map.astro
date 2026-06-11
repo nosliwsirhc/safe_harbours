@@ -1,0 +1,23 @@
+---
+// A full-width Google Maps embed. Lazy-loaded by the theme JS (it swaps data-src
+// into src), matching the mirror. The embed URL is editable.
+import type { MapData } from '../lib/content';
+type Props = MapData;
+const { embed = '' } = Astro.props;
+const placeholder = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+---
+<iframe
+  width="600"
+  height="450"
+  style="border:0;"
+  allowfullscreen
+  loading="lazy"
+  referrerpolicy="no-referrer-when-downgrade"
+  data-src={embed}
+  class="lazyload"
+  src={placeholder}
+  title="Map"></iframe>
+
+<style is:global>
+  iframe.lazyloaded { width: 100%; height: 622px; }
+</style>

@@ -1,0 +1,310 @@
+---
+// Admin: the per-article editor. Metadata fields + a rich-text body, with the
+// same draft-autosave + Publish + live-preview model as the page editor. The
+// preview iframe shows the draft (?preview=1).
+export const prerender = false;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { isAuthed } from '../../../lib/admin';
+import { getArticleForView, listAdminArticles, hasUnpublishedChanges } from '../../../lib/articles';
+import '../../../styles/admin-editor.css';
+
+if (!isAuthed(Astro.request)) return Astro.redirect('/admin/login');
+
+const slug = Astro.params.slug ?? '';
+const article = await getArticleForView(slug, true);
+if (!article) return Astro.redirect('/admin/articles');
+
+const all = await listAdminArticles();
+const others = all.filter((a) => a.slug !== slug);
+const categories = [...new Set(all.map((a) => a.category).filter(Boolean))].sort();
+const unpublished = await hasUnpublishedChanges(slug);
+const dateStr = Number.isNaN(article.date.getTime()) ? '' : article.date.toISOString().slice(0, 10);
+const previewSrc = `/resources/${slug}?preview=1`;
+---
+<AdminLayout title={`Editing ${article.title}`} active="articles">
+  <div id="errbar" class="errbar" role="alert" hidden>
+    ⚠ Couldn’t save your changes — check your connection.
+    <button type="button" id="retry">Try again</button>
+  </div>
+  <div class="editor">
+    <section class="pane pane--edit">
+      <div class="topbar">
+        <a class="back" href="/admin/articles">← All articles</a>
+        <div class="pub">
+          <span class="save" id="save" data-state="saved" role="status" aria-live="polite">Saved</span>
+          <button type="button" class="btn btn--primary" id="publish" disabled={!unpublished}>Publish changes</button>
+        </div>
+      </div>
+      <h1>Edit article</h1>
+      <p class="livenote" id="livenote" data-pending={String(unpublished)}>
+        {unpublished
+          ? 'You have unpublished changes. Click “Publish changes” to put them on the live site.'
+          : 'This article is up to date with the live site.'}
+      </p>
+
+      <form id="form" autocomplete="off">
+        <section class="group">
+          <h2 class="group-head">Basics</h2>
+          <label for="f-title">Title</label>
+          <input id="f-title" data-f value={article.title} />
+
+          <label for="f-excerpt">Excerpt <span class="muted">— the one-line summary shown on the cards</span></label>
+          <textarea id="f-excerpt" data-f rows="3">{article.excerpt}</textarea>
+        </section>
+
+        <section class="group">
+          <h2 class="group-head">Images</h2>
+          <label>Hero image <span class="muted">— the banner at the top of the article</span></label>
+          <div class="img" data-img>
+            <img class="thumb" src={article.heroImage} alt="" hidden={!article.heroImage} />
+            <input type="hidden" id="f-heroImage" data-f data-imgval value={article.heroImage} />
+            <button type="button" class="btn btn--ghost up">Upload image…</button>
+            <button type="button" class="btn btn--quiet rm" hidden>Remove</button>
+            <span class="upmsg muted"></span>
+            <input type="file" class="file" accept="image/jpeg,image/png" hidden />
+          </div>
+
+          <label>Card thumbnail <span class="muted">— optional; defaults to the hero</span></label>
+          <div class="img" data-img>
+            <img class="thumb" src={article.thumbnail} alt="" hidden={!article.thumbnail} />
+            <input type="hidden" id="f-thumbnail" data-f data-imgval value={article.thumbnail} />
+            <button type="button" class="btn btn--ghost up">Upload image…</button>
+            <button type="button" class="btn btn--quiet rm" hidden>Remove</button>
+            <span class="upmsg muted"></span>
+            <input type="file" class="file" accept="image/jpeg,image/png" hidden />
+          </div>
+        </section>
+
+        <section class="group">
+          <h2 class="group-head">Listing &amp; details</h2>
+          <label>Web address <span class="muted">— set automatically, can’t be changed</span></label>
+          <p class="urlnote">/resources/{slug}</p>
+
+          <div class="two">
+            <div>
+              <label for="f-date">Date</label>
+              <input id="f-date" data-f type="date" value={dateStr} />
+            </div>
+            <div>
+              <label for="f-author">Author</label>
+              <input id="f-author" data-f value={article.author} />
+            </div>
+          </div>
+
+          <label for="f-category">Category</label>
+          <input id="f-category" data-f list="cats" value={article.category} />
+          <datalist id="cats">{categories.map((c) => <option value={c}></option>)}</datalist>
+
+          <div class="two">
+            <div>
+              <label for="f-indexOrder">List position <span class="muted">(blank = hidden)</span></label>
+              <input id="f-indexOrder" data-f type="number" value={article.indexOrder ?? ''} />
+            </div>
+            <label class="check"><input type="checkbox" id="f-featured" data-f checked={article.featured} /> Feature at the top of Resources</label>
+          </div>
+
+          <label for="f-related">Related articles</label>
+          <select id="f-related" data-f multiple size="5">
+            {others.map((a) => (
+              <option value={a.slug} selected={article.related.includes(a.slug)}>{a.title || a.slug}</option>
+            ))}
+          </select>
+        </section>
+
+        <section class="group group--content">
+          <h2 class="group-head">Article content</h2>
+          <div class="rt" data-rt-label="Article body">
+          <div class="rt-toolbar" role="toolbar" aria-label="Text formatting">
+            <button type="button" data-rt="h2" title="Heading" aria-label="Heading">H2</button>
+            <button type="button" data-rt="h3" title="Subheading" aria-label="Subheading">H3</button>
+            <button type="button" data-rt="p" title="Normal text" aria-label="Normal text">¶</button>
+            <button type="button" data-rt="ul" title="Bullet list" aria-label="Bullet list">•</button>
+            <button type="button" data-rt="ol" title="Numbered list" aria-label="Numbered list">1.</button>
+            <button type="button" data-rt="bold" title="Bold" aria-label="Bold" aria-pressed="false"><b>B</b></button>
+            <button type="button" data-rt="italic" title="Italic" aria-label="Italic" aria-pressed="false"><i>I</i></button>
+            <button type="button" data-rt="link" title="Link" aria-label="Add link">Link</button>
+          </div>
+          <div class="rt-editor"></div>
+          <input type="hidden" id="f-body" class="rt-value" data-f value={article.body} />
+        </div>
+        </section>
+      </form>
+    </section>
+
+    <section class="pane pane--preview">
+      <div class="preview__bar">
+        <span class="muted">Live preview</span>
+        <div class="preview__bar-right">
+          <div class="preview__viewport" role="group" aria-label="Preview width">
+            <button type="button" data-vp="desktop" aria-pressed="true" title="Desktop">Desktop</button>
+            <button type="button" data-vp="tablet" aria-pressed="false" title="Tablet">Tablet</button>
+            <button type="button" data-vp="mobile" aria-pressed="false" title="Mobile">Mobile</button>
+          </div>
+          <a href={`/resources/${slug}`} target="_blank" rel="noopener">Open ↗</a>
+        </div>
+      </div>
+      <iframe id="preview" src={previewSrc} title="Article preview"></iframe>
+    </section>
+  </div>
+
+  <style>
+    form label { display: block; font-weight: 600; font-size: 0.85rem; margin: 1rem 0 0.35rem; }
+    form input, form textarea, form select { width: 100%; font: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 0.55rem 0.65rem; background: #fff; color: var(--ink); }
+    form input:focus, form textarea:focus, form select:focus { outline: 2px solid var(--brand); border-color: var(--brand); }
+
+    /* Grouped sections so the form reads as Basics / Images / Listing / Content
+       instead of one flat stack — and the body gets its own prominent block. */
+    .group { margin: 0 0 0.5rem; }
+    .group-head { font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin: 1.5rem 0 0.75rem; padding-top: 1.1rem; border-top: 1px solid var(--line); }
+    .group:first-of-type .group-head { margin-top: 0.25rem; padding-top: 0; border-top: 0; }
+    .group--content .group-head { color: var(--brand-deep); font-size: 0.82rem; }
+    .group--content .rt-editor { min-height: 22rem; }
+
+    .urlnote { margin: 0; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 0.84rem; color: var(--muted); background: var(--bg); border: 1px solid var(--line); border-radius: 7px; padding: 0.4rem 0.65rem; display: inline-block; }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: end; }
+    .check { display: flex; align-items: center; gap: 0.4rem; font-weight: 600; font-size: 0.85rem; }
+    .check input { width: auto; }
+    .img { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+    .thumb { width: 110px; height: 64px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); background: #f0f1f4; }
+    .upmsg { font-size: 0.8rem; }
+
+    .rt { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #fff; margin-top: 0.35rem; }
+    .rt:focus-within { outline: 2px solid var(--brand); border-color: var(--brand); }
+    .rt-toolbar { display: flex; gap: 0.15rem; padding: 0.25rem; border-bottom: 1px solid var(--line); background: #f7f8fa; flex-wrap: wrap; }
+    .rt-toolbar button { font: inherit; font-size: 0.85rem; min-width: 2.25rem; min-height: 2rem; padding: 0.25rem 0.55rem; border: 1px solid transparent; background: transparent; border-radius: 5px; cursor: pointer; color: var(--ink); }
+    .rt-toolbar button:hover { background: #e6e8ee; }
+    .rt-toolbar button[aria-pressed='true'] { background: var(--control-active); color: var(--brand-deep); }
+    .rt-editor { min-height: 16rem; padding: 0.65rem 0.75rem; font: inherit; outline: none; }
+    .rt-editor:empty::before { content: 'Write the article…'; color: #aab0bb; }
+    .rt-editor h2 { font-size: 1.3rem; margin: 1rem 0 0.5rem; }
+    .rt-editor h3 { font-size: 1.1rem; margin: 0.9rem 0 0.4rem; }
+    .rt-editor a { color: var(--brand-deep); text-decoration: underline; }
+  </style>
+
+  <script>
+    import { initRichText } from '../../../lib/rich-text-client';
+    import { initPreviewViewport } from '../../../lib/preview-viewport';
+    initRichText();
+    initPreviewViewport();
+  </script>
+  <script is:inline define:vars={{ slug }}>
+    const saveEl = document.getElementById('save');
+    const errbar = document.getElementById('errbar');
+    const preview = document.getElementById('preview');
+    const publishBtn = document.getElementById('publish');
+    const livenote = document.getElementById('livenote');
+    const form = document.getElementById('form');
+    let timer, lastSave = null;
+
+    preview.addEventListener('load', () => {
+      try {
+        const doc = preview.contentDocument;
+        const s = doc.createElement('style');
+        s.textContent = '#consent, astro-dev-toolbar { display: none !important; }';
+        doc.head.appendChild(s);
+      } catch {}
+    });
+
+    const setState = (s) => { saveEl.dataset.state = s; saveEl.textContent = s === 'saving' ? 'Saving…' : s === 'error' ? 'Not saved' : 'Saved'; };
+    const showError = () => { errbar.hidden = false; };
+    const hideError = () => { errbar.hidden = true; };
+    function markPending(p) {
+      publishBtn.disabled = !p;
+      livenote.dataset.pending = String(p);
+      livenote.textContent = p
+        ? 'You have unpublished changes. Click “Publish changes” to put them on the live site.'
+        : 'This article is up to date with the live site.';
+    }
+
+    const val = (id) => document.getElementById(id).value;
+    function collect() {
+      const io = val('f-indexOrder').trim();
+      return {
+        action: 'save', slug,
+        title: val('f-title'),
+        heroImage: val('f-heroImage'),
+        thumbnail: val('f-thumbnail'),
+        excerpt: val('f-excerpt'),
+        date: val('f-date'),
+        author: val('f-author'),
+        category: val('f-category'),
+        indexOrder: io === '' ? null : Number(io),
+        featured: document.getElementById('f-featured').checked,
+        related: [...document.getElementById('f-related').selectedOptions].map((o) => o.value),
+        body: val('f-body'),
+      };
+    }
+
+    async function save() {
+      setState('saving');
+      const payload = collect();
+      lastSave = save;
+      try {
+        const res = await fetch('/api/admin/articles', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
+        const ok = (await res.json()).ok;
+        if (ok) { setState('saved'); hideError(); markPending(true); return true; }
+        setState('error'); showError(); return false;
+      } catch { setState('error'); showError(); return false; }
+    }
+    const schedule = (fn) => { clearTimeout(timer); timer = setTimeout(fn, 800); };
+    const saveAndReload = () => { setState('saving'); schedule(async () => { if (await save()) preview.contentWindow.location.reload(); }); };
+
+    // Patch the preview in place for the two fields visible on the article page
+    // (title + body); other fields aren't shown there, so just save.
+    function patchPreview(sel, value, html) {
+      let doc; try { doc = preview.contentDocument; } catch { return false; }
+      const el = doc && doc.querySelector(sel);
+      if (!el) return false;
+      if (html) el.innerHTML = value; else el.textContent = value;
+      return true;
+    }
+    form.addEventListener('input', (e) => {
+      setState('saving');
+      if (e.target.id === 'f-title') { patchPreview('[data-cms-field="title"]', e.target.value, false) ? schedule(save) : saveAndReload(); }
+      else if (e.target.id === 'f-body') { patchPreview('[data-cms-article-body]', e.target.value, true) ? schedule(save) : saveAndReload(); }
+      else schedule(save);
+    });
+    form.addEventListener('change', () => { setState('saving'); schedule(save); });
+
+    // Image uploads (hero + thumbnail): resize via the Worker, store the URL.
+    for (const wrap of document.querySelectorAll('[data-img]')) {
+      const btn = wrap.querySelector('.up');
+      const file = wrap.querySelector('.file');
+      const valEl = wrap.querySelector('[data-imgval]');
+      const thumb = wrap.querySelector('.thumb');
+      const msg = wrap.querySelector('.upmsg');
+      const rm = wrap.querySelector('.rm');
+      const syncRm = () => { rm.hidden = !valEl.value; };
+      syncRm();
+      btn.addEventListener('click', () => file.click());
+      rm.addEventListener('click', () => { valEl.value = ''; thumb.src = ''; thumb.hidden = true; syncRm(); saveAndReload(); });
+      file.addEventListener('change', async () => {
+        if (!file.files[0]) return;
+        msg.textContent = 'Resizing…';
+        const fd = new FormData(); fd.append('file', file.files[0]);
+        try {
+          const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
+          const d = await res.json();
+          if (d.ok) { valEl.value = d.img.jpg; thumb.src = d.img.jpg; thumb.hidden = false; msg.textContent = ''; syncRm(); saveAndReload(); }
+          else msg.textContent = d.error || 'Upload failed';
+        } catch { msg.textContent = 'Upload failed'; }
+        file.value = '';
+      });
+    }
+
+    document.getElementById('retry').addEventListener('click', () => { if (lastSave) lastSave(); });
+    publishBtn.addEventListener('click', async () => {
+      publishBtn.disabled = true; publishBtn.textContent = 'Publishing…';
+      try {
+        clearTimeout(timer);
+        await save();
+        const res = await fetch('/api/admin/articles/publish', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ slug }) });
+        publishBtn.textContent = 'Publish changes';
+        const ok = (await res.json()).ok;
+        markPending(!ok);
+        if (ok) { hideError(); preview.contentWindow.location.reload(); } else showError();
+      } catch { publishBtn.textContent = 'Publish changes'; markPending(true); showError(); }
+    });
+  </script>
+</AdminLayout>

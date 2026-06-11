@@ -7,6 +7,7 @@ date: 2026-03-03
 author: "Safe Harbours"
 related: ["best-childrens-foster-agencies-in-toronto", "4-best-childrens-foster-agencies-in-hamilton", "what-is-it-like-to-be-a-foster-parent-guide-for-ontario"]
 indexOrder: 1
+category: "Choosing an Agency"
 ---
 Choosing the right foster agency is a key decision when you are considering becoming a foster parent, and this guide outlines some of the best foster agencies in Mississauga to help you decide your next step.
 

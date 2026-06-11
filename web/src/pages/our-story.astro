@@ -1,4 +1,17 @@
 ---
+// Fully composed from D1 blocks (editable from /admin), rendered by BlockRenderer
+// — the hero, purpose banner, values, founder, team, testimonials, CTA and logos
+// are all data now. Draft shown only inside the authed admin preview (?preview=1).
+export const prerender = false;
+
 import ThemeLayout from '../layouts/ThemeLayout.astro';
+import BlockRenderer from '../components/BlockRenderer.astro';
+import { getBlocksForView } from '../lib/content';
+import { isAuthed } from '../lib/admin';
+
+const preview = Astro.url.searchParams.get('preview') === '1' && isAuthed(Astro.request);
+const blocks = await getBlocksForView('our-story', 'main', preview);
 ---
-<ThemeLayout name="our-story" title="Our Story | Safe Harbours" />
+<ThemeLayout name="our-story" title="Our Story | Safe Harbours">
+  {blocks.map((b, i) => <BlockRenderer block={b} index={i} />)}
+</ThemeLayout>

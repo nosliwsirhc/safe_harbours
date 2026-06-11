@@ -1,0 +1,14 @@
+---
+// A flexible raw section: the theme section classes + a block of rich HTML inside
+// the grid-container. Used for bespoke editorial regions (e.g. the program's
+// "Client Characteristics" lists, the home "Why Safe Harbours" banner and the
+// "How it works" intro band) that don't map to a typed block.
+import type { RichSectionData } from '../lib/content';
+type Props = RichSectionData;
+const { sectionClass = '', body = '', bg = '', innerClass = '' } = Astro.props;
+const classes = sectionClass.split(' ').filter(Boolean);
+const inner = ['grid-container', ...innerClass.split(' ')].filter(Boolean);
+---
+<section class:list={classes} style={bg ? `background-image: ${bg};` : undefined}>
+  <div class:list={inner} data-cms-field="body" set:html={body}></div>
+</section>

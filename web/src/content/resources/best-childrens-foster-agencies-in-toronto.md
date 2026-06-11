@@ -7,6 +7,7 @@ date: 2026-03-03
 author: "Safe Harbours"
 related: ["5-best-childrens-foster-agencies-in-mississauga", "4-best-childrens-foster-agencies-in-hamilton", "what-is-it-like-to-be-a-foster-parent-guide-for-ontario"]
 indexOrder: 0
+category: "Choosing an Agency"
 ---
 Foster care in Toronto is built around a shared responsibility between Children’s Aid Societies and licensed foster agencies, all working to keep children safe when they cannot live at home.
 

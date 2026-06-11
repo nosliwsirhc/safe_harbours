@@ -8,13 +8,29 @@ import SiteHead from '../components/SiteHead.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import OffCanvasNav from '../components/OffCanvasNav.astro';
+import { getSettings } from '../lib/content';
+
+// Site-wide settings (Google tag ids) from D1. On SSR pages these are live; on
+// prerendered pages getSettings() runs at BUILD time (env.DB is empty → {}), so
+// the tags only bake into static pages at build. SSR pages (e.g. /our-story)
+// reflect /admin edits immediately. Graceful: empty on any error.
+const settings = await getSettings();
+const ga4Id = settings.ga4_id || '';
+const gtmId = settings.gtm_id || '';
 
 // Inline the per-page <main> content at BUILD time (Vite ?raw) — the Cloudflare
 // prerender runtime has no node:fs, so we can't read files at render time. The
 // surrounding chrome (head styles, header, footer, off-canvas) is now composed
 // from components rather than injected as a blob.
+interface MirrorMeta {
+  title?: string;
+  description?: string;
+  styles: string[];
+  bodyClass?: string;
+  script: string;
+}
 const mains = import.meta.glob('../../_mirror/*.main.html', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
-const metas = import.meta.glob('../../_mirror/*.meta.json', { import: 'default', eager: true }) as Record<string, any>;
+const metas = import.meta.glob('../../_mirror/*.meta.json', { import: 'default', eager: true }) as Record<string, MirrorMeta>;
 
 interface Props {
   name: string;            // mirror basename, e.g. "home"
@@ -90,6 +106,15 @@ const orgSchema = {
 <html lang="en-CA">
   <head>
     <meta charset="UTF-8" />
+    {gtmId && (
+      <script is:inline set:html={`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${gtmId}');`} />
+    )}
+    {ga4Id && (
+      <Fragment>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`} is:inline></script>
+        <script is:inline set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${ga4Id}');`} />
+      </Fragment>
+    )}
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{pageTitle}</title>
     {pageDesc && <meta name="description" content={pageDesc} />}
@@ -104,7 +129,7 @@ const orgSchema = {
     <meta property="og:description" content={pageDesc} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={new URL('/images/og-default.jpg', site.url).href} />
-    <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} is:inline />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

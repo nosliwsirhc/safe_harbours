@@ -4,6 +4,10 @@ heroImage: "/assets/uploads/2025/10/getting-started.jpg"
 date: 2026-03-03
 author: "Safe Harbours"
 related: ["best-childrens-foster-agencies-in-toronto", "5-best-childrens-foster-agencies-in-mississauga", "4-best-childrens-foster-agencies-in-hamilton"]
+category: "Getting Started"
+indexOrder: 9
+thumbnail: "/assets/uploads/2025/10/getting-started.jpg"
+excerpt: "Ontario needs more foster families than it has. Here’s how to get started with fostering — what’s required, and the training and support you’ll receive."
 ---
 ## **Why Ontario Needs More Foster Families**
 

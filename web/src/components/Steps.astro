@@ -1,0 +1,22 @@
+---
+// "How it Works" — one zig-zag section whose rows are a repeater of steps. The
+// rows must be direct children of the grid-container (after the section title) so
+// the theme's :nth-child rules alternate the image side + the number colours;
+// auto-numbered by position. Each row carries data-cms-item for the live editor.
+import ZigZag from './ZigZag.astro';
+import type { StepsData } from '../lib/content';
+type Props = StepsData;
+const { heading = '', steps = [], sectionClass = '' } = Astro.props;
+---
+<section class:list={['zig-zag', sectionClass]}>
+  <div class="grid-container">
+    {heading && (
+      <div class="section-title">
+        <h3 style="color: #2D3648;" data-cms-field="heading">{heading}</h3>
+      </div>
+    )}
+    {steps.map((s, i) => (
+      <ZigZag reverse={s.reverse} count={`${i + 1}.`} heading={s.heading} body={s.body} img={s.img} item={i} />
+    ))}
+  </div>
+</section>

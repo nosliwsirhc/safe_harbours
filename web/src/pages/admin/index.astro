@@ -1,0 +1,75 @@
+---
+// The landing screen: pick a page to edit. Shows every page so nothing looks
+// "missing" — ones we haven't wired yet are marked "coming soon".
+export const prerender = false;
+
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { isAuthed } from '../../lib/admin';
+import { EDITABLE_PAGES } from '../../lib/pages';
+
+if (!isAuthed(Astro.request)) return Astro.redirect('/admin/login');
+
+// Pages managed by other systems (shown greyed so the list feels complete):
+// Careers comes from the jobs board, Resources from the articles collection.
+const MANAGED_ELSEWHERE = [
+  { name: 'Careers', where: 'Managed from the jobs board.' },
+];
+---
+<AdminLayout title="Pages" active="pages">
+  <main class="wrap">
+    <h1>Edit your website</h1>
+
+    <ol class="how" role="list">
+      <li><strong>1.</strong> Pick a page below.</li>
+      <li><strong>2.</strong> Change the text — it saves as a private draft automatically.</li>
+      <li><strong>3.</strong> Click <strong>Publish changes</strong> when you’re ready to make it live.</li>
+    </ol>
+
+    <h2 class="grouphead">Pages you can edit</h2>
+    <ul class="pages" role="list">
+      {EDITABLE_PAGES.map((p) => (
+        <li>
+          <a class="page" href={`/admin/edit/${p.key}`}>
+            <span class="page__name">{p.name}</span>
+            <span class="page__path muted">{p.path}</span>
+            <span class="page__blurb muted">{p.blurb}</span>
+            <span class="page__go" aria-hidden="true">Edit →</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <h2 class="grouphead">Managed elsewhere</h2>
+    <ul class="pages" role="list">
+      {MANAGED_ELSEWHERE.map((p) => (
+        <li>
+          <div class="page page--soon" aria-disabled="true">
+            <span class="page__name">{p.name}</span>
+            <span class="page__blurb muted">{p.where}</span>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </main>
+
+  <style>
+    .wrap { max-width: 720px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+    h1 { font-size: 1.6rem; margin: 0 0 1rem; }
+
+    .how { list-style: none; margin: 0 0 2rem; padding: 1rem 1.25rem; display: grid; gap: 0.4rem;
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); font-size: 0.95rem; }
+    .how strong { color: var(--brand-deep); margin-right: 0.25rem; }
+    .grouphead { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 1.75rem 0 0.6rem; }
+    .pages { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+
+    .page { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0.2rem 1rem;
+      padding: 1rem 1.25rem; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+      text-decoration: none; color: inherit; box-shadow: var(--shadow); transition: border-color 0.15s ease, transform 0.15s ease; }
+    a.page:hover { border-color: var(--brand); transform: translateY(-1px); }
+    .page--soon { opacity: 0.6; box-shadow: none; }
+    .page__name { grid-column: 1; font-family: Montserrat, sans-serif; font-weight: 600; font-size: 1.05rem; }
+    .page__path { grid-column: 1; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 0.76rem; }
+    .page__blurb { grid-column: 1; font-size: 0.9rem; margin-top: 0.15rem; }
+    .page__go { grid-column: 2; grid-row: 1 / span 3; color: var(--accent); font-weight: 600; }
+  </style>
+</AdminLayout>

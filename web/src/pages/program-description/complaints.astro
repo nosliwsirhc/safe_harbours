@@ -1,4 +1,12 @@
 ---
+export const prerender = false;
 import ThemeLayout from '../../layouts/ThemeLayout.astro';
+import BlockRenderer from '../../components/BlockRenderer.astro';
+import { getBlocksForView } from '../../lib/content';
+import { isAuthed } from '../../lib/admin';
+const preview = Astro.url.searchParams.get('preview') === '1' && isAuthed(Astro.request);
+const blocks = await getBlocksForView('complaints', 'main', preview);
 ---
-<ThemeLayout name="complaints" title="Complaints | Safe Harbours" />
+<ThemeLayout name="complaints" title="Complaints Process | Safe Harbours">
+  {blocks.map((b, i) => <BlockRenderer block={b} index={i} />)}
+</ThemeLayout>

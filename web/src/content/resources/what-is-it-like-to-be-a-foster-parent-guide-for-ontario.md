@@ -7,6 +7,7 @@ date: 2026-03-03
 author: "Safe Harbours"
 related: ["best-childrens-foster-agencies-in-toronto", "5-best-childrens-foster-agencies-in-mississauga", "4-best-childrens-foster-agencies-in-hamilton"]
 indexOrder: 3
+category: "Getting Started"
 ---
 If you are considering fostering, it helps to understand what the role actually looks like once a child arrives in your home. Foster parenting is structured, supported, and demanding, but it is also practical, grounded, and deeply meaningful for many families who choose to do it.
 

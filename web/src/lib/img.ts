@@ -6,7 +6,7 @@ import { imageVariants } from '../data/image-variants';
 // manifest (scripts/images.mjs) — the Cloudflare prerender runtime has no
 // node:fs, so we can't scan the disk here.
 export function bgImageSet(src: string, maxWidth = 1920): string {
-  const widths = imageVariants[src];
+  const widths = Object.hasOwn(imageVariants, src) ? imageVariants[src] : undefined;
   if (!widths?.length) return `url("${src}")`; // no variants — serve original
   const base = src.replace(/\.(jpe?g|png)$/i, '');
   const pick = widths.filter((w) => w <= maxWidth).pop() ?? widths[0];

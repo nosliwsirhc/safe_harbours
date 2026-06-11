@@ -28,5 +28,7 @@ export default defineConfig({
   // adapter defaults to a KV-backed session and emits a SESSION KV binding
   // that would need a provisioned namespace at deploy time. A memory driver
   // keeps the build binding-free; nothing in the site ever reads a session.
+  // @ts-expect-error — `memory` exists at runtime (it's in sessionDrivers) but is
+  // omitted from Astro's sessionDrivers type. Self-clears if Astro fixes the type.
   session: { driver: sessionDrivers.memory() },
 });

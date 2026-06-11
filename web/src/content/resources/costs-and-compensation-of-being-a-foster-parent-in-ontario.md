@@ -4,6 +4,10 @@ heroImage: "/assets/uploads/2025/10/compensation.jpg"
 date: 2026-03-03
 author: "Safe Harbours"
 related: ["best-childrens-foster-agencies-in-toronto", "5-best-childrens-foster-agencies-in-mississauga", "4-best-childrens-foster-agencies-in-hamilton"]
+category: "Costs & Support"
+indexOrder: 10
+thumbnail: "/assets/uploads/2025/10/compensation.jpg"
+excerpt: "Foster parents in Ontario receive a daily per diem to cover a child’s needs. What the allowance covers, what’s reimbursed, and how it works at tax time."
 ---
 ## Are Foster Parents in Ontario Compensated?
 

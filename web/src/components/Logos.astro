@@ -1,0 +1,24 @@
+---
+// logos strip: a heading + a row of logo images. Each logo is a repeater item.
+// Markup/classes copied from the mirror so the theme CSS styles it identically.
+import CmsImage from './CmsImage.astro';
+import type { LogosData } from '../lib/content';
+type Props = LogosData;
+const { heading = '', logos = [] } = Astro.props;
+---
+<section class="logos">
+  <div class="grid-container">
+    <div class="grid-x">
+      <div class="cell text-center">
+        <div class="section-title text-center">
+          <h4 data-cms-field="heading">{heading}</h4>
+        </div>
+        <ul>
+          {logos.map((l, i) => (
+            <li data-cms-item={i}><CmsImage img={l.img} /></li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

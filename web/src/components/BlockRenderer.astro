@@ -1,0 +1,167 @@
+---
+// Renders one composer block by its `kind`. A page is a list of these. The
+// data-cms-block index + each component's data-cms-field / data-cms-item hooks
+// let the editor update the live preview in place.
+import Hero from './Hero.astro';
+import ZigZag from './ZigZag.astro';
+import Cta from './Cta.astro';
+import Banner from './Banner.astro';
+import ValueCards from './ValueCards.astro';
+import ImageBlock from './ImageBlock.astro';
+import Team from './Team.astro';
+import Testimonials from './Testimonials.astro';
+import Logos from './Logos.astro';
+import HeroForm from './HeroForm.astro';
+import Steps from './Steps.astro';
+import LargeList from './LargeList.astro';
+import Safety from './Safety.astro';
+import TextBlock from './TextBlock.astro';
+import Faqs from './Faqs.astro';
+import ContactHero from './ContactHero.astro';
+import Map from './Map.astro';
+import EventSection from './EventSection.astro';
+import RichSection from './RichSection.astro';
+import HomeHero from './HomeHero.astro';
+import type {
+  Hero as HeroData,
+  ZigRow,
+  CtaData,
+  BannerData,
+  ValueCardsData,
+  ImageBlockData,
+  TeamData,
+  TestimonialsData,
+  LogosData,
+  HeroFormData,
+  StepsData,
+  LargeListData,
+  SafetyData,
+  TextBlockData,
+  FaqsData,
+  ContactHeroData,
+  MapData,
+  EventSectionData,
+  RichSectionData,
+  HomeHeroData,
+} from '../lib/content';
+
+interface Props {
+  block: { kind: string; body: string };
+  index: number;
+}
+const { block, index } = Astro.props;
+
+function parse<T>(s: string): T | null {
+  try {
+    return JSON.parse(s) as T;
+  } catch {
+    return null;
+  }
+}
+
+const hero = block.kind === 'hero' ? parse<HeroData>(block.body) : null;
+const row = block.kind === 'imageText' ? parse<ZigRow>(block.body) : null;
+const cta = block.kind === 'cta' ? parse<CtaData>(block.body) : null;
+const heading = block.kind === 'heading' ? parse<{ text?: string }>(block.body) : null;
+const text = block.kind === 'text' ? parse<{ html?: string }>(block.body) : null;
+const banner = block.kind === 'banner' ? parse<BannerData>(block.body) : null;
+const valueCards = block.kind === 'valueCards' ? parse<ValueCardsData>(block.body) : null;
+const imageBlock = block.kind === 'imageBlock' ? parse<ImageBlockData>(block.body) : null;
+const team = block.kind === 'team' ? parse<TeamData>(block.body) : null;
+const testimonials = block.kind === 'testimonials' ? parse<TestimonialsData>(block.body) : null;
+const logos = block.kind === 'logos' ? parse<LogosData>(block.body) : null;
+const heroForm = block.kind === 'heroForm' ? parse<HeroFormData>(block.body) : null;
+const steps = block.kind === 'steps' ? parse<StepsData>(block.body) : null;
+const largeList = block.kind === 'largeList' ? parse<LargeListData>(block.body) : null;
+const safety = block.kind === 'safety' ? parse<SafetyData>(block.body) : null;
+const textBlock = block.kind === 'textBlock' ? parse<TextBlockData>(block.body) : null;
+const faqs = block.kind === 'faqs' ? parse<FaqsData>(block.body) : null;
+const contactHero = block.kind === 'contactHero' ? parse<ContactHeroData>(block.body) : null;
+const map = block.kind === 'map' ? parse<MapData>(block.body) : null;
+const eventSection = block.kind === 'eventSection' ? parse<EventSectionData>(block.body) : null;
+const richSection = block.kind === 'richSection' ? parse<RichSectionData>(block.body) : null;
+const homeHero = block.kind === 'homeHero' ? parse<HomeHeroData>(block.body) : null;
+---
+<div class="cms-block-wrap" data-cms-block={index}>
+  {hero && <Hero lead={hero.lead} heading={hero.heading} intro={hero.intro} bg={hero.bg} variant={hero.variant} />}
+
+  {row && (
+    <section class="zig-zag ">
+      <div class="grid-container">
+        <ZigZag reverse={row.reverse} heading={row.heading} body={row.body} img={row.img} />
+      </div>
+    </section>
+  )}
+
+  {cta && <Cta heading={cta.heading} body={cta.body} label={cta.label} href={cta.href} />}
+
+  {heading && (
+    <div class="grid-container">
+      <div class="section-title"><h2 data-cms-field="text">{heading.text}</h2></div>
+    </div>
+  )}
+
+  {text && (
+    <div class="grid-container">
+      <div class="composed-text" data-cms-field="html" set:html={text.html}></div>
+    </div>
+  )}
+
+  {banner && <Banner heading={banner.heading} body={banner.body} shorten={banner.shorten ?? true} />}
+
+  {valueCards && (
+    <ValueCards
+      heading={valueCards.heading}
+      cards={valueCards.cards}
+      bg={valueCards.bg}
+      alt={valueCards.alt ?? true}
+      large={valueCards.large ?? false}
+      cols={valueCards.cols ?? 3}
+    />
+  )}
+
+  {imageBlock && <ImageBlock img={imageBlock.img} heading={imageBlock.heading} body={imageBlock.body} />}
+
+  {team && <Team heading={team.heading} members={team.members} label={team.label} href={team.href} />}
+
+  {testimonials && <Testimonials items={testimonials.items} />}
+
+  {logos && <Logos heading={logos.heading} logos={logos.logos} />}
+
+  {heroForm && <HeroForm heading={heroForm.heading} intro={heroForm.intro} bg={heroForm.bg} />}
+
+  {steps && <Steps heading={steps.heading} steps={steps.steps} sectionClass={steps.sectionClass} />}
+
+  {largeList && <LargeList heading={largeList.heading} items={largeList.items} label={largeList.label} href={largeList.href} />}
+
+  {safety && <Safety content={safety.content} cards={safety.cards} important={safety.important} />}
+
+  {textBlock && <TextBlock heading={textBlock.heading} body={textBlock.body} />}
+
+  {faqs && <Faqs heading={faqs.heading} items={faqs.items} />}
+
+  {contactHero && (
+    <ContactHero
+      heading={contactHero.heading}
+      phone={contactHero.phone}
+      email={contactHero.email}
+      address={contactHero.address}
+      bg={contactHero.bg}
+      variant={contactHero.variant}
+      description={contactHero.description}
+      showImage={contactHero.showImage ?? true}
+    />
+  )}
+
+  {map && <Map embed={map.embed} />}
+
+  {eventSection && <EventSection eyebrow={eventSection.eyebrow} heading={eventSection.heading} body={eventSection.body} calendlyUrl={eventSection.calendlyUrl} bg={eventSection.bg} />}
+
+  {richSection && <RichSection sectionClass={richSection.sectionClass} body={richSection.body} bg={richSection.bg} innerClass={richSection.innerClass} />}
+
+  {homeHero && <HomeHero heading={homeHero.heading} intro={homeHero.intro} featureHeading={homeHero.featureHeading} featureBody={homeHero.featureBody} />}
+</div>
+
+<style is:global>
+  .composed-text { max-width: 70ch; margin-inline: auto; padding: 1rem 0; }
+</style>

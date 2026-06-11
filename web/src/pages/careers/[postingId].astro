@@ -21,7 +21,7 @@ const unit = job?.payBasis === 'Annual' ? '/yr' : '/hr';
 const wage = job && (job.wageMin != null || job.wageMax != null)
   ? (job.wageMin != null && job.wageMax != null && job.wageMin !== job.wageMax
       ? `${money(job.wageMin)}–${money(job.wageMax)}${unit}`
-      : `${money((job.wageMin ?? job.wageMax)!)}${unit}`)
+      : `${money(job.wageMin ?? job.wageMax ?? 0)}${unit}`)
   : null;
 const location = job ? [job.city, job.region].filter(Boolean).join(', ') || job.home || 'Ontario' : '';
 const closesDate = job ? new Date(`${job.closingDate}T12:00:00`) : null;
@@ -55,8 +55,8 @@ const applyLabel = job?.howToApply?.label && /apply/i.test(job.howToApply.label)
 // untouched). %-encoded per RFC 6068 (encodeURIComponent → %20, not "+").
 const applyUrl = (() => {
   const raw = job?.howToApply?.url ?? '';
-  if (!/^mailto:/i.test(raw) || /[?&]subject=/i.test(raw)) return raw;
-  const subject = encodeURIComponent(`Application: ${job!.postingId} — ${job!.title}`);
+  if (!job || !/^mailto:/i.test(raw) || /[?&]subject=/i.test(raw)) return raw;
+  const subject = encodeURIComponent(`Application: ${job.postingId} — ${job.title}`);
   return `${raw}${raw.includes('?') ? '&' : '?'}subject=${subject}`;
 })();
 const title = job ? `${job.title} | Careers | Safe Harbours` : 'Position closed | Careers | Safe Harbours';

@@ -1,4 +1,12 @@
 ---
+export const prerender = false;
 import ThemeLayout from '../layouts/ThemeLayout.astro';
+import BlockRenderer from '../components/BlockRenderer.astro';
+import { getBlocksForView } from '../lib/content';
+import { isAuthed } from '../lib/admin';
+const preview = Astro.url.searchParams.get('preview') === '1' && isAuthed(Astro.request);
+const blocks = await getBlocksForView('home', 'main', preview);
 ---
-<ThemeLayout name="home" title="Home | Safe Harbours" />
+<ThemeLayout name="home" title="Foster Care Agency in Ontario | Safe Harbours">
+  {blocks.map((b, i) => <BlockRenderer block={b} index={i} />)}
+</ThemeLayout>

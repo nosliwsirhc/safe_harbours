@@ -50,7 +50,7 @@ for (const f of files) {
   if (/\.(js|ts|astro)$/.test(f))
     for (const m of txt.matchAll(/["'`]([a-zA-Z][a-zA-Z0-9_-]+)["'`]/g)) usedClasses.add(m[1]);
   if (f.endsWith('.meta.json')) {
-    try { JSON.parse(txt).bodyClass?.split(/\s+/).forEach((c) => c && usedClasses.add(c)); } catch {}
+    try { JSON.parse(txt).bodyClass?.split(/\s+/).forEach((c) => c && usedClasses.add(c)); } catch { /* skip malformed meta.json */ }
   }
 }
 

@@ -1,0 +1,31 @@
+---
+// Renders a ZigImage faithfully as a <picture>, handling BOTH shapes:
+//   • uploaded (resized in the Worker)  → webpset / jpgset + a jpg fallback
+//   • committed (build-time variants)   → avif / webp srcsets + a jpg/png fallback
+// Used by every CMS card/image block so the theme CSS styles images identically
+// to the original mirror markup. Images update via reload (no live patch), so no
+// data-cms-field hook is needed here.
+import type { ZigImage } from '../lib/content';
+interface Props {
+  img?: ZigImage;
+  alt?: string;
+  sizes?: string;
+  loading?: 'lazy' | 'eager';
+  class?: string;
+}
+const { img = {}, alt = '', sizes = '100vw', loading = 'lazy', class: className } = Astro.props;
+const hasUpload = Boolean(img.webpset);
+const hasCommitted = Boolean(img.avif ?? img.webp ?? img.jpg);
+---
+{hasUpload ? (
+  <picture>
+    {img.webpset && <source type="image/webp" srcset={img.webpset} sizes={sizes} />}
+    <img src={img.jpg ?? ''} srcset={img.jpgset} sizes={sizes} alt={alt} class={className} width={img.w} height={img.h} decoding="async" loading={loading} />
+  </picture>
+) : hasCommitted ? (
+  <picture>
+    {img.avif && <source type="image/avif" srcset={img.avif} sizes={sizes} />}
+    {img.webp && <source type="image/webp" srcset={img.webp} sizes={sizes} />}
+    <img src={img.jpg ?? ''} alt={alt} class={className} width={img.w} height={img.h} decoding="async" loading={loading} />
+  </picture>
+) : null}

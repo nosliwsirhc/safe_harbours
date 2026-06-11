@@ -1,0 +1,30 @@
+---
+// Renders an uploaded, Worker-resized image as a responsive <picture>: a WebP
+// srcset (modern, smaller) with a JPEG srcset fallback, intrinsic width/height
+// (no layout shift), lazy-loaded, scaling to its container. All variants are
+// served from R2 via /media — no paid edge service, works the same in dev + prod.
+interface Props {
+  jpg: string;
+  webpset?: string;
+  jpgset?: string;
+  w?: string | number;
+  h?: string | number;
+  alt?: string;
+  sizes?: string;
+}
+const { jpg, webpset, jpgset, w, h, alt = '', sizes = '(max-width: 800px) 100vw, 50vw' } = Astro.props;
+---
+<picture>
+  {webpset && <source type="image/webp" srcset={webpset} sizes={sizes} />}
+  <img
+    src={jpg}
+    srcset={jpgset}
+    sizes={jpgset ? sizes : undefined}
+    width={w}
+    height={h}
+    alt={alt}
+    loading="lazy"
+    decoding="async"
+    style="max-width:100%;height:auto;"
+  />
+</picture>
