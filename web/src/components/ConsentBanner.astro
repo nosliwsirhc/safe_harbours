@@ -1,10 +1,17 @@
 ---
-// Opt-in cookie consent. No analytics cookies load until the visitor clicks
-// Accept; the choice is remembered in localStorage. Declining (or doing
-// nothing, or having JS off) loads nothing. Returning visitors who accepted
-// get GA loaded immediately without seeing the banner again.
-// Safe Harbours' GA4 Measurement ID (from the live WordPress site).
-const gaId = 'G-BMMJVTQGHX';
+// Opt-in cookie consent. Nothing tracks until the visitor clicks Accept; the
+// choice is remembered in localStorage. Declining (or doing nothing, or having
+// JS off) keeps Consent Mode at its denied default, so no analytics/ads cookies
+// load. Returning visitors who accepted get tracking enabled without the banner.
+//
+// IDs come from /admin/settings (D1). If a GTM container is configured, GTM
+// owns GA4/Ads and we only flip the consent state; otherwise we load GA4
+// directly here as a fallback so analytics keeps working.
+interface Props {
+  ga4Id?: string;
+  gtmId?: string;
+}
+const { ga4Id = '', gtmId = '' } = Astro.props;
 ---
 <div class="consent" id="consent" role="region" aria-label="Cookie consent" hidden>
   <p class="consent-text">
@@ -17,35 +24,40 @@ const gaId = 'G-BMMJVTQGHX';
   </div>
 </div>
 
-<script is:inline define:vars={{ gaId }}>
+<script is:inline define:vars={{ ga4Id, gtmId }}>
   (function () {
     var KEY = 'sh-consent';
-    var loaded = false;
+    var enabled = false;
+    // gtag() is defined in the head (Consent Mode default). Guard anyway.
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { window.dataLayer.push(arguments); }
+    if (!window.gtag) window.gtag = gtag;
 
-    function loadGA() {
-      if (loaded || !gaId || gaId === 'G-XXXXXXXXXX') return;
-      loaded = true;
-      var s = document.createElement('script');
-      s.async = true;
-      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + gaId;
-      document.head.appendChild(s);
-      window.dataLayer = window.dataLayer || [];
-      function gtag() { window.dataLayer.push(arguments); }
-      window.gtag = gtag;
-      gtag('js', new Date());
-      gtag('config', gaId, { anonymize_ip: true });
+    function enable() {
+      if (enabled) return;
+      enabled = true;
+      // Tell GTM + any Consent-Mode tags they may now run.
+      window.gtag('consent', 'update', {
+        ad_storage: 'granted', ad_user_data: 'granted',
+        ad_personalization: 'granted', analytics_storage: 'granted',
+      });
+      window.dataLayer.push({ event: 'consent_granted' });
+      // No GTM container? Load GA4 directly as a fallback.
+      if (!gtmId && ga4Id && ga4Id !== 'G-XXXXXXXXXX') {
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=' + ga4Id;
+        document.head.appendChild(s);
+        window.gtag('js', new Date());
+        window.gtag('config', ga4Id, { anonymize_ip: true });
+      }
     }
 
     var stored = null;
     try { stored = localStorage.getItem(KEY); } catch (e) {}
 
-    if (stored === 'granted') {
-      loadGA();
-      return;
-    }
-    if (stored === 'denied') {
-      return;
-    }
+    if (stored === 'granted') { enable(); return; }
+    if (stored === 'denied') { return; }
 
     // No choice yet: show the banner.
     var banner = document.getElementById('consent');
@@ -61,7 +73,7 @@ const gaId = 'G-BMMJVTQGHX';
       banner.addEventListener('transitionend', hide);
       // Fallback in case transitionend doesn't fire (reduced motion, etc.).
       setTimeout(hide, 400);
-      if (value === 'granted') loadGA();
+      if (value === 'granted') enable();
     }
 
     document.getElementById('consent-accept')?.addEventListener('click', function () { decide('granted'); });
