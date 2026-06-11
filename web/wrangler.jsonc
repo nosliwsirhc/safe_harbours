@@ -4,6 +4,10 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "safe-harbours-web",
   "compatibility_date": "2026-04-15",
+  // Don't expose the site on the *.workers.dev preview subdomain — production is
+  // served via the www.safeharbours.ca Custom Domain only. Keeps a duplicate
+  // copy of the site (and an admin surface) off a second hostname.
+  "workers_dev": false,
   // The public job board (read-only here; written by the jobs-sync worker).
   // Accessed in SSR via `import { env } from 'cloudflare:workers'` → env.DB.
   "d1_databases": [
