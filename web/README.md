@@ -279,8 +279,42 @@ image transfer from ~4.6 MB to ~175 KB.)
   WP paths 1:1, so no content-URL redirects are needed.
 - **Apex → www** is a cross-host redirect, which `_redirects` can't do — it's a
   **Cloudflare zone Redirect Rule** (configured in the dashboard, not in the repo).
-- **`public/_headers`** — long, immutable cache for `/assets/uploads/*`; shorter
-  for theme CSS/JS.
+- **`public/_headers`** — cache headers for static assets: `immutable` (1 year)
+  for `/_astro/*` (content-hashed bundles) and `/assets/uploads/*`; shorter for
+  theme CSS/JS. `_headers` only applies to **static** assets, not Worker-rendered
+  responses — those are handled in middleware (below).
+
+### Edge caching (`src/middleware.ts`)
+
+Public pages are server-rendered on demand and read their copy from D1.
+Cloudflare does **not** cache Worker-generated responses automatically, so the
+middleware caches them itself with the **Cache API** (`caches.default`):
+
+- On a public `GET`, it serves a stored copy if present, otherwise renders and
+  stores the `200 text/html` response for **`s-maxage=60`** (per data centre).
+  Repeat hits are served from the edge with **no D1 read**.
+- **Never cached:** `/admin` and `/api` (`private, no-store`), `/media` (caches
+  itself), anything with a `Set-Cookie`, and — importantly — **any request with
+  the `sh_admin` cookie or a `?preview=…` param**. The admin preview loads the
+  public URL with `?preview=1` to render the *draft*, so caching it would both
+  show editors stale drafts and leak unpublished drafts to the public. Editors
+  therefore always bypass the cache and see live content the moment they publish.
+- A cached hit must be **copied into a fresh `Response`** before returning —
+  Cache API responses have immutable headers (see [§13](#13-gotchas--things-to-know)).
+- An **`x-edge-cache: HIT|MISS`** header is added so caching is observable
+  (`cf-cache-status` is *not* emitted for Cache API hits).
+
+**Flush on publish** (`src/lib/cache.ts`): publishing a page/article (or deleting
+an article) calls `flushPublicPages()`, which does a per-data-centre
+`caches.default.delete()` for the affected URLs and, if `CF_PURGE_TOKEN` +
+`CF_ZONE_ID` are set as Worker secrets, a global Cloudflare purge-by-URL. Without
+the token, global staleness is bounded by the 60 s TTL.
+
+> **Zone setting:** Cloudflare's **Browser Cache TTL** (Caching → Configuration)
+> floors the browser-facing `max-age`. With it set to "4 hours" the pages'
+> `max-age=0` is rewritten to `14400`, so returning visitors' browsers can hold a
+> page for 4 h (the edge cache + flush are unaffected). Set it to **"Respect
+> Existing Headers"** if you want the publish-flush to reach returning browsers.
 
 ---
 
@@ -389,3 +423,11 @@ sanitize), refreshed by a Power Automate webhook and a 6h cron. See
 - **The apex must redirect via Cloudflare, not WordPress** — until the apex
   Redirect Rule + proxied record are confirmed, `safeharbours.ca` depends on the
   old WP host (see `../docs/go-live.md`).
+- **Cache API responses have immutable headers, and the *runtime* enforces it but
+  Miniflare/dev does not.** Returning a `caches.default.match()` response directly
+  throws "Can't modify immutable headers" the moment Astro sets a header
+  downstream — a **production-only 500 that passes lint, build, and `astro dev`.**
+  Always copy a cached response into a new `Response` before returning it (see
+  `src/middleware.ts`). Verify edge-cache changes against the **production custom
+  domain** (the Cache API is a no-op on `*.workers.dev`, so the hit path can't be
+  exercised in preview).
