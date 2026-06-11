@@ -1,4 +1,18 @@
-# Plan: scoped agency logins via Cloudflare Access
+# Scoped agency logins via Cloudflare Access
+
+> **STATUS: LIVE.** `/admin` and `/api/admin` are protected by two Cloudflare
+> Access apps ("Safe Harbours CMS (admin)" + "(admin API)") sharing one Allow
+> policy: `christopher.wilson@safeharbours.ca` + the `nvision.co` email domain.
+> Login is email one-time-PIN; team domain `safeharbours.cloudflareaccess.com`.
+> The Worker verifies the Access JWT (header on admin paths, `CF_Authorization`
+> cookie elsewhere e.g. draft preview). Secrets `CF_ACCESS_TEAM_DOMAIN` +
+> `CF_ACCESS_AUD` (both apps' AUDs) are set.
+>
+> **Manage users:** edit the shared policy in Zero Trust → Access → Policies
+> ("Safe Harbours editors"). **Revert to password:** delete the two Access apps —
+> `/admin` falls back to the still-present `ADMIN_TOKEN` immediately.
+> **Remaining:** retire `ADMIN_TOKEN` + disable the `*.workers.dev` preview URL
+> once an OTP login is confirmed.
 
 ## Goal
 
