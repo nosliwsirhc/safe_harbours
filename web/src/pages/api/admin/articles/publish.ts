@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { isAuthed } from '../../../../lib/admin';
 import { publishArticle } from '../../../../lib/articles';
+import { flushPublicPages } from '../../../../lib/cache';
 
 // Promote an article's draft to published (makes it live on /resources).
 export const prerender = false;
@@ -19,5 +20,9 @@ export const POST: APIRoute = async ({ request }) => {
   const slug = raw && typeof raw === 'object' && 'slug' in raw && typeof raw.slug === 'string' ? raw.slug : '';
   if (!slug) return json({ ok: false, error: 'Missing slug' }, 400);
   await publishArticle(slug);
+
+  // The article page and the /resources index both change — flush both.
+  await flushPublicPages(new URL(request.url).origin, [`/resources/${slug}`, '/resources']);
+
   return json({ ok: true });
 };

@@ -32,6 +32,20 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return res;
   }
 
+  // Authed editors and draft previews must NEVER be cached, nor served a cached
+  // copy: the admin preview loads the public page with `?preview=1` and renders
+  // the unpublished draft, so caching it would (a) show editors a stale draft and
+  // (b) leak that draft to anyone who hits the guessable preview URL. Bypassing
+  // for the admin cookie also means editors always see live published content the
+  // instant they publish, with no flush needed on their side.
+  const authed = (request.headers.get('cookie') ?? '').includes('sh_admin=');
+  const isPreview = url.searchParams.has('preview');
+  if (authed || isPreview) {
+    const res = await next();
+    res.headers.set('Cache-Control', 'private, no-store');
+    return res;
+  }
+
   // The Cache API only exists in the Cloudflare runtime — skip in dev/build.
   // `caches.default` is Cloudflare's non-standard extension to CacheStorage.
   const cache = (globalThis.caches as unknown as { default?: Cache } | undefined)?.default;
