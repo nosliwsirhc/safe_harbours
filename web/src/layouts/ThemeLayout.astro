@@ -158,7 +158,25 @@ const orgSchema = {
     {/* Conversion events → dataLayer (for GTM/GA4). Phone-call + email clicks are
         tracked everywhere; CTA clicks fire for elements marked data-cta or links
         to the key conversion pages. Form submits push generate_lead (forms.js). */}
-    <script is:inline set:html={`(function(){window.dataLayer=window.dataLayer||[];document.addEventListener('click',function(e){var a=e.target&&e.target.closest&&e.target.closest('a,[data-cta]');if(!a)return;var href=a.getAttribute('href')||'';var text=(a.textContent||'').trim().slice(0,100);if(href.indexOf('tel:')===0){window.dataLayer.push({event:'phone_call',link_url:href,link_text:text});}else if(href.indexOf('mailto:')===0){window.dataLayer.push({event:'email_click',link_url:href,link_text:text});}else if(a.hasAttribute('data-cta')||/\\/(become-a-foster-parent|book-an-appointment)(\\/|$|\\?)/.test(href)){window.dataLayer.push({event:'cta_click',cta_label:a.getAttribute('data-cta')||text,cta_url:href});}},true);})();`} />
+    <script is:inline set:html={`
+      (function () {
+        window.dataLayer = window.dataLayer || [];
+        var KEY_CTA = /\\/(become-a-foster-parent|book-an-appointment)(\\/|$|\\?)/;
+        document.addEventListener('click', function (e) {
+          var a = e.target && e.target.closest && e.target.closest('a, [data-cta]');
+          if (!a) return;
+          var href = a.getAttribute('href') || '';
+          var text = (a.textContent || '').trim().slice(0, 100);
+          if (href.indexOf('tel:') === 0) {
+            window.dataLayer.push({ event: 'phone_call', link_url: href, link_text: text });
+          } else if (href.indexOf('mailto:') === 0) {
+            window.dataLayer.push({ event: 'email_click', link_url: href, link_text: text });
+          } else if (a.hasAttribute('data-cta') || KEY_CTA.test(href)) {
+            window.dataLayer.push({ event: 'cta_click', cta_label: a.getAttribute('data-cta') || text, cta_url: href });
+          }
+        }, true);
+      })();
+    `} />
     <script is:inline define:vars={{ turnstileKey }}>window.__TS_KEY = turnstileKey;</script>
     <script src={meta.script} defer is:inline></script>
     <script src={ver('/assets/forms.js')} defer is:inline></script>

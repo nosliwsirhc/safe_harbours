@@ -25,7 +25,7 @@ This is the approach the auth code already anticipates (`src/lib/admin.ts`:
 
 ## How it works
 
-```
+```text
 Editor ──> Cloudflare Access (verify identity + policy) ──> Worker /admin
                      │ on success, injects headers:
                      │   Cf-Access-Authenticated-User-Email: jane@nvision.ca

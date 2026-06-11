@@ -9,7 +9,7 @@ The site is **not** WordPress anymore. It's a static-first **Astro** app that
 runs as a single **Cloudflare Worker** named **`safe-harbours-web`**. Pages are
 server-rendered on demand and read their content from a Cloudflare D1 database.
 
-```
+```text
 Visitor ──> Cloudflare edge ──> Worker "safe-harbours-web" ──> D1 (content) / R2 (images)
 ```
 
