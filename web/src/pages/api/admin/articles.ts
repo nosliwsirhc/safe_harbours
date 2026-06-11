@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { isAuthed } from '../../../lib/admin';
 import { saveArticleDraft, deleteArticle, getArticle, uniqueSlug, slugify, type Article } from '../../../lib/articles';
 import { sanitizeRich, toPlainText, sanitizeUrl } from '../../../lib/sanitize';
+import { flushPublicPages } from '../../../lib/cache';
 
 // Article authoring writes. The admin editor posts JSON (same-origin, so safe
 // from cross-site forms). Everything is sanitized per field before it touches D1.
@@ -77,6 +78,8 @@ export const POST: APIRoute = async ({ request }) => {
     const slug = str(payload.slug);
     if (!slug) return json({ ok: false, error: 'Missing slug' }, 400);
     await deleteArticle(slug);
+    // Drop the removed article and the index from the edge cache.
+    await flushPublicPages(new URL(request.url).origin, [`/resources/${slug}`, '/resources']);
     return json({ ok: true });
   }
 

@@ -5,6 +5,11 @@
 #
 # Uploaded media never changes (stable filenames) → cache hard for a year.
 # Theme CSS/JS can change on a re-mirror → cache a day.
+# Astro's own bundles (/_astro/*) are content-hashed → immutable for a year
+# (Cloudflare otherwise serves them max-age=0, must-revalidate).
+
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
 
 /assets/uploads/*
   Cache-Control: public, max-age=31536000, immutable
