@@ -1,4 +1,18 @@
-# Plan: scoped agency logins via Cloudflare Access
+# Scoped agency logins via Cloudflare Access
+
+> **STATUS: LIVE.** `/admin` and `/api/admin` are protected by two Cloudflare
+> Access apps ("Safe Harbours CMS (admin)" + "(admin API)") sharing one Allow
+> policy: `christopher.wilson@safeharbours.ca` + the `nvision.co` email domain.
+> Login is email one-time-PIN; team domain `safeharbours.cloudflareaccess.com`.
+> The Worker verifies the Access JWT (header on admin paths, `CF_Authorization`
+> cookie elsewhere e.g. draft preview). Secrets `CF_ACCESS_TEAM_DOMAIN` +
+> `CF_ACCESS_AUD` (both apps' AUDs) are set.
+>
+> **Manage users:** edit the shared policy in Zero Trust → Access → Policies
+> ("Safe Harbours editors"). **Revert to password:** delete the two Access apps —
+> `/admin` falls back to the still-present `ADMIN_TOKEN` immediately.
+> **Remaining:** retire `ADMIN_TOKEN` + disable the `*.workers.dev` preview URL
+> once an OTP login is confirmed.
 
 ## Goal
 
@@ -28,7 +42,7 @@ This is the approach the auth code already anticipates (`src/lib/admin.ts`:
 ```text
 Editor ──> Cloudflare Access (verify identity + policy) ──> Worker /admin
                      │ on success, injects headers:
-                     │   Cf-Access-Authenticated-User-Email: jane@nvision.ca
+                     │   Cf-Access-Authenticated-User-Email: jane@nvision.co
                      └   Cf-Access-Jwt-Assertion: <signed JWT>
 ```
 
@@ -40,7 +54,7 @@ Editor ──> Cloudflare Access (verify identity + policy) ──> Worker /admi
    - `www.safeharbours.ca/admin*`
    - `www.safeharbours.ca/api/admin*`
 3. **Add an Access policy** — Allow, with an **emails / email-domain** rule:
-   - the nvision editors' emails (or `@nvision.ca`)
+   - the nvision editors' emails (or `@nvision.co`)
    - Safe Harbours staff emails
    - Login method: One-time PIN (no IdP setup needed) or Google/Microsoft SSO.
 4. **Set two Worker secrets** so the app trusts Access (see below). Until both are
@@ -85,8 +99,8 @@ password entirely.
 
 - **Attribution:** `accessEmail(request)` is ready to stamp a "by" field on
   publishes once revision history exists (see the roadmap).
-- **Logout:** point the admin "Log out" link at `/cdn-cgi/access/logout` when
-  Access is active (the cookie logout still works in the meantime).
+- **Logout:** ✅ done — when Access is configured, `/api/admin/logout` redirects
+  to the team's `/cdn-cgi/access/logout` to end the SSO session.
 
 ## Risks / notes
 
