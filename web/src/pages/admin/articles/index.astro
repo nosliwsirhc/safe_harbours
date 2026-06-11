@@ -8,7 +8,7 @@ import AdminLayout from '../../../layouts/AdminLayout.astro';
 import { isAuthed } from '../../../lib/admin';
 import { listAdminArticles } from '../../../lib/articles';
 
-if (!isAuthed(Astro.request)) return Astro.redirect('/admin/login');
+if (!(await isAuthed(Astro.request))) return Astro.redirect('/admin/login');
 
 const articles = await listAdminArticles();
 const fmt = (d: Date) => (Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' }));

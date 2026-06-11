@@ -7,7 +7,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 import { isAuthed } from '../../lib/admin';
 import { EDITABLE_PAGES } from '../../lib/pages';
 
-if (!isAuthed(Astro.request)) return Astro.redirect('/admin/login');
+if (!(await isAuthed(Astro.request))) return Astro.redirect('/admin/login');
 
 // Pages managed by other systems (shown greyed so the list feels complete):
 // Careers comes from the jobs board, Resources from the articles collection.

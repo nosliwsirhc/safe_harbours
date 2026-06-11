@@ -14,7 +14,7 @@ import { getBlocksForView, hasUnpublishedChanges } from '../../../lib/content';
 import { findPage } from '../../../lib/pages';
 import '../../../styles/admin-editor.css';
 
-if (!isAuthed(Astro.request)) return Astro.redirect('/admin/login');
+if (!(await isAuthed(Astro.request))) return Astro.redirect('/admin/login');
 
 const key = Astro.params.page;
 const page = key ? findPage(key) : undefined;

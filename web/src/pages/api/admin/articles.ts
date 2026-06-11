@@ -34,7 +34,7 @@ function cleanArticle(slug: string, raw: Record<string, unknown>): Article {
 }
 
 export const POST: APIRoute = async ({ request }) => {
-  if (!isAuthed(request)) return json({ ok: false, error: 'Unauthorized' }, 401);
+  if (!(await isAuthed(request))) return json({ ok: false, error: 'Unauthorized' }, 401);
 
   let raw: unknown;
   try {
