@@ -74,6 +74,12 @@ export async function accessEmail(request: Request): Promise<string | null> {
   }
 }
 
+/** Cloudflare Access global logout URL, or null when Access isn't configured. */
+export function accessLogoutUrl(): string | null {
+  const team = cfg().CF_ACCESS_TEAM_DOMAIN;
+  return team ? `https://${team}/cdn-cgi/access/logout` : null;
+}
+
 // --- Shared password (fallback) ----------------------------------------------
 
 function hasValidPassword(request: Request): boolean {
