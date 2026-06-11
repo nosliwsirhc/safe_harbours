@@ -43,8 +43,12 @@ function jwksFor(team: string): ReturnType<typeof createRemoteJWKSet> {
  * Access isn't configured / no valid token is present.
  */
 export async function accessEmail(request: Request): Promise<string | null> {
-  const { CF_ACCESS_TEAM_DOMAIN: team, CF_ACCESS_AUD: aud } = cfg();
-  if (!team || !aud) return null; // Access not configured — fall back to password
+  const { CF_ACCESS_TEAM_DOMAIN: team, CF_ACCESS_AUD: audRaw } = cfg();
+  if (!team || !audRaw) return null; // Access not configured — fall back to password
+  // /admin and /api/admin are protected by separate Access apps with separate
+  // AUD tags; CF_ACCESS_AUD holds both, comma-separated.
+  const aud = audRaw.split(',').map((s) => s.trim()).filter(Boolean);
+  if (aud.length === 0) return null;
   const token = request.headers.get('Cf-Access-Jwt-Assertion');
   if (!token) return null;
   try {
@@ -65,7 +69,12 @@ function hasValidPassword(request: Request): boolean {
   if (!tok) return false; // no secret configured → password path closed
   const cookie = request.headers.get('cookie') ?? '';
   const m = /(?:^|;\s*)sh_admin=([^;]+)/.exec(cookie);
-  return !!m && decodeURIComponent(m[1]) === tok;
+  if (!m) return false;
+  try {
+    return decodeURIComponent(m[1]) === tok;
+  } catch {
+    return false; // malformed cookie → fail closed (clean 401/redirect, not a 500)
+  }
 }
 
 // --- Public API --------------------------------------------------------------
