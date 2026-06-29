@@ -22,6 +22,24 @@ const EDGE_TTL = 60; // seconds a rendered page stays cached in a data centre
 // public path like /apiary isn't accidentally forced private.
 const isPrivate = (pathname: string): boolean => /^\/(admin|api)(\/|$)/.test(pathname);
 
+// Query params that may take part in the edge cache key. Empty today (no public
+// page varies its HTML by query string); extend deliberately — see the cache-key
+// comment below for why tracking params must never appear here.
+const CACHE_KEY_ALLOWED_PARAMS: readonly string[] = [];
+
+// The cache-key query suffix: only allowlisted params, sorted for a stable key.
+// Returns '' (bare path) when nothing is allowlisted or present.
+const allowedSearch = (url: URL): string => {
+  if (CACHE_KEY_ALLOWED_PARAMS.length === 0) return '';
+  const kept = new URLSearchParams();
+  for (const name of CACHE_KEY_ALLOWED_PARAMS) {
+    for (const value of url.searchParams.getAll(name)) kept.append(name, value);
+  }
+  kept.sort();
+  const s = kept.toString();
+  return s ? `?${s}` : '';
+};
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const { request, locals } = context;
   const url = new URL(request.url);
@@ -56,9 +74,22 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return next();
   }
 
-  // Normalised key: scheme + path + query only, so every visitor shares one
-  // entry (these pages have no per-request variation).
-  const cacheKey = new Request(`${url.origin}${url.pathname}${url.search}`, { method: 'GET' });
+  // Normalised key: scheme + path + an ALLOWLIST of query params only.
+  //
+  // Why drop the rest: campaign links arrive with tracking params (utm_*, gclid,
+  // fbclid, …). If those folded into the key, every variant of /lp?utm_source=…
+  // would be its own cache entry — so (a) the shared edge entry never warms, and
+  // (b) flushPublicPages() can never purge them: it deletes the BARE path, so a
+  // keyed-with-query entry would survive a publish and go stale. Stripping them
+  // collapses every campaign URL onto the one entry for the path, which the
+  // bare-path flush then matches.
+  //
+  // The allowlist is empty today on purpose: no public page varies its rendered
+  // HTML by query string (?preview is handled above and bypasses the cache
+  // entirely). A future feature that genuinely needs a param in the key adds it
+  // here — but A/B variance is carried by the assigned-variant cookie below, not
+  // by a query param, precisely so the bare-path flush keeps matching.
+  const cacheKey = new Request(`${url.origin}${url.pathname}${allowedSearch(url)}`, { method: 'GET' });
 
   // Serve a cached copy if present. Cache API responses have IMMUTABLE headers,
   // and the runtime enforces that strictly (Miniflare/dev does not — which is
