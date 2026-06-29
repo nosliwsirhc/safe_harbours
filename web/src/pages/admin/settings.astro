@@ -16,6 +16,7 @@ const settings = await getSettings();
     <div class="crumbs"><a href="/admin">← All pages</a><span class="save" id="save" data-state="saved" role="status" aria-live="polite">All changes saved</span></div>
     <h1>Tracking & analytics</h1>
     <p class="muted lede">Paste the IDs from Google. They’re added to every page automatically. Leave a box empty to turn that one off.</p>
+    <p class="err" id="err" role="alert" hidden></p>
 
     <label for="ga4">Google Analytics measurement ID</label>
     <input id="ga4" data-key="ga4_id" value={settings.ga4_id ?? ''} placeholder="G-XXXXXXXXXX" autocomplete="off" />
@@ -36,6 +37,7 @@ const settings = await getSettings();
     input { width: 100%; font: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.7rem; background: #fff; }
     input:focus { outline: 2px solid var(--brand); border-color: var(--brand); }
     .small { font-size: 0.84rem; margin: 0.35rem 0 0; }
+    .err { color: var(--danger); font-size: 0.9rem; font-weight: 600; margin: 0 0 1rem; }
     .save { font-size: 0.82rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 999px; }
     .save[data-state='saved'] { color: var(--ok); background: var(--ok-bg); }
     .save[data-state='saving'] { color: var(--muted); background: var(--saving-bg); }
@@ -44,11 +46,13 @@ const settings = await getSettings();
 
   <script is:inline>
     const saveEl = document.getElementById('save');
+    const errEl = document.getElementById('err');
     let timer;
     function setState(s) {
       saveEl.dataset.state = s;
       saveEl.textContent = s === 'saving' ? 'Saving…' : s === 'dirty' ? 'Unsaved changes' : 'All changes saved';
     }
+    function showError(msg) { errEl.textContent = msg || ''; errEl.hidden = !msg; }
     async function save() {
       setState('saving');
       const payload = {};
@@ -57,8 +61,10 @@ const settings = await getSettings();
         const res = await fetch('/api/admin/settings', {
           method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload),
         });
-        setState((await res.json()).ok ? 'saved' : 'dirty');
-      } catch { setState('dirty'); }
+        const data = await res.json();
+        if (data.ok) { setState('saved'); showError(''); }
+        else { setState('dirty'); showError(data.error || 'Could not save your changes.'); }
+      } catch { setState('dirty'); showError('Could not save — check your connection.'); }
     }
     document.querySelectorAll('input[data-key]').forEach((el) => {
       el.addEventListener('input', () => { setState('dirty'); clearTimeout(timer); timer = setTimeout(save, 700); });

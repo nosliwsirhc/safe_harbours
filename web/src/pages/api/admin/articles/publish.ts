@@ -19,10 +19,15 @@ export const POST: APIRoute = async ({ request }) => {
   }
   const slug = raw && typeof raw === 'object' && 'slug' in raw && typeof raw.slug === 'string' ? raw.slug : '';
   if (!slug) return json({ ok: false, error: 'Missing slug' }, 400);
-  await publishArticle(slug);
+  try {
+    await publishArticle(slug);
 
-  // The article page and the /resources index both change — flush both.
-  await flushPublicPages(new URL(request.url).origin, [`/resources/${slug}`, '/resources']);
+    // The article page and the /resources index both change — flush both.
+    await flushPublicPages(new URL(request.url).origin, [`/resources/${slug}`, '/resources']);
+  } catch (err) {
+    console.error('admin/articles/publish: publish failed', err);
+    return json({ ok: false, error: 'Could not publish the article. Please try again.' }, 500);
+  }
 
   return json({ ok: true });
 };

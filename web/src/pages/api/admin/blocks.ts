@@ -63,15 +63,20 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   // Autosave always writes the DRAFT — never the live site.
-  await replaceBlocks(
-    page,
-    slot,
-    blocks.map((b) => {
-      const kind = b.kind ?? 'text';
-      return { kind, body: cleanBlock(kind, b.body ?? '') };
-    }),
-    'draft',
-  );
+  try {
+    await replaceBlocks(
+      page,
+      slot,
+      blocks.map((b) => {
+        const kind = b.kind ?? 'text';
+        return { kind, body: cleanBlock(kind, b.body ?? '') };
+      }),
+      'draft',
+    );
+  } catch (err) {
+    console.error('admin/blocks: save failed', err);
+    return json({ ok: false, error: 'Could not save your changes. Please try again.' }, 500);
+  }
 
   return json({ ok: true, count: blocks.length });
 };
