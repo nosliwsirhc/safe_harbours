@@ -4,7 +4,7 @@
 // Auth is checked per-page (a layout can't redirect), not here.
 interface Props {
   title: string;
-  active?: 'pages' | 'articles' | 'settings';
+  active?: 'pages' | 'articles' | 'redirects' | 'settings';
 }
 const { title, active } = Astro.props;
 ---
@@ -94,6 +94,7 @@ const { title, active } = Astro.props;
       <nav>
         <a href="/admin" aria-current={active === 'pages' ? 'true' : undefined}>Pages</a>
         <a href="/admin/articles" aria-current={active === 'articles' ? 'true' : undefined}>Resources</a>
+        <a href="/admin/redirects" aria-current={active === 'redirects' ? 'true' : undefined}>Redirects</a>
         <a href="/admin/settings" aria-current={active === 'settings' ? 'true' : undefined}>Settings</a>
       </nav>
       <a class="admin-bar__out" href="/api/admin/logout">Log out</a>

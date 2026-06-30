@@ -1,5 +1,6 @@
 import { defineMiddleware } from 'astro:middleware';
 import { publicCacheKey } from './lib/cache-key';
+import { lookupRedirect } from './lib/redirects';
 
 // Edge caching for the server-rendered public pages.
 //
@@ -32,6 +33,23 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const res = await next();
     res.headers.set('Cache-Control', 'private, no-store');
     return res;
+  }
+
+  // DB-driven redirects: applied to public paths BEFORE any cache lookup or
+  // render, so a retired/moved URL 301s straight from the edge for everyone
+  // (the source path is matched normalised — trailing slash ignored). The set is
+  // held in an isolate-global ~60s map (lib/redirects.ts), so this is an in-memory
+  // lookup, not a D1 read per request. `no-store` keeps a mistaken redirect from
+  // being pinned in browsers (a 301 is otherwise cached hard) so an edit to a
+  // redirect takes effect within the cache window, not "never" for prior visitors.
+  if (request.method === 'GET' || request.method === 'HEAD') {
+    const hit = await lookupRedirect(url.pathname);
+    if (hit) {
+      return new Response(null, {
+        status: hit.status,
+        headers: { Location: hit.to, 'Cache-Control': 'no-store' },
+      });
+    }
   }
 
   // Authed editors and draft previews must NEVER be cached, nor served a cached
