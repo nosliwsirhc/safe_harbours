@@ -23,7 +23,7 @@
     "images": "node scripts/images.mjs"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^13.6.0",
+    "@astrojs/cloudflare": "^14.0.1",
     "@astrojs/sitemap": "^3.7.3",
     "@jsquash/jpeg": "^1.6.0",
     "@jsquash/png": "^3.1.1",
@@ -33,7 +33,7 @@
     "@lexical/link": "^0.45.0",
     "@lexical/rich-text": "^0.45.0",
     "@lexical/utils": "^0.45.0",
-    "astro": "^6.4.8",
+    "astro": "^7.0.3",
     "jose": "^6.2.3",
     "lexical": "^0.45.0",
     "xss": "^1.0.15"
