@@ -42,6 +42,9 @@ const { ga4Id = '', gtmId = '' } = Astro.props;
         ad_personalization: 'granted', analytics_storage: 'granted',
       });
       window.dataLayer.push({ event: 'consent_granted' });
+      // Let non-Google trackers (the marketing pixels injected by ThemeLayout,
+      // which aren't Consent-Mode aware) know they may now load.
+      try { window.dispatchEvent(new Event('sh-consent-granted')); } catch (e) {}
       // No GTM container? Load GA4 directly as a fallback.
       if (!gtmId && ga4Id && ga4Id !== 'G-XXXXXXXXXX') {
         var s = document.createElement('script');
