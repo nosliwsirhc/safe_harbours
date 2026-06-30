@@ -3,6 +3,7 @@ import { isAuthed } from '../../../lib/admin';
 import { setSettings } from '../../../lib/content';
 import { validatePixels } from '../../../lib/pixel-ids';
 import { isGa4Id, isGtmId } from '../../../lib/tag-ids';
+import { validateFormConversions } from '../../../lib/form-conversions';
 
 // On-demand: save the site-wide settings (Google tag ids + marketing pixels). JSON
 // in, JSON out, so the Settings screen can autosave the same way the page editor
@@ -16,7 +17,7 @@ const json = (body: unknown, status = 200) =>
 export const POST: APIRoute = async ({ request }) => {
   if (!(await isAuthed(request))) return json({ ok: false, error: 'Unauthorized' }, 401);
 
-  let payload: { ga4_id?: string; gtm_id?: string; marketing_pixels?: unknown };
+  let payload: { ga4_id?: string; gtm_id?: string; marketing_pixels?: unknown; form_conversions?: unknown };
   try {
     payload = await request.json();
   } catch {
@@ -45,6 +46,15 @@ export const POST: APIRoute = async ({ request }) => {
       return json({ ok: false, error: `These IDs don’t look right: ${invalid.join(', ')}. Check the format and try again.`, invalid }, 400);
     }
     updates.marketing_pixels = JSON.stringify(clean);
+  }
+
+  // Same for per-form conversion config (event name + thank-you URL).
+  if (payload.form_conversions !== undefined) {
+    const { clean, invalid } = validateFormConversions(payload.form_conversions);
+    if (invalid.length) {
+      return json({ ok: false, error: `Some conversion settings aren’t valid: ${invalid.join(', ')}. Event names use letters/numbers/underscores; thank-you links must be a path on this site (e.g. /thank-you).`, invalid }, 400);
+    }
+    updates.form_conversions = JSON.stringify(clean);
   }
 
   try {

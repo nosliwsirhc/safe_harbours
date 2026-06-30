@@ -11,6 +11,7 @@ import OffCanvasNav from '../components/OffCanvasNav.astro';
 import { getSettings } from '../lib/content';
 import { safeMarketingPixels } from '../lib/pixel-ids';
 import { safeGa4Id, safeGtmId } from '../lib/tag-ids';
+import { safeFormConversions } from '../lib/form-conversions';
 
 // Site-wide settings (Google tag ids) from D1. On SSR pages these are live; on
 // prerendered pages getSettings() runs at BUILD time (env.DB is empty → {}), so
@@ -28,6 +29,11 @@ const gtmId = safeGtmId(settings.gtm_id);
 // page — a malformed/unsafe stored value is dropped, never injected. The pixels
 // load behind the consent banner (see the consent-gated loader in <body>).
 const pixels = safeMarketingPixels(settings.marketing_pixels);
+
+// Per-form conversion config (custom event name per form) for forms.js. Validated
+// here so only well-formed values are injected; the thank-you redirect is returned
+// by the API handlers, not needed client-side.
+const formConversions = safeFormConversions(settings.form_conversions);
 
 // Inline the per-page <main> content at BUILD time (Vite ?raw) — the Cloudflare
 // prerender runtime has no node:fs, so we can't read files at render time. The
@@ -229,7 +235,7 @@ const orgSchema = {
         }, true);
       })();
     `} />
-    <script is:inline define:vars={{ turnstileKey }}>window.__TS_KEY = turnstileKey;</script>
+    <script is:inline define:vars={{ turnstileKey, formConversions }}>window.__TS_KEY = turnstileKey; window.__SH_FORM_CONV = formConversions;</script>
     <script src={meta.script} defer is:inline></script>
     <script src={ver('/assets/forms.js')} defer is:inline></script>
   </body>

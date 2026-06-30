@@ -2,6 +2,19 @@ import type { APIRoute } from 'astro';
 import { env as workerEnv } from 'cloudflare:workers';
 import { isValidEmail } from '../../lib/form';
 import { renderEmail } from '../../lib/email';
+import { getSettings } from '../../lib/content';
+import { safeFormConversions, conversionFor } from '../../lib/form-conversions';
+
+// The configured thank-you redirect for this signup form (keyed by its source),
+// or undefined. Wrapped so a settings read can never break a submission.
+async function thankYouFor(source: string): Promise<string | undefined> {
+  try {
+    const conv = safeFormConversions((await getSettings()).form_conversions);
+    return conversionFor(conv, source).thankYou || undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 // On-demand newsletter signup. Adds the subscriber to the account's Resend
 // Contacts (POST /contacts — the modern replacement for the now-deprecated
@@ -50,10 +63,13 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   if (!isValidEmail(email)) {
     return json({ ok: false, error: 'Please enter a valid email address.' }, 422);
   }
+  // Which form they came from (footer vs Resources sign-up) — also the conversion
+  // config key for the per-form thank-you redirect.
+  const source = (data.source ?? '').trim() || 'Website form';
 
   const apiKey = env.RESEND_TOKEN ?? env.RESEND_API_KEY;
   if (!apiKey) {
-    if (import.meta.env.DEV) return json({ ok: true, dev: true });
+    if (import.meta.env.DEV) return json({ ok: true, dev: true, redirect: await thankYouFor(source) });
     return json({ ok: false, error: 'Subscriptions are not configured yet. Please email us.' }, 500);
   }
 
@@ -63,7 +79,6 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   // which form they came from (footer newsletter vs Resources sign-up) so the
   // team can build a Segment on it.
   const sp = name.indexOf(' ');
-  const source = (data.source ?? '').trim() || 'Website form';
   try {
     const res = await fetch('https://api.resend.com/contacts', {
       method: 'POST',
@@ -78,7 +93,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     });
     // 2xx = added (or already present). On any other status fall through to the
     // email backstop so the signup isn't lost.
-    if (res.ok) return json({ ok: true });
+    if (res.ok) return json({ ok: true, redirect: await thankYouFor(source) });
   } catch {
     /* fall through to email backstop */
   }
@@ -113,5 +128,5 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     return json({ ok: false, error: 'Could not reach our mail service. Please try again.' }, 502);
   }
 
-  return json({ ok: true });
+  return json({ ok: true, redirect: await thankYouFor(source) });
 };

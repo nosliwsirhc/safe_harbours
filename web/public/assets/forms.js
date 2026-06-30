@@ -164,13 +164,24 @@
         });
         var data = await res.json().catch(function () { return {}; });
         if (res.ok && data.ok) {
-          showSuccess(form, okMsg);
-          // Conversion event for GTM/GA4. dataLayer.push catches AJAX submits
-          // (GTM can't see a fetch() form submit on its own); gtag is a fallback.
+          // Conversion event → dataLayer (GTM owns conversions; dataLayer.push
+          // catches AJAX submits GTM can't see on its own — gtag is a fallback for
+          // non-GTM setups). The event NAME is per-form configurable via
+          // window.__SH_FORM_CONV (injected by ThemeLayout), defaulting to the old
+          // generate_lead so unconfigured forms behave exactly as before.
+          var formKey = form.getAttribute('data-role') || form.getAttribute('data-source') || '';
           var formSource = form.getAttribute('data-source') || '';
+          var conv = (window.__SH_FORM_CONV || {})[formKey] || {};
+          var eventName = conv.event || 'generate_lead';
           window.dataLayer = window.dataLayer || [];
-          window.dataLayer.push({ event: 'generate_lead', form_location: location.pathname, form_source: formSource });
-          if (window.gtag) window.gtag('event', 'generate_lead', { form_location: location.pathname, form_source: formSource });
+          window.dataLayer.push({ event: eventName, form_id: formKey, form_location: location.pathname, form_source: formSource });
+          if (window.gtag) window.gtag('event', eventName, { form_id: formKey, form_location: location.pathname, form_source: formSource });
+          // Thank-you: redirect to the per-form page when one is configured (the
+          // API returns it; the injected config is a fallback). Both are validated
+          // same-origin paths. Otherwise show the inline success message (default).
+          var dest = (data && data.redirect) || conv.thankYou || '';
+          if (dest) { window.location.assign(dest); return; }
+          showSuccess(form, okMsg);
         } else {
           formError(form, (data && data.error) || 'Something went wrong. Please try again, or call us.');
           if (window.turnstile) try { window.turnstile.reset(); } catch (x) {}

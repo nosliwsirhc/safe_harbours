@@ -87,4 +87,4 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_redirects_from ON redirects(from_path);
 -- Seed the known setting keys (empty = not configured). Page content is seeded
 -- separately from the current site copy — run db/seed-hero.sql and
 -- db/seed-zigzag.sql after this schema.
-INSERT OR IGNORE INTO settings (k, v) VALUES ('ga4_id', ''), ('gtm_id', ''), ('marketing_pixels', '{}');
+INSERT OR IGNORE INTO settings (k, v) VALUES ('ga4_id', ''), ('gtm_id', ''), ('marketing_pixels', '{}'), ('form_conversions', '{}');
