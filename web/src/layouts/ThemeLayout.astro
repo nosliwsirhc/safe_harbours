@@ -36,8 +36,9 @@ interface Props {
   name: string;            // mirror basename, e.g. "home"
   title?: string;
   description?: string;
+  noindex?: boolean;       // emit <meta robots noindex> (campaign pages default to this)
 }
-const { name, title, description } = Astro.props;
+const { name, title, description, noindex } = Astro.props;
 
 const mainHtml = mains[`../../_mirror/${name}.main.html`] ?? '';
 const meta = metas[`../../_mirror/${name}.meta.json`];
@@ -118,6 +119,7 @@ const orgSchema = {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{pageTitle}</title>
     {pageDesc && <meta name="description" content={pageDesc} />}
+    {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonical} />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />

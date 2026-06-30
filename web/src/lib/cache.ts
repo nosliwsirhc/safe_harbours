@@ -1,4 +1,5 @@
 import { env } from 'cloudflare:workers';
+import { flushCacheKey } from './cache-key';
 
 // Flush edge-cached public pages after a publish, so anonymous visitors see the
 // change without waiting out the cache TTL. (Authed editors already bypass the
@@ -14,11 +15,13 @@ export async function flushPublicPages(origin: string, paths: string[]): Promise
   if (paths.length === 0) return;
   const urls = paths.map((p) => `${origin}${p}`);
 
-  // 1. Per-data-centre Cache API delete (matches the middleware's cache key).
+  // 1. Per-data-centre Cache API delete. Uses the SAME key builder as the
+  //    middleware (lib/cache-key.ts) so the delete always targets the entry a
+  //    visit warmed — including campaign URLs that arrived with tracking params.
   const cache = (globalThis.caches as unknown as { default?: Cache } | undefined)?.default;
   if (cache) {
     await Promise.all(
-      urls.map((u) => cache.delete(new Request(u, { method: 'GET' })).catch(() => false)),
+      paths.map((p) => cache.delete(flushCacheKey(origin, p)).catch(() => false)),
     );
   }
 

@@ -1,0 +1,124 @@
+---
+// Campaign pages: list every DB-driven landing page and create a new one. Create
+// is a plain server-handled POST (no JS needed): it validates the web address,
+// makes it unique, writes an empty DRAFT, then opens the editor. Pages are listed
+// with their status (live / draft) and whether they're hidden from search.
+export const prerender = false;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { isAuthed } from '../../../lib/admin';
+import { listAdminPages, savePageDraft, uniquePageSlug } from '../../../lib/landing-pages';
+import { isValidCampaignSlug } from '../../../lib/reserved-slugs';
+import { slugify } from '../../../lib/articles';
+
+if (!(await isAuthed(Astro.request))) return Astro.redirect('/admin/login');
+
+let error = '';
+let titleVal = '';
+let slugVal = '';
+
+if (Astro.request.method === 'POST') {
+  try {
+    const form = await Astro.request.formData();
+    titleVal = String(form.get('title') ?? '').trim();
+    slugVal = String(form.get('slug') ?? '').trim().toLowerCase();
+    const base = slugVal || slugify(titleVal);
+    if (!titleVal) {
+      error = 'Please enter a page title.';
+    } else if (!isValidCampaignSlug(base)) {
+      error = 'That web address can’t be used. Use lowercase letters, numbers and dashes — and not a reserved name like “admin” or an existing page.';
+    } else {
+      const slug = await uniquePageSlug(base);
+      await savePageDraft({ slug, title: titleVal, description: '', blocks: [], noindex: true, inNav: false });
+      return Astro.redirect(`/admin/pages/${slug}`);
+    }
+  } catch (err) {
+    console.error('admin/pages create failed', err);
+    error = 'Could not create the page. Please try again.';
+  }
+}
+
+const pages = await listAdminPages();
+---
+<AdminLayout title="Campaign pages" active="pages">
+  <main class="wrap">
+    <h1>Campaign pages</h1>
+    <p class="lede muted">
+      Self-serve landing pages for campaigns and ads — built from the same sections as the
+      rest of the site, live the moment you publish. New pages are hidden from search and the
+      menu until you’re ready.
+    </p>
+
+    <form class="create" method="POST">
+      <h2 class="grouphead">Create a new page</h2>
+      {error && <p class="formerr" role="alert">{error}</p>}
+      <div class="create-row">
+        <label class="create-field">
+          <span>Page title</span>
+          <input class="field" type="text" name="title" value={titleVal} placeholder="Spring Foster Campaign" required />
+        </label>
+        <label class="create-field">
+          <span>Web address <span class="muted">(optional — made from the title)</span></span>
+          <input class="field" type="text" name="slug" value={slugVal} placeholder="spring-foster-campaign" />
+        </label>
+        <button type="submit" class="btn btn--primary">Create &amp; edit</button>
+      </div>
+    </form>
+
+    <h2 class="grouphead">Your pages</h2>
+    {pages.length === 0 ? (
+      <p class="empty muted">No campaign pages yet. Create your first one above.</p>
+    ) : (
+      <ul class="pages" role="list">
+        {pages.map((p) => (
+          <li>
+            <a class="page" href={`/admin/pages/${p.slug}`}>
+              <span class="page__name">{p.title || p.slug}</span>
+              <span class="page__path muted">/{p.slug}</span>
+              <span class="page__status">
+                {p.published ? <span class="tag tag--live">Live</span> : <span class="tag tag--draft">Draft</span>}
+                {p.hasDraft && p.published && <span class="tag tag--draft">Unpublished edits</span>}
+                {p.noindex && <span class="tag tag--muted">Hidden from search</span>}
+              </span>
+              <span class="page__go" aria-hidden="true">Edit →</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+  </main>
+
+  <style>
+    .wrap { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+    h1 { font-size: 1.6rem; margin: 0 0 0.5rem; }
+    .lede { margin: 0 0 2rem; font-size: 0.95rem; max-width: 60ch; }
+    .grouphead { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 1.75rem 0 0.6rem; }
+
+    .create { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.1rem 1.25rem; margin-bottom: 1rem; }
+    .create .grouphead { margin-top: 0; }
+    .create-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.75rem; align-items: end; }
+    .create-field { display: grid; gap: 0.3rem; font-size: 0.85rem; font-weight: 600; }
+    .create-field .muted { font-weight: 400; }
+    .field { width: 100%; font: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 0.55rem 0.65rem; background: #fff; }
+    .field:focus { outline: 2px solid var(--brand); border-color: var(--brand); }
+    .formerr { color: var(--danger); background: var(--danger-bg); border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.9rem; margin: 0 0 0.75rem; }
+
+    .pages { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+
+    .page { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0.2rem 1rem;
+      padding: 1rem 1.25rem; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+      text-decoration: none; color: inherit; box-shadow: var(--shadow); transition: border-color 0.15s ease, transform 0.15s ease; }
+    a.page:hover { border-color: var(--brand); transform: translateY(-1px); }
+    .page__name { grid-column: 1; font-family: Montserrat, sans-serif; font-weight: 600; font-size: 1.05rem; }
+    .page__path { grid-column: 1; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 0.76rem; }
+    .page__status { grid-column: 1; display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.35rem; }
+    .page__go { grid-column: 2; grid-row: 1 / span 3; color: var(--accent); font-weight: 600; }
+
+    .tag { font-size: 0.72rem; font-weight: 600; padding: 0.1rem 0.5rem; border-radius: 999px; }
+    .tag--live { color: var(--ok); background: var(--ok-bg); }
+    .tag--draft { color: var(--warn); background: var(--saving-bg); }
+    .tag--muted { color: var(--muted); background: var(--control-active); }
+
+    @media (width <= 620px) { .create-row { grid-template-columns: 1fr; } }
+  </style>
+</AdminLayout>

@@ -1,0 +1,30 @@
+---
+// Catch-all for DB-driven campaign / landing pages, served live from D1 (SSR).
+// Astro ranks every static + named-dynamic route ABOVE this, so it only handles
+// paths nothing else owns. New pages authored in /admin/pages appear immediately,
+// no rebuild. Draft is shown only inside the authed admin preview (?preview=1).
+//
+// Lookups for the public (non-preview) case go through an isolate-global ~60s
+// cache that memoises misses too — so the flood of 404 / bot traffic this route
+// also receives doesn't become a D1 read per request.
+export const prerender = false;
+
+import ThemeLayout from '../layouts/ThemeLayout.astro';
+import BlockRenderer from '../components/BlockRenderer.astro';
+import { getPageForView, getPublishedPageCached } from '../lib/landing-pages';
+import { isReservedSlug } from '../lib/reserved-slugs';
+import { isAuthed } from '../lib/admin';
+
+const slug = Astro.params.slug ?? '';
+
+// Defence-in-depth: a DB page must never resolve on a real route, asset prefix,
+// or redirect alias even if one were somehow created with a reserved slug.
+if (isReservedSlug(slug)) return new Response('Not found', { status: 404 });
+
+const preview = Astro.url.searchParams.get('preview') === '1' && (await isAuthed(Astro.request));
+const page = preview ? await getPageForView(slug, true) : await getPublishedPageCached(slug);
+if (!page) return new Response('Page not found', { status: 404 });
+---
+<ThemeLayout name="landing" title={page.title || 'Safe Harbours'} description={page.description} noindex={page.noindex}>
+  {page.blocks.map((b, i) => <BlockRenderer block={b} index={i} />)}
+</ThemeLayout>

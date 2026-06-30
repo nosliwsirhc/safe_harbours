@@ -1,0 +1,156 @@
+---
+// The campaign-page editor: the SAME live-preview composer as the fixed-page
+// editor (shared /assets/composer.js), plus a small metadata panel (page title,
+// search description, hide-from-search). Content + metadata autosave to the DRAFT
+// via /api/admin/pages; the preview iframe shows the draft (?preview=1); "Publish
+// changes" promotes the draft and flushes the edge cache. New pages are created
+// from /admin/pages, so the draft already exists by the time we land here.
+export const prerender = false;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { isAuthed } from '../../../lib/admin';
+import { getPageForView, hasUnpublishedChanges } from '../../../lib/landing-pages';
+import { ALL_KINDS } from '../../../lib/pages';
+import '../../../styles/admin-editor.css';
+
+if (!(await isAuthed(Astro.request))) return Astro.redirect('/admin/login');
+
+const slug = Astro.params.slug ?? '';
+const page = await getPageForView(slug, true);
+if (!page) return Astro.redirect('/admin/pages');
+
+const unpublished = await hasUnpublishedChanges(slug);
+const previewSrc = `/${slug}?preview=1`;
+
+// Campaign pages get the full general-purpose palette plus a lead-capture hero.
+const palette = [...ALL_KINDS, 'heroForm'];
+const composerConfig = {
+  config: { palette, single: null, numbered: false, addLabel: null },
+  blocks: page.blocks,
+  save: { url: '/api/admin/pages', body: { slug } },
+  publish: { url: '/api/admin/pages/publish', body: { slug } },
+};
+---
+<AdminLayout title={`Editing ${page.title || slug}`} active="pages">
+  <div id="errbar" class="errbar" role="alert" hidden>
+    ⚠ Couldn’t save your changes — check your connection.
+    <button type="button" id="retry">Try again</button>
+  </div>
+  <div class="editor">
+    <section class="pane pane--edit">
+      <div class="topbar">
+        <a class="back" href="/admin/pages">← All campaign pages</a>
+        <div class="pub">
+          <span class="save" id="save" data-state="saved" role="status" aria-live="polite">Saved</span>
+          <button type="button" class="btn btn--primary" id="publish" disabled={!unpublished}>Publish changes</button>
+        </div>
+      </div>
+      <h1>{page.title || slug}</h1>
+      <p class="livenote" id="livenote" data-pending={String(unpublished)}>
+        {unpublished
+          ? 'You have unpublished changes. Click “Publish changes” to put them on the live site.'
+          : 'This page is up to date with the live site.'}
+      </p>
+
+      <div class="meta-panel">
+        <p class="meta-url">Web address: <code>/{slug}</code></p>
+        <label class="meta-field">
+          <span class="meta-label">Page title <span class="muted">(shown in the browser tab &amp; search results)</span></span>
+          <input class="field" type="text" data-page-meta="title" value={page.title} maxlength="200" />
+        </label>
+        <label class="meta-field">
+          <span class="meta-label">Search description <span class="muted">(the grey line under the title in search results)</span></span>
+          <input class="field" type="text" data-page-meta="description" value={page.description} maxlength="320" />
+        </label>
+        <label class="meta-toggle">
+          <input type="checkbox" data-page-meta="noindex" checked={page.noindex} />
+          <span>Hide this page from search engines <span class="muted">(recommended while a campaign is private)</span></span>
+        </label>
+      </div>
+
+      <p class="muted hint">
+        Build the page from sections. Add one below, edit it, and drag the <span class="grip-inline">⠿</span>
+        handle to reorder. It saves automatically.
+      </p>
+
+      <ol class="sections" id="composer" role="list"></ol>
+
+      <div class="palette">
+        <span class="palette-label">Add a section</span>
+        <div id="palette" class="palette-btns"></div>
+      </div>
+
+      <div class="danger-row">
+        <button type="button" class="btn btn--quiet danger-btn" id="delete-page">Delete this page</button>
+      </div>
+    </section>
+
+    <section class="pane pane--preview">
+      <div class="preview__bar">
+        <span class="muted">Live preview</span>
+        <div class="preview__bar-right">
+          <div class="preview__viewport" role="group" aria-label="Preview width">
+            <button type="button" data-vp="desktop" aria-pressed="true" title="Desktop">Desktop</button>
+            <button type="button" data-vp="tablet" aria-pressed="false" title="Tablet">Tablet</button>
+            <button type="button" data-vp="mobile" aria-pressed="false" title="Mobile">Mobile</button>
+          </div>
+          <a href={`/${slug}`} target="_blank" rel="noopener">Open ↗</a>
+        </div>
+      </div>
+      <iframe id="preview" src={previewSrc} title={`Preview of ${page.title || slug}`}></iframe>
+    </section>
+  </div>
+
+  <style>
+    .hint { margin: 0 0 1rem; font-size: 0.92rem; }
+    .grip-inline { color: var(--muted); }
+    .sections { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: 0.85rem; }
+
+    .meta-panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem 1.1rem; margin: 0 0 1.5rem; display: grid; gap: 0.85rem; }
+    .meta-url { margin: 0; font-size: 0.85rem; color: var(--muted); }
+    .meta-url code { font-family: ui-monospace, 'SF Mono', Menlo, monospace; color: var(--brand-deep); }
+    .meta-field { display: grid; gap: 0.3rem; }
+    .meta-label { font-size: 0.85rem; font-weight: 600; }
+    .meta-toggle { display: flex; gap: 0.5rem; align-items: flex-start; font-size: 0.9rem; }
+    .meta-toggle input { margin-top: 0.2rem; }
+
+    .palette { border: 1px dashed var(--line); border-radius: var(--radius); padding: 1rem; text-align: center; }
+    .palette-label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--muted); margin-bottom: 0.6rem; }
+    .palette-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+    .palette-btns .btn { flex: 0 0 auto; }
+
+    .danger-row { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+    .danger-btn { color: var(--danger); }
+  </style>
+
+  <script src="/assets/sortable.min.js" is:inline></script>
+  <script>
+    import { initRichText } from '../../../lib/rich-text-client';
+    import { initPreviewViewport } from '../../../lib/preview-viewport';
+    initRichText();
+    initPreviewViewport();
+  </script>
+  <script type="application/json" id="cms-composer-config" is:inline set:html={JSON.stringify(composerConfig)}></script>
+  <script src="/assets/composer.js" is:inline></script>
+  <script is:inline define:vars={{ slug }}>
+    // Delete (with confirm) → back to the campaign-pages list.
+    document.getElementById('delete-page')?.addEventListener('click', async (e) => {
+      const btn = e.currentTarget;
+      if (btn.dataset.confirm !== '1') {
+        btn.dataset.confirm = '1';
+        btn.textContent = 'Click again to permanently delete';
+        setTimeout(() => { btn.dataset.confirm = ''; btn.textContent = 'Delete this page'; }, 4000);
+        return;
+      }
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/admin/pages', {
+          method: 'DELETE', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ slug }),
+        });
+        if ((await res.json()).ok) { window.location.href = '/admin/pages'; return; }
+      } catch {}
+      btn.disabled = false; btn.textContent = 'Delete failed — try again';
+    });
+  </script>
+</AdminLayout>

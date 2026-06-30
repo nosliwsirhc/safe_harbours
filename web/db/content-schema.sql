@@ -48,6 +48,27 @@ CREATE TABLE IF NOT EXISTS articles (
 CREATE UNIQUE INDEX IF NOT EXISTS idx_articles_slug_state ON articles(slug, state);
 CREATE INDEX IF NOT EXISTS idx_articles_state ON articles(state, index_order);
 
+-- DB-driven campaign / landing pages. Same draft/published model as articles:
+-- one row per (slug, state). The whole page lives in the row — `blocks` is a JSON
+-- array of {kind, body} rendered through the existing block engine (BlockRenderer)
+-- by the catch-all route src/pages/[...slug].astro. Authored from /admin/pages.
+-- New pages default to noindex + out-of-nav so a half-built campaign page can't
+-- leak into search or the site nav before it's ready.
+CREATE TABLE IF NOT EXISTS pages (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  slug        TEXT NOT NULL,
+  state       TEXT NOT NULL DEFAULT 'published',  -- 'published' (live) | 'draft' (editing)
+  title       TEXT NOT NULL DEFAULT '',
+  description TEXT NOT NULL DEFAULT '',
+  blocks      TEXT NOT NULL DEFAULT '[]',         -- JSON array of {kind, body}
+  noindex     INTEGER NOT NULL DEFAULT 1,         -- 1 = emit <meta robots noindex>
+  in_nav      INTEGER NOT NULL DEFAULT 0,         -- 1 = eligible for site nav (not wired yet)
+  updated_at  TEXT NOT NULL DEFAULT ''
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_pages_slug_state ON pages(slug, state);
+CREATE INDEX IF NOT EXISTS idx_pages_state ON pages(state);
+
 -- Seed the known setting keys (empty = not configured). Page content is seeded
 -- separately from the current site copy — run db/seed-hero.sql and
 -- db/seed-zigzag.sql after this schema.
