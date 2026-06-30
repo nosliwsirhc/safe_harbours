@@ -5,6 +5,8 @@ import type { APIRoute } from 'astro';
 import { env as workerEnv } from 'cloudflare:workers';
 import { isValidEmail, isValidPhone } from '../../lib/form';
 import { renderEmail } from '../../lib/email';
+import { getSettings } from '../../lib/content';
+import { safeFormConversions, conversionFor } from '../../lib/form-conversions';
 
 // On-demand: runs as a Cloudflare Worker route, not prerendered.
 export const prerender = false;
@@ -15,6 +17,17 @@ const TEST_SECRET = '1x0000000000000000000000000000000AA';
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
+
+// The configured thank-you redirect for this form (keyed by its role), or
+// undefined. Wrapped so a settings read can never break a submission.
+async function thankYouFor(role: string): Promise<string | undefined> {
+  try {
+    const conv = safeFormConversions((await getSettings()).form_conversions);
+    return conversionFor(conv, role).thankYou || undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   const env = workerEnv as unknown as Record<string, string | undefined>;
@@ -72,7 +85,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   if (!apiKey) {
     if (import.meta.env.DEV) {
       console.warn('[contact] No RESEND_TOKEN set — skipping send (dev only).');
-      return json({ ok: true, dev: true });
+      return json({ ok: true, dev: true, redirect: await thankYouFor(role) });
     }
     return json({ ok: false, error: 'The contact form is not configured. Please call us.' }, 500);
   }
@@ -120,5 +133,5 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     return json({ ok: false, error: 'We could not reach our mail service. Please call us instead.' }, 502);
   }
 
-  return json({ ok: true });
+  return json({ ok: true, redirect: await thankYouFor(role) });
 };
