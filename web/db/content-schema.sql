@@ -69,6 +69,21 @@ CREATE TABLE IF NOT EXISTS pages (
 CREATE UNIQUE INDEX IF NOT EXISTS idx_pages_slug_state ON pages(slug, state);
 CREATE INDEX IF NOT EXISTS idx_pages_state ON pages(state);
 
+-- DB-driven redirects, applied in the middleware before the cache lookup so a
+-- retired/moved URL 301s straight from the edge. `from_path` is a normalised
+-- same-origin path (leading slash, no trailing slash); `to_path` is validated
+-- same-origin at write time (NOT via lib/sanitize.sanitizeUrl, which allows any
+-- external host → open redirect). Cycles are rejected at write time.
+CREATE TABLE IF NOT EXISTS redirects (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  from_path  TEXT NOT NULL UNIQUE,
+  to_path    TEXT NOT NULL,
+  status     INTEGER NOT NULL DEFAULT 301,  -- 301 (permanent) | 302 (temporary)
+  updated_at TEXT NOT NULL DEFAULT ''
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_redirects_from ON redirects(from_path);
+
 -- Seed the known setting keys (empty = not configured). Page content is seeded
 -- separately from the current site copy — run db/seed-hero.sql and
 -- db/seed-zigzag.sql after this schema.
