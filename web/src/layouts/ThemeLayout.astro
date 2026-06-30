@@ -10,14 +10,18 @@ import SiteFooter from '../components/SiteFooter.astro';
 import OffCanvasNav from '../components/OffCanvasNav.astro';
 import { getSettings } from '../lib/content';
 import { safeMarketingPixels } from '../lib/pixel-ids';
+import { safeGa4Id, safeGtmId } from '../lib/tag-ids';
 
 // Site-wide settings (Google tag ids) from D1. On SSR pages these are live; on
 // prerendered pages getSettings() runs at BUILD time (env.DB is empty → {}), so
 // the tags only bake into static pages at build. SSR pages (e.g. /our-story)
 // reflect /admin edits immediately. Graceful: empty on any error.
+// gtm_id is interpolated RAW into the inline GTM loader below, so pass both ids
+// through the validators — a malformed/unsafe stored value is dropped here rather
+// than injected (stored-XSS guard, paired with the write-time check in settings).
 const settings = await getSettings();
-const ga4Id = settings.ga4_id || '';
-const gtmId = settings.gtm_id || '';
+const ga4Id = safeGa4Id(settings.ga4_id);
+const gtmId = safeGtmId(settings.gtm_id);
 
 // Marketing pixels (Meta / TikTok / LinkedIn / Google Ads), preset-only. Each ID
 // is re-validated here at inject time, so only a well-formed value reaches the

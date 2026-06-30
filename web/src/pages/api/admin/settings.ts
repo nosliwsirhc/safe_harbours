@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { isAuthed } from '../../../lib/admin';
 import { setSettings } from '../../../lib/content';
 import { validatePixels } from '../../../lib/pixel-ids';
+import { isGa4Id, isGtmId } from '../../../lib/tag-ids';
 
 // On-demand: save the site-wide settings (Google tag ids + marketing pixels). JSON
 // in, JSON out, so the Settings screen can autosave the same way the page editor
@@ -22,10 +23,19 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ ok: false, error: 'Invalid JSON' }, 400);
   }
 
-  const updates: Record<string, string> = {
-    ga4_id: (payload.ga4_id ?? '').trim(),
-    gtm_id: (payload.gtm_id ?? '').trim(),
-  };
+  // Validate the Google tag ids before storing — gtm_id is injected raw into an
+  // inline <script> in ThemeLayout, so an unchecked value is a stored-XSS vector.
+  // Empty is allowed (turns that tag off); a non-empty value must match the format.
+  const ga4_id = (payload.ga4_id ?? '').trim();
+  const gtm_id = (payload.gtm_id ?? '').trim();
+  if (ga4_id && !isGa4Id(ga4_id)) {
+    return json({ ok: false, error: 'That doesn’t look like a GA4 measurement ID — it should look like G-XXXXXXXXXX.' }, 400);
+  }
+  if (gtm_id && !isGtmId(gtm_id)) {
+    return json({ ok: false, error: 'That doesn’t look like a Tag Manager container ID — it should look like GTM-XXXXXXX.' }, 400);
+  }
+
+  const updates: Record<string, string> = { ga4_id, gtm_id };
 
   // Only touch marketing_pixels when the field is sent, so a partial save can't
   // wipe configured pixels. Reject malformed (non-empty) IDs with a clear message.
