@@ -1,21 +1,25 @@
 ---
-// Settings: the Google tag ids. Rare setup task, kept off the main editing flow.
-// Autosaves on change, in plain language.
+// Settings: the Google tag ids + marketing pixels. Rare setup task, kept off the
+// main editing flow. Autosaves on change, in plain language. Pixel IDs are
+// preset-only (vendor + ID) and validated server-side before they're stored.
 export const prerender = false;
 
 import AdminLayout from '../../layouts/AdminLayout.astro';
 import { isAuthed } from '../../lib/admin';
 import { getSettings } from '../../lib/content';
+import { safeMarketingPixels, PIXEL_DEFS } from '../../lib/pixel-ids';
 
 if (!(await isAuthed(Astro.request))) return Astro.redirect('/admin/login');
 
 const settings = await getSettings();
+const pixels = safeMarketingPixels(settings.marketing_pixels);
 ---
 <AdminLayout title="Settings" active="settings">
   <main class="wrap">
     <div class="crumbs"><a href="/admin">← All pages</a><span class="save" id="save" data-state="saved" role="status" aria-live="polite">All changes saved</span></div>
     <h1>Tracking & analytics</h1>
-    <p class="muted lede">Paste the IDs from Google. They’re added to every page automatically. Leave a box empty to turn that one off.</p>
+    <p class="muted lede">Paste the IDs from each tool. They’re added to every page automatically. Leave a box empty to turn that one off.</p>
+    <p class="formerr" id="err" role="alert" hidden></p>
 
     <label for="ga4">Google Analytics measurement ID</label>
     <input id="ga4" data-key="ga4_id" value={settings.ga4_id ?? ''} placeholder="G-XXXXXXXXXX" autocomplete="off" />
@@ -24,6 +28,19 @@ const settings = await getSettings();
     <label for="gtm">Google Tag Manager container ID</label>
     <input id="gtm" data-key="gtm_id" value={settings.gtm_id ?? ''} placeholder="GTM-XXXXXXX" autocomplete="off" />
     <p class="muted small">Only if you use Tag Manager. Starts with “GTM-”.</p>
+
+    <h2 class="section">Marketing pixels</h2>
+    <p class="muted lede small-lede">
+      For ad campaigns (Meta, TikTok, etc.). These only load after a visitor accepts cookies, so they
+      respect consent. Paste just the ID — the tracking code is added for you.
+    </p>
+    {PIXEL_DEFS.map((p) => (
+      <Fragment>
+        <label for={`px-${p.type}`}>{p.label}</label>
+        <input id={`px-${p.type}`} data-pixel={p.type} value={pixels[p.type] ?? ''} placeholder={p.placeholder} autocomplete="off" />
+        <p class="muted small">{p.hint}</p>
+      </Fragment>
+    ))}
   </main>
 
   <style>
@@ -31,11 +48,16 @@ const settings = await getSettings();
     .crumbs { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
     .crumbs a { font-weight: 600; text-decoration: none; font-size: 0.9rem; }
     h1 { font-size: 1.5rem; margin: 0 0 0.3rem; }
+    .section { font-size: 1.1rem; margin: 2.5rem 0 0.3rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
     .lede { margin: 0 0 2rem; font-size: 1.02rem; }
+    .small-lede { margin-bottom: 1.5rem; font-size: 0.92rem; }
     label { display: block; font-weight: 600; font-size: 0.9rem; margin: 1.25rem 0 0.4rem; }
     input { width: 100%; font: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.7rem; background: #fff; }
     input:focus { outline: 2px solid var(--brand); border-color: var(--brand); }
+    input[aria-invalid='true'] { border-color: var(--danger); outline-color: var(--danger); }
     .small { font-size: 0.84rem; margin: 0.35rem 0 0; }
+    .formerr { color: var(--danger); background: var(--danger-bg); border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.9rem; margin: 0 0 1rem; }
+    .formerr[hidden] { display: none; }
     .save { font-size: 0.82rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 999px; }
     .save[data-state='saved'] { color: var(--ok); background: var(--ok-bg); }
     .save[data-state='saving'] { color: var(--muted); background: var(--saving-bg); }
@@ -44,23 +66,34 @@ const settings = await getSettings();
 
   <script is:inline>
     const saveEl = document.getElementById('save');
+    const errEl = document.getElementById('err');
     let timer;
     function setState(s) {
       saveEl.dataset.state = s;
       saveEl.textContent = s === 'saving' ? 'Saving…' : s === 'dirty' ? 'Unsaved changes' : 'All changes saved';
     }
+    function showErr(msg, invalid) {
+      errEl.textContent = msg || '';
+      errEl.hidden = !msg;
+      document.querySelectorAll('input[data-pixel]').forEach((el) => {
+        el.setAttribute('aria-invalid', invalid && invalid.indexOf(el.dataset.pixel) !== -1 ? 'true' : 'false');
+      });
+    }
     async function save() {
       setState('saving');
-      const payload = {};
+      const payload = { marketing_pixels: {} };
       document.querySelectorAll('input[data-key]').forEach((el) => { payload[el.dataset.key] = el.value; });
+      document.querySelectorAll('input[data-pixel]').forEach((el) => { payload.marketing_pixels[el.dataset.pixel] = el.value; });
       try {
         const res = await fetch('/api/admin/settings', {
           method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload),
         });
-        setState((await res.json()).ok ? 'saved' : 'dirty');
-      } catch { setState('dirty'); }
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.ok) { setState('saved'); showErr(''); }
+        else { setState('dirty'); showErr(data.error || 'Could not save.', data.invalid); }
+      } catch { setState('dirty'); showErr('Could not reach the server.'); }
     }
-    document.querySelectorAll('input[data-key]').forEach((el) => {
+    document.querySelectorAll('input[data-key], input[data-pixel]').forEach((el) => {
       el.addEventListener('input', () => { setState('dirty'); clearTimeout(timer); timer = setTimeout(save, 700); });
     });
   </script>

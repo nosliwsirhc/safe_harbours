@@ -9,6 +9,7 @@ import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import OffCanvasNav from '../components/OffCanvasNav.astro';
 import { getSettings } from '../lib/content';
+import { safeMarketingPixels } from '../lib/pixel-ids';
 
 // Site-wide settings (Google tag ids) from D1. On SSR pages these are live; on
 // prerendered pages getSettings() runs at BUILD time (env.DB is empty → {}), so
@@ -17,6 +18,12 @@ import { getSettings } from '../lib/content';
 const settings = await getSettings();
 const ga4Id = settings.ga4_id || '';
 const gtmId = settings.gtm_id || '';
+
+// Marketing pixels (Meta / TikTok / LinkedIn / Google Ads), preset-only. Each ID
+// is re-validated here at inject time, so only a well-formed value reaches the
+// page — a malformed/unsafe stored value is dropped, never injected. The pixels
+// load behind the consent banner (see the consent-gated loader in <body>).
+const pixels = safeMarketingPixels(settings.marketing_pixels);
 
 // Inline the per-page <main> content at BUILD time (Vite ?raw) — the Cloudflare
 // prerender runtime has no node:fs, so we can't read files at render time. The
@@ -157,6 +164,45 @@ const orgSchema = {
       </div>
     </div>
     <ConsentBanner ga4Id={ga4Id} gtmId={gtmId} />
+    {/* Marketing pixels (Meta / TikTok / LinkedIn / Google Ads), loaded ONLY after
+        the visitor accepts (these third-party pixels aren't Consent-Mode aware, so
+        we gate them ourselves): load now if consent was already granted, else wait
+        for the banner's `sh-consent-granted` event. IDs are server-validated, so
+        they're injected as plain values — never string-built — and the manager is
+        preset-only, so there's no raw <script> to inject. */}
+    <script is:inline define:vars={{ pixels }}>
+      (function () {
+        var P = pixels || {};
+        if (!P.meta && !P.tiktok && !P.linkedin && !P.google_ads) return;
+        function load() {
+          if (window.__shPixelsLoaded) return;
+          window.__shPixelsLoaded = true;
+          if (P.meta) {
+            !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+            window.fbq('init', P.meta); window.fbq('track', 'PageView');
+          }
+          if (P.tiktok) {
+            !function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=['page','track','identify','instances','debug','on','off','once','ready','alias','group','enableCookie','disableCookie','holdConsent','revokeConsent','grantConsent'];ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e};ttq.load=function(e,n){var r='https://analytics.tiktok.com/i18n/pixel/events.js';ttq._i=ttq._i||{};ttq._i[e]=[];ttq._i[e]._u=r;ttq._t=ttq._t||{};ttq._t[e]=+new Date;ttq._o=ttq._o||{};ttq._o[e]=n||{};var s=d.createElement('script');s.type='text/javascript';s.async=!0;s.src=r+'?sdkid='+e+'&lib='+t;var a=d.getElementsByTagName('script')[0];a.parentNode.insertBefore(s,a)};ttq.load(P.tiktok);ttq.page();}(window,document,'ttq');
+          }
+          if (P.linkedin) {
+            window._linkedin_partner_id = P.linkedin;
+            window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
+            window._linkedin_data_partner_ids.push(P.linkedin);
+            (function(l){if(!l){window.lintrk=function(a,b){window.lintrk.q.push([a,b])};window.lintrk.q=[]}var s=document.getElementsByTagName('script')[0];var b=document.createElement('script');b.type='text/javascript';b.async=!0;b.src='https://snap.licdn.com/li.lms-analytics/insight.min.js';s.parentNode.insertBefore(b,s)})(window.lintrk);
+          }
+          if (P.google_ads) {
+            var gs = document.createElement('script'); gs.async = true;
+            gs.src = 'https://www.googletagmanager.com/gtag/js?id=' + P.google_ads;
+            document.head.appendChild(gs);
+            if (window.gtag) window.gtag('config', P.google_ads);
+          }
+        }
+        var granted = false;
+        try { granted = localStorage.getItem('sh-consent') === 'granted'; } catch (e) {}
+        if (granted) { load(); return; }
+        window.addEventListener('sh-consent-granted', load, { once: true });
+      })();
+    </script>
     {/* Conversion events → dataLayer (for GTM/GA4). Phone-call + email clicks are
         tracked everywhere; CTA clicks fire for elements marked data-cta or links
         to the key conversion pages. Form submits push generate_lead (forms.js). */}
