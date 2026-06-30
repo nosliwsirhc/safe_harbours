@@ -7,6 +7,7 @@ a future maintainer can work on it confidently.
 - **Live:** https://www.safeharbours.ca (apex `safeharbours.ca` 301s to www)
 - **Worker:** `safe-harbours-web` · preview at `safe-harbours-web.chrisjwilson1984.workers.dev`
 - **Deploy:** push to `main` → GitHub Actions builds + `wrangler deploy`
+- **Editing the site (CMS):** engineering view in [`../CMS-SPIKE.md`](../CMS-SPIKE.md); the plain-language editor guide for the marketing team is [`../docs/marketing-guide.md`](../docs/marketing-guide.md)
 
 ---
 
