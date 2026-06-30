@@ -21,9 +21,25 @@ carry through and explain a lot of the unusual choices:
    reproduce it byte-for-byte (WordPress quirks included). Changes are verified
    with `scripts/diff-built.mjs`, which diffs the built HTML before/after a change
    and ignores only intended differences.
-2. **Static-first.** Every page is prerendered to static HTML/assets. The only
-   server code is **two API routes** (`/api/contact`, `/api/subscribe`) that run
-   on the Worker on demand (`export const prerender = false`).
+2. **SSR for editable content, static for the rest.** Pages whose content is
+   editor-managed in `/admin` — the marketing/content pages (`/`, `/our-story`,
+   `/about-fostering`, `/become-a-foster-parent`, `/our-impact`,
+   `/program-description`, `/contact-us`, `/book-an-appointment`, …), the resource
+   articles, the careers board, and the DB-driven campaign pages — run on the
+   Worker (`export const prerender = false`) and read their copy from D1, so an
+   `/admin` edit goes live **the moment it's published, with no redeploy**. Purely
+   static pages (legal/utility) stay prerendered. The contact/subscribe API routes
+   are also `prerender = false`.
+
+   **Perf/cost trade.** SSR pages would re-run the render + a D1 read on every hit,
+   so the middleware **edge-caches** them (`s-maxage=60`, see *Edge caching* below):
+   a repeat visit in a warmed data centre is served from the edge with **no Worker
+   render and no D1 read** — close to static-CDN latency. The cost vs. fully static
+   is bounded: at most one render + one D1 read per path per data centre per 60 s
+   (plus the cache miss after a publish, which `flushPublicPages` triggers
+   immediately so edits don't wait out the TTL). For this site's traffic that's a
+   negligible number of D1 reads; the win is that editors never need an engineer to
+   redeploy. Turn a page back to fully static only if it has no editable content.
 
 What's componentized vs still a mirrored blob, today:
 
