@@ -52,3 +52,56 @@
   .pane--edit { border-right: 0; border-bottom: 1px solid var(--line); }
   #preview { height: 70vh; }
 }
+
+/* ---- Composer block cards (shared by both editors) -------------------------
+   The block cards are built at runtime by /assets/composer.js (innerHTML), so
+   they never receive Astro's component-scoped attribute — these card-internal
+   rules live here (global) so both the fixed-page and campaign-page editors get
+   them. No other admin route uses these class names. */
+.pane--edit .mini { display: block; font-weight: 600; font-size: 0.78rem; color: var(--muted); margin: 0.6rem 0 0.25rem; }
+
+/* rich-text control (bold / italic / link) */
+.pane--edit .rt { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #fff; }
+.pane--edit .rt:focus-within { outline: 2px solid var(--brand); border-color: var(--brand); }
+.pane--edit .rt-toolbar { display: flex; gap: 0.15rem; padding: 0.25rem; border-bottom: 1px solid var(--line); background: #f7f8fa; }
+.pane--edit .rt-toolbar button { font: inherit; font-size: 0.85rem; min-width: 2.25rem; min-height: 2rem; padding: 0.25rem 0.55rem; border: 1px solid transparent; background: transparent; border-radius: 5px; cursor: pointer; color: var(--ink); }
+.pane--edit .rt-toolbar button[aria-pressed='true'] { background: var(--control-active); color: var(--brand-deep); }
+.pane--edit .rt-toolbar button:hover { background: #e6e8ee; }
+.pane--edit .rt-editor { min-height: 3.5rem; padding: 0.55rem 0.65rem; font: inherit; outline: none; }
+.pane--edit .rt-editor:empty::before { content: 'Write here…'; color: #aab0bb; }
+.pane--edit .rt-editor a { color: var(--brand-deep); text-decoration: underline; }
+
+.pane--edit .section { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--brand); border-radius: var(--radius); padding: 0.85rem 0.95rem; box-shadow: var(--shadow); }
+.pane--edit .section.dragging { opacity: 0.5; }
+.pane--edit .section.confirming { border-color: #d99; background: #fdf3f3; }
+.pane--edit .section__head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+.pane--edit .head-spacer { flex: 1; }
+.pane--edit .grip { cursor: grab; background: var(--line); border: 0; color: var(--grip-fg); font-size: 1.05rem; line-height: 1; padding: 0.25rem 0.5rem; border-radius: 6px; }
+.pane--edit .grip:hover { background: #d7dae1; }
+.pane--edit .grip:active { cursor: grabbing; }
+.pane--edit .moveb { min-width: 1.9rem; min-height: 1.9rem; border: 1px solid var(--line); background: #fff; color: var(--grip-fg); font-size: 0.95rem; line-height: 1; border-radius: 6px; cursor: pointer; }
+.pane--edit .moveb:hover { background: var(--control-active); color: var(--brand-deep); }
+.pane--edit .moveb:disabled { opacity: 0.3; cursor: default; }
+.pane--edit .moveb:disabled:hover { background: #fff; color: var(--grip-fg); }
+.pane--edit .zz-num { font-family: Montserrat, sans-serif; font-weight: 700; font-size: 0.85rem; color: var(--brand-deep); }
+.pane--edit .rev { display: flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; color: var(--muted); margin-top: 0.6rem; }
+.pane--edit .rev input { width: auto; }
+.pane--edit .kind { font: inherit; font-size: 0.85rem; padding: 0.25rem 0.4rem; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+.pane--edit .field { width: 100%; font: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 0.55rem 0.65rem; background: #fff; }
+.pane--edit .field:focus { outline: 2px solid var(--brand); border-color: var(--brand); }
+.pane--edit .zz-image { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.35rem; }
+.pane--edit .zz-thumb { width: 96px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); background: #f0f1f4; }
+.pane--edit .zz-upmsg { font-size: 0.8rem; }
+.pane--edit .confirm { display: flex; gap: 0.5rem; align-items: center; font-size: 0.85rem; color: var(--danger); font-weight: 600; }
+.pane--edit .confirm button { font: inherit; font-weight: 600; cursor: pointer; border-radius: 6px; padding: 0.25rem 0.6rem; border: 1px solid var(--line); background: #fff; }
+.pane--edit .confirm .yes { background: var(--danger-bg); color: var(--danger); border-color: #e3b3b3; }
+
+/* repeater (a list of sub-item cards inside one block) */
+.pane--edit .rep { display: grid; gap: 0.6rem; margin: 0.35rem 0 0.6rem; }
+.pane--edit .rep-item { border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 8px; padding: 0.6rem 0.7rem; background: #fbfbfc; }
+.pane--edit .rep-item.confirming { border-color: #d99; background: #fdf3f3; }
+.pane--edit .rep-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem; }
+.pane--edit .rep-grip { cursor: grab; background: var(--line); border: 0; color: var(--grip-fg); font-size: 1rem; line-height: 1; padding: 0.15rem 0.45rem; border-radius: 6px; }
+.pane--edit .rep-grip:hover { background: #d7dae1; }
+.pane--edit .rep-grip:active { cursor: grabbing; }
+.pane--edit .rep-add { width: 100%; }
