@@ -48,38 +48,53 @@ export const POST: APIRoute = async ({ request }) => {
 
   if (action === 'create') {
     const title = toPlainText(str(payload.title)) || 'Untitled article';
-    const slug = await uniqueSlug(slugify(title));
     const today = new Date().toISOString().slice(0, 10);
-    await saveArticleDraft({
-      slug,
-      title,
-      heroImage: '',
-      thumbnail: '',
-      excerpt: '',
-      author: 'Safe Harbours',
-      date: new Date(today),
-      category: '',
-      related: [],
-      indexOrder: null,
-      featured: false,
-      body: '<p></p>',
-    });
-    return json({ ok: true, slug });
+    try {
+      const slug = await uniqueSlug(slugify(title));
+      await saveArticleDraft({
+        slug,
+        title,
+        heroImage: '',
+        thumbnail: '',
+        excerpt: '',
+        author: 'Safe Harbours',
+        date: new Date(today),
+        category: '',
+        related: [],
+        indexOrder: null,
+        featured: false,
+        body: '<p></p>',
+      });
+      return json({ ok: true, slug });
+    } catch (err) {
+      console.error('admin/articles: create failed', err);
+      return json({ ok: false, error: 'Could not create the article. Please try again.' }, 500);
+    }
   }
 
   if (action === 'save') {
     const slug = str(payload.slug);
     if (!slug) return json({ ok: false, error: 'Missing slug' }, 400);
-    await saveArticleDraft(cleanArticle(slug, payload));
+    try {
+      await saveArticleDraft(cleanArticle(slug, payload));
+    } catch (err) {
+      console.error('admin/articles: save failed', err);
+      return json({ ok: false, error: 'Could not save. Please try again.' }, 500);
+    }
     return json({ ok: true });
   }
 
   if (action === 'delete') {
     const slug = str(payload.slug);
     if (!slug) return json({ ok: false, error: 'Missing slug' }, 400);
-    await deleteArticle(slug);
-    // Drop the removed article and the index from the edge cache.
-    await flushPublicPages(new URL(request.url).origin, [`/resources/${slug}`, '/resources']);
+    try {
+      await deleteArticle(slug);
+      // Drop the removed article and the index from the edge cache.
+      await flushPublicPages(new URL(request.url).origin, [`/resources/${slug}`, '/resources']);
+    } catch (err) {
+      console.error('admin/articles: delete failed', err);
+      return json({ ok: false, error: 'Could not delete. Please try again.' }, 500);
+    }
     return json({ ok: true });
   }
 

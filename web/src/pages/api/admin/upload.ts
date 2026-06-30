@@ -44,14 +44,19 @@ export const POST: APIRoute = async ({ request }) => {
   const webpParts: string[] = [];
   const jpgParts: string[] = [];
   let fallbackJpg = '';
-  for (const v of processed.variants) {
-    const wk = `uploads/${id}-${v.width}.webp`;
-    const jk = `uploads/${id}-${v.width}.jpg`;
-    await media.put(wk, v.webp, { httpMetadata: { contentType: 'image/webp' } });
-    await media.put(jk, v.jpg, { httpMetadata: { contentType: 'image/jpeg' } });
-    webpParts.push(`/media/${wk} ${v.width}w`);
-    jpgParts.push(`/media/${jk} ${v.width}w`);
-    fallbackJpg = `/media/${jk}`; // last = largest
+  try {
+    for (const v of processed.variants) {
+      const wk = `uploads/${id}-${v.width}.webp`;
+      const jk = `uploads/${id}-${v.width}.jpg`;
+      await media.put(wk, v.webp, { httpMetadata: { contentType: 'image/webp' } });
+      await media.put(jk, v.jpg, { httpMetadata: { contentType: 'image/jpeg' } });
+      webpParts.push(`/media/${wk} ${v.width}w`);
+      jpgParts.push(`/media/${jk} ${v.width}w`);
+      fallbackJpg = `/media/${jk}`; // last = largest
+    }
+  } catch (err) {
+    console.error('admin/upload: store failed', err);
+    return json({ ok: false, error: 'Could not save the image. Please try again.' }, 500);
   }
 
   const img = {
