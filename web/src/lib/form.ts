@@ -18,9 +18,15 @@ export function formatPhone(raw: string): string {
   return digits.substring(0, 3) + '-' + digits.substring(3, 6) + '-' + digits.substring(6);
 }
 
-/** True once a complete 10-digit NANP number has been entered (XXX-XXX-XXXX). */
+/**
+ * True if the value contains a complete 10-digit number, in ANY formatting.
+ * Validate by digit count, not by a specific separator layout: the client
+ * (public/assets/forms.js) formats phones as "(416) 555-1234" while this module's
+ * formatPhone uses "416-555-1234", so a layout-specific check here rejected every
+ * real submission. Digit-count matches what forms.js itself validates.
+ */
 export function isValidPhone(value: string): boolean {
-  return PHONE_LOCAL_PATTERN.test(value.trim());
+  return value.replace(/\D/g, '').length === 10;
 }
 
 /**
