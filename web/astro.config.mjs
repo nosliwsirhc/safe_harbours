@@ -1,6 +1,5 @@
 // @ts-check
 import { defineConfig, passthroughImageService, sessionDrivers } from 'astro/config';
-import sitemap from '@astrojs/sitemap';
 import cloudflare from '@astrojs/cloudflare';
 
 // Mostly-static content site with one on-demand endpoint (the contact form).
@@ -19,7 +18,9 @@ export default defineConfig({
   // passthroughImageService below, this avoids requiring an IMAGES binding on
   // the Worker.
   adapter: cloudflare({ imageService: 'compile' }),
-  integrations: [sitemap()],
+  // The sitemap is served live from D1 by src/pages/sitemap.xml.ts, NOT the
+  // @astrojs/sitemap integration: that integration only sees build-time routes
+  // and would miss every SSR page/article/job (and go stale on publish).
   // Images are served as-is from public/ (the mirror writes them under
   // public/assets/), so no build-time image transformation is needed.
   image: { service: passthroughImageService() },

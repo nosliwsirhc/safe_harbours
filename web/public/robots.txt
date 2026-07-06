@@ -22,4 +22,4 @@ Allow: /
 User-agent: CCBot
 Allow: /
 
-Sitemap: https://www.safeharbours.ca/sitemap-index.xml
+Sitemap: https://www.safeharbours.ca/sitemap.xml
